@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap');
+
+.atc-home {
+  --background: 0 18% 97%;
+  --foreground: 0 18% 9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 18% 9%;
+  --card-border: 0 16% 89%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 18% 9%;
+  --popover-border: 0 16% 89%;
+  --primary: 0 77% 44%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 16% 89%;
+  --secondary-foreground: 0 18% 9%;
+  --muted: 0 16% 93%;
+  --muted-foreground: 0 21% 20%;
+  --accent: 0 16% 93%;
+  --accent-foreground: 0 18% 9%;
+  --destructive: 0 77% 44%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 16% 89%;
+  --input: 0 16% 89%;
+  --ring: 0 18% 9%;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-mono: Menlo, monospace;
+  --radius: 0;
+  font-family: var(--font-sans);
+}
+
+.atc-home h1,
+.atc-home h2,
+.atc-home h3,
+.atc-home h4,
+.atc-home h5,
+.atc-home h6 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
