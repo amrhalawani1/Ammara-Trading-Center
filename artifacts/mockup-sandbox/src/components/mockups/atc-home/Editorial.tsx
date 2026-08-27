@@ -84,7 +84,7 @@ function Header() {
         </button>
       </div>
       {open && (
-        <nav className="mx-4 border-t border-[#2b211c]/10 bg-[#f2ede5] px-6 py-5 shadow-xl md:hidden">
+        <nav className="mx-4 border-t border-[#2b211c]/10 bg-white px-6 py-5 shadow-xl md:hidden">
           {links.map(([label, href]) => (
             <Anchor key={href} href={href} onClick={() => setOpen(false)} className="block border-b border-[#2b211c]/10 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#2b211c]">
               {label}
@@ -280,7 +280,7 @@ export function Editorial() {
   };
   return (
     <NavContext.Provider value={navigate}>
-    <div className="atc-home min-h-screen w-full overflow-hidden bg-[#f2ede5] text-[#2b211c] selection:bg-[#9d2f24]/20">
+     <div className="atc-home min-h-screen w-full overflow-hidden bg-white text-[#2b211c] selection:bg-[#9d2f24]/20">
       <Header />
       <main>
         {view !== "home" && <div className="border-b border-[#2b211c]/15 px-6 py-4 md:px-12"><div className="mx-auto flex max-w-[1440px] items-center justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/50"><Anchor href="/">Back to the opening</Anchor><span>Flow prototype / {view}</span></div></div>}
@@ -349,7 +349,7 @@ export function Editorial() {
               <div className="md:col-span-7">
                 <div className="relative aspect-[1.12] overflow-hidden">
                   <img src={`${assetRoot}atc-showroom-wide.jpg`} alt="ATC showroom with curated hardware displays" className="h-full w-full object-cover grayscale-[35%] transition-transform duration-700 hover:scale-[1.025]" />
-                  <span className="absolute bottom-5 left-5 bg-[#f2ede5]/90 px-3 py-2 text-[9px] uppercase tracking-[0.2em]">The collection, in context</span>
+                   <span className="absolute bottom-5 left-5 bg-white/90 px-3 py-2 text-[9px] uppercase tracking-[0.2em]">The collection, in context</span>
                 </div>
               </div>
               <div className="md:col-span-4 md:col-start-9 md:pb-3">
@@ -361,7 +361,7 @@ export function Editorial() {
           </div>
         </section>
 
-        <section className="bg-[#f2ede5] px-6 py-24 md:px-12 md:py-32">
+         <section className="bg-white px-6 py-24 md:px-12 md:py-32">
           <div className="mx-auto max-w-[1440px]">
             <div className="grid gap-12 md:grid-cols-12 md:items-end">
               <div className="md:col-span-4">
@@ -451,7 +451,7 @@ export function Editorial() {
           </div>
         </section>
 
-        <section className="px-6 py-24 md:px-12 md:py-36">
+         <section className="bg-white px-6 py-24 md:px-12 md:py-36">
           <div className="mx-auto grid max-w-[1440px] gap-12 md:grid-cols-12">
             <div className="md:col-span-4">
               <SectionKicker>Come closer</SectionKicker>
@@ -465,7 +465,7 @@ export function Editorial() {
         </section>
         </>}
       </main>
-      {view === "home" && <footer className="bg-[#ded5c9] px-6 py-10 md:px-12">
+       {view === "home" && <footer className="bg-[#ded5c9] px-6 py-10 md:px-12">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div><Mark /><p className="mt-5 max-w-xs text-xs leading-5 text-[#2b211c]/55">Premium kitchen systems and furniture fittings, serving Jordan since 1977.</p></div>
           <div className="flex flex-col gap-3 text-[10px] uppercase tracking-[0.17em] text-[#2b211c]/60 md:items-end"><span>Al-Bayader · Al-Wehdat · Amman</span><Anchor href="/contact" className="text-[#9d2f24] hover:underline">Send an inquiry</Anchor></div>
