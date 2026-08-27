@@ -1,8 +1,10 @@
 import { ArrowDownRight, ArrowUpRight, Menu, X } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type FormEvent, type ReactNode } from "react";
 import "./_group.css";
 
 const assetRoot = "/__mockup/images/";
+type View = "home" | "catalog" | "brands" | "product" | "trade" | "showroom" | "resources" | "about" | "contact";
+const NavContext = createContext<((href: string) => void) | null>(null);
 
 function Anchor({
   href,
@@ -15,11 +17,13 @@ function Anchor({
   className?: string;
   onClick?: () => void;
 }) {
+  const navigate = useContext(NavContext);
   return (
     <a
       href={href}
       onClick={(event) => {
         event.preventDefault();
+        navigate?.(href);
         onClick?.();
       }}
       className={`focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9d2f24] focus-visible:ring-offset-4 ${className}`}
@@ -104,11 +108,184 @@ function SectionKicker({ children, light = false }: { children: ReactNode; light
   );
 }
 
-export function Editorial() {
+function FlowHeader({ view, eyebrow, title, detail }: { view: Exclude<View, "home">; eyebrow: string; title: string; detail: string }) {
   return (
+    <section className="border-b border-[#2b211c]/15 px-6 pb-20 pt-36 md:px-12 md:pb-28 md:pt-48">
+      <div className="mx-auto grid max-w-[1440px] gap-10 md:grid-cols-12 md:items-end">
+        <div className="md:col-span-8">
+          <SectionKicker>{eyebrow}</SectionKicker>
+          <h1 className="mt-7 max-w-4xl font-serif text-6xl leading-[0.88] tracking-[-0.045em] md:text-8xl">{title}</h1>
+        </div>
+        <div className="md:col-span-4 md:pb-2">
+          <p className="max-w-xs text-sm leading-6 text-[#2b211c]/60">{detail}</p>
+          <span className="mt-8 block text-[9px] uppercase tracking-[0.22em] text-[#9d2f24]">ATC / {view}</span>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FlowPage({ view }: { view: Exclude<View, "home"> }) {
+  const [category, setCategory] = useState("All");
+  const [submitted, setSubmitted] = useState(false);
+  const categories = ["All", "Kitchen systems", "Furniture fittings", "Hardware"];
+  const products = [
+    { name: "Sensys hinge system", brand: "Hettich", type: "Furniture fittings", image: "atc-hero-kitchen.jpg", copy: "Soft-close movement for a quieter, more resolved cabinet." },
+    { name: "Free Fold door system", brand: "Salice", type: "Kitchen systems", image: "atc-showroom-wide.jpg", copy: "A considered opening solution for wide overhead storage." },
+    { name: "Arena Pure", brand: "Kesseböhmer", type: "Kitchen systems", image: "atc-trade-workshop.jpg", copy: "Practical access and clean organization inside the cabinet." },
+  ];
+  const visibleProducts = category === "All" ? products : products.filter((product) => product.type === category);
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+  };
+
+  if (view === "catalog") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="The collection" title="A considered library of movement." detail="Browse the systems, fittings, and hardware we keep close at hand for Jordanian makers, architects, and homeowners." />
+        <section className="px-6 py-16 md:px-12 md:py-24">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="flex flex-wrap gap-3 border-b border-[#2b211c]/15 pb-8">
+              {categories.map((item) => (
+                <button key={item} type="button" onClick={() => setCategory(item)} className={`border px-4 py-3 text-[10px] font-semibold uppercase tracking-[0.16em] transition-colors ${category === item ? "border-[#9d2f24] bg-[#9d2f24] text-[#f2ede5]" : "border-[#2b211c]/20 text-[#2b211c]/65 hover:border-[#9d2f24] hover:text-[#9d2f24]"}`}>
+                  {item}
+                </button>
+              ))}
+            </div>
+            <div className="mt-12 grid gap-10 md:grid-cols-3">
+              {visibleProducts.map((product, index) => (
+                <article key={product.name} className={`group ${index === 1 ? "md:mt-14" : ""}`}>
+                  <div className="aspect-[0.9] overflow-hidden bg-[#ded5c9]">
+                    <img src={`${assetRoot}${product.image}`} alt={`${product.name} application`} className="h-full w-full object-cover grayscale-[32%] transition-transform duration-700 group-hover:scale-[1.03]" />
+                  </div>
+                  <div className="border-b border-[#2b211c]/20 py-5">
+                    <div className="flex items-center justify-between text-[9px] uppercase tracking-[0.18em] text-[#9d2f24]"><span>{product.brand}</span><span>{product.type}</span></div>
+                    <h2 className="mt-4 font-serif text-3xl">{product.name}</h2>
+                    <p className="mt-3 max-w-xs text-sm leading-6 text-[#2b211c]/60">{product.copy}</p>
+                    <Anchor href="/product" className="mt-6 inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9d2f24]">View product <ArrowUpRight size={14} /></Anchor>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  if (view === "brands") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Our partners" title="The right company behind the right detail." detail="A focused portfolio of international specialists, represented in Jordan with the context and support to specify them well." />
+        <section className="bg-[#ded5c9] px-6 py-16 md:px-12 md:py-24">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="grid gap-px border border-[#2b211c]/15 bg-[#2b211c]/15 sm:grid-cols-2 lg:grid-cols-3">
+              {["Hettich", "Salice", "Kesseböhmer", "Vibo", "Olivari", "Simonswerk"].map((brand, index) => (
+                <Anchor key={brand} href="/product" className="group min-h-44 bg-[#ded5c9] p-7 transition-colors hover:bg-[#f2ede5]">
+                  <span className="text-[9px] uppercase tracking-[0.18em] text-[#9d2f24]">0{index + 1} / Partner</span>
+                  <span className="mt-12 block font-serif text-4xl transition-transform group-hover:translate-x-1">{brand}</span>
+                  <span className="mt-3 block text-xs text-[#2b211c]/55">{index % 2 === 0 ? "Kitchen systems & movement" : "Furniture fittings & hardware"}</span>
+                </Anchor>
+              ))}
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  if (view === "product") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Product study / Hettich" title="Sensys hinge system." detail="A soft-close hinge system for the moments that should feel effortless. Designed for clean lines, consistent movement, and dependable installation." />
+        <section className="grid gap-12 bg-[#2b211c] px-6 py-16 text-[#f2ede5] md:grid-cols-12 md:px-12 md:py-24">
+          <div className="md:col-span-7"><img src={`${assetRoot}atc-hero-kitchen.jpg`} alt="Sensys hinge system shown in a kitchen application" className="aspect-[1.18] h-full w-full object-cover grayscale-[40%]" /></div>
+          <div className="md:col-span-4 md:col-start-9 md:pt-4">
+            <SectionKicker light>Specification notes</SectionKicker>
+            <div className="mt-9 space-y-5 border-t border-[#f2ede5]/20 pt-5 text-sm text-[#f2ede5]/70">
+              <p className="flex justify-between gap-5"><span>Application</span><span className="text-right text-[#f2ede5]">Concealed cabinet doors</span></p>
+              <p className="flex justify-between gap-5"><span>Movement</span><span className="text-right text-[#f2ede5]">Integrated soft close</span></p>
+              <p className="flex justify-between gap-5"><span>Support</span><span className="text-right text-[#f2ede5]">ATC trade guidance</span></p>
+            </div>
+            <Anchor href="/trade" className="mt-12 inline-flex items-center gap-3 bg-[#9d2f24] px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5]">Request specification <ArrowUpRight size={15} /></Anchor>
+          </div>
+        </section>
+      </>
+    );
+  }
+
+  if (view === "trade") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Trade / B2B" title="Bring us the detail your project depends on." detail="A direct route for architects, fabricators, contractors, and procurement teams who need one accountable partner across the specification." />
+        <section className="grid gap-16 px-6 py-16 md:grid-cols-12 md:px-12 md:py-24">
+          <div className="md:col-span-5"><SectionKicker>Why ATC</SectionKicker><h2 className="mt-7 font-serif text-5xl leading-[0.94] md:text-7xl">One conversation. A deeper portfolio.</h2><p className="mt-8 max-w-sm text-sm leading-7 text-[#2b211c]/60">From product selection to technical support, we help your team move with confidence through the details that make a project hold together.</p></div>
+          <form onSubmit={submit} className="space-y-5 md:col-span-5 md:col-start-8">
+            {submitted ? <div className="border border-[#9d2f24]/35 bg-[#f2e3dc] p-8"><SectionKicker>Inquiry received</SectionKicker><h3 className="mt-6 font-serif text-4xl">We will come back to you shortly.</h3><p className="mt-5 text-sm leading-6 text-[#2b211c]/65">Your project context is the right place to begin.</p><button type="button" onClick={() => setSubmitted(false)} className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9d2f24]">Send another inquiry</button></div> : <><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Your name<input required name="name" className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Project type<input required name="project" className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">What are you specifying?<textarea required name="message" rows={4} className="mt-3 block w-full resize-none border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><button type="submit" className="mt-6 bg-[#9d2f24] px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5] transition-colors hover:bg-[#7e261e]">Start the conversation <ArrowUpRight className="ml-2 inline" size={15} /></button></>}
+          </form>
+        </section>
+      </>
+    );
+  }
+
+  if (view === "showroom") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Come closer" title="The details make more sense in the room." detail="Two Amman showrooms, arranged for the slower work of comparing finishes, opening systems, and the feeling of a resolved space." />
+        <section className="grid gap-10 bg-[#ded5c9] px-6 py-16 md:grid-cols-12 md:px-12 md:py-24">
+          <div className="md:col-span-8"><img src={`${assetRoot}atc-showroom-wide.jpg`} alt="ATC showroom with curated hardware displays" className="aspect-[1.45] h-full w-full object-cover grayscale-[30%]" /></div>
+          <div className="flex flex-col justify-end md:col-span-3 md:col-start-10"><SectionKicker>Visit ATC</SectionKicker><p className="mt-7 font-serif text-3xl leading-tight">Al-Bayader or Al-Wehdat. Open the drawer. Ask a better question.</p><Anchor href="/contact" className="mt-9 inline-flex items-center gap-3 border-b border-[#2b211c]/25 pb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9d2f24]">Plan your visit <ArrowUpRight size={15} /></Anchor></div>
+        </section>
+        <section className="grid gap-px bg-[#2b211c]/15 md:grid-cols-2"><div className="bg-[#f2ede5] p-8 md:p-12"><span className="text-[9px] uppercase tracking-[0.18em] text-[#9d2f24]">01 / Al-Bayader</span><h2 className="mt-10 font-serif text-4xl">Al-Bayader showroom</h2><p className="mt-4 text-sm text-[#2b211c]/60">Amman · +962 6 5811 896</p></div><div className="bg-[#f2ede5] p-8 md:p-12"><span className="text-[9px] uppercase tracking-[0.18em] text-[#9d2f24]">02 / Al-Wehdat</span><h2 className="mt-10 font-serif text-4xl">Al-Wehdat showroom</h2><p className="mt-4 text-sm text-[#2b211c]/60">Amman · +962 6 4707 504</p></div></section>
+      </>
+    );
+  }
+
+  if (view === "resources") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Reference room" title="Useful before, during, and after the install." detail="Practical guidance for specifying with confidence: brand references, product care, technical support, and the questions worth asking early." />
+        <section className="px-6 py-16 md:px-12 md:py-24"><div className="mx-auto max-w-[1000px] divide-y divide-[#2b211c]/15 border-t border-[#2b211c]/15">{["Brand guides", "Specification tips", "Product care & maintenance", "Training & technical support", "Articles and notes"].map((item, index) => <button key={item} type="button" onClick={() => setSubmitted(true)} className="flex w-full items-center justify-between py-7 text-left transition-colors hover:text-[#9d2f24]"><span><small className="mr-6 text-[9px] uppercase tracking-[0.18em] text-[#9d2f24]">0{index + 1}</small><span className="font-serif text-3xl">{item}</span></span><ArrowDownRight size={18} /></button>)}</div>{submitted && <p className="mt-8 text-sm text-[#9d2f24]">Resource access is prepared for the next content phase.</p>}</section>
+      </>
+    );
+  }
+
+  if (view === "about") {
+    return (
+      <>
+        <FlowHeader view={view} eyebrow="Since 1977" title="A long view of the small things." detail="ATC began with a belief that the details of a room deserve the same care as the room itself. That belief still guides the collection." />
+        <section className="grid gap-14 px-6 py-16 md:grid-cols-12 md:px-12 md:py-28"><div className="md:col-span-4"><SectionKicker>Quiet authority</SectionKicker><p className="mt-8 max-w-xs text-sm leading-7 text-[#2b211c]/60">Our role is not to make the most noise. It is to know the right mechanism, the right finish, and the right moment to recommend it.</p></div><div className="md:col-span-7 md:col-start-6"><p className="font-serif text-5xl leading-[0.95] md:text-7xl">A trusted Jordanian home for international craft.</p><p className="mt-10 max-w-lg text-sm leading-7 text-[#2b211c]/60">Founded in 1977, Amara Trading Center brings together kitchen systems, furniture fittings, and hardware from specialist makers around the world—supported locally by people who understand how spaces are made.</p></div></section>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <FlowHeader view="contact" eyebrow="Contact ATC" title="Start with the question." detail="For a showroom visit, a product reference, or a project conversation, send us the context and we will point you to the right next step." />
+      <section className="grid gap-16 px-6 py-16 md:grid-cols-12 md:px-12 md:py-24">
+        <div className="md:col-span-4"><SectionKicker>Find us</SectionKicker><div className="mt-9 space-y-7 text-sm text-[#2b211c]/65"><p><strong className="block text-[#2b211c]">Al-Bayader</strong>+962 6 5811 896</p><p><strong className="block text-[#2b211c]">Al-Wehdat</strong>+962 6 4707 504</p><p><strong className="block text-[#2b211c]">General inquiries</strong>sales@atc-jo.com</p></div></div>
+        <form onSubmit={submit} className="space-y-5 md:col-span-5 md:col-start-7">{submitted ? <div className="border border-[#9d2f24]/35 bg-[#f2e3dc] p-8"><SectionKicker>Message received</SectionKicker><h3 className="mt-6 font-serif text-4xl">Thank you. We have the thread.</h3><button type="button" onClick={() => setSubmitted(false)} className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9d2f24]">Send another message</button></div> : <><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Name<input required className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Email<input required type="email" className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Message<textarea required rows={4} className="mt-3 block w-full resize-none border-b border-[#2b211c]/25 bg-transparent px-0 py-3 outline-none focus:border-[#9d2f24]" /></label><button type="submit" className="mt-6 bg-[#9d2f24] px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5]">Send inquiry <ArrowUpRight className="ml-2 inline" size={15} /></button></>}</form>
+      </section>
+    </>
+  );
+}
+
+export function Editorial() {
+  const [view, setView] = useState<View>("home");
+  const navigate = (href: string) => {
+    const next = href.replace("/", "") as View;
+    setView(next || "home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  return (
+    <NavContext.Provider value={navigate}>
     <div className="atc-home min-h-screen w-full overflow-hidden bg-[#f2ede5] text-[#2b211c] selection:bg-[#9d2f24]/20">
       <Header />
       <main>
+        {view !== "home" && <div className="border-b border-[#2b211c]/15 px-6 py-4 md:px-12"><div className="mx-auto flex max-w-[1440px] items-center justify-between text-[9px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/50"><Anchor href="/">Back to the opening</Anchor><span>Flow prototype / {view}</span></div></div>}
+        {view !== "home" && <FlowPage view={view} />}
+        {view === "home" && <>
         <section className="relative flex min-h-[min(850px,100dvh)] items-end overflow-hidden px-6 pb-12 pt-32 md:px-12 md:pb-16">
           <img
             src={`${assetRoot}atc-hero-kitchen.jpg`}
@@ -286,14 +463,16 @@ export function Editorial() {
             </div>
           </div>
         </section>
+        </>}
       </main>
-      <footer className="bg-[#ded5c9] px-6 py-10 md:px-12">
+      {view === "home" && <footer className="bg-[#ded5c9] px-6 py-10 md:px-12">
         <div className="mx-auto flex max-w-[1440px] flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div><Mark /><p className="mt-5 max-w-xs text-xs leading-5 text-[#2b211c]/55">Premium kitchen systems and furniture fittings, serving Jordan since 1977.</p></div>
           <div className="flex flex-col gap-3 text-[10px] uppercase tracking-[0.17em] text-[#2b211c]/60 md:items-end"><span>Al-Bayader · Al-Wehdat · Amman</span><Anchor href="/contact" className="text-[#9d2f24] hover:underline">Send an inquiry</Anchor></div>
         </div>
         <div className="mx-auto mt-10 flex max-w-[1440px] justify-between border-t border-[#2b211c]/15 pt-5 text-[9px] uppercase tracking-[0.2em] text-[#2b211c]/45"><span>© {new Date().getFullYear()} Amara Trading Center</span><span className="hidden sm:block">Quiet authority in hardware.</span></div>
-      </footer>
+      </footer>}
     </div>
+    </NavContext.Provider>
   );
 }

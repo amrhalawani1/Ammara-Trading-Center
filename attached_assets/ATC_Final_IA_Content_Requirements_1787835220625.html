@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amara Trading Center — Final Information Architecture &amp; Content Requirements</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #C41A1A; --gold-light: #E03030; --gold-pale: #F5DADA;
+    --ink: #1A1212; --ink-mid: #3D2828; --ink-muted: #7A6060;
+    --cream: #FAF5F5; --cream-mid: #F2E8E8; --white: #FFFFFF;
+    --rule: rgba(196,26,26,0.2);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', sans-serif;
+    --green: #2f7a3d; --amber: #8a6d1a;
+  }
+  html { scroll-behavior: smooth; font-size: 16px; }
+  body { background: var(--cream); color: var(--ink); font-family: var(--sans); font-weight: 300; line-height: 1.7; }
+  .container { max-width: 1160px; margin: 0 auto; padding: 0 48px; }
+
+  header.hero { background: linear-gradient(135deg, #1A1212 60%, #2A0A0A 100%); padding: 72px 48px; }
+  header.hero .eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 16px; }
+  header.hero h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(28px, 3.2vw, 44px); color: var(--white); line-height: 1.15; max-width: 800px; }
+  header.hero h1 em { color: var(--gold-light); font-style: italic; }
+  header.hero p { font-size: 13px; color: rgba(255,255,255,0.55); max-width: 680px; margin-top: 18px; line-height: 1.85; }
+  .hero-sources { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px; }
+  .hero-sources span { font-size: 10px; letter-spacing:0.08em; text-transform:uppercase; color: rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.15); padding:5px 12px; }
+
+  section { padding: 56px 0; border-bottom: 1px solid var(--rule); }
+  .section-eyebrow { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; display:flex; align-items:center; gap:10px; }
+  .section-eyebrow::before { content:''; width:24px; height:1px; background:var(--gold); }
+  h2.section-title { font-family: var(--serif); font-weight: 300; font-size: clamp(24px, 2.2vw, 34px); color: var(--ink); margin-bottom: 14px; }
+  h2.section-title em { color: var(--gold); font-style: italic; }
+  .section-body { font-size: 13px; color: var(--ink-muted); max-width: 760px; line-height: 1.9; margin-bottom: 28px; }
+
+  /* PAGE CARD */
+  .page-card { background: var(--white); border: 1px solid var(--rule); margin-bottom: 32px; }
+  .page-head { background: #1A1212; padding: 20px 28px; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .page-head h3 { font-family: var(--serif); font-size: 22px; font-weight: 400; color: var(--white); }
+  .page-head .page-tag { font-size: 9px; letter-spacing:0.1em; text-transform:uppercase; color: var(--gold-light); }
+  .page-purpose { padding: 18px 28px; border-bottom: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-mid); font-style: italic; background: var(--cream-mid); }
+  .page-purpose strong { font-style: normal; color: var(--ink); }
+
+  table.content-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table.content-table th { background: var(--cream-mid); text-align:left; padding: 10px 14px; font-size: 9.5px; letter-spacing:0.08em; text-transform:uppercase; color: var(--ink-mid); font-weight: 500; border-bottom: 1px solid var(--rule); }
+  table.content-table td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-mid); line-height: 1.6; }
+  table.content-table tr:last-child td { border-bottom: none; }
+  table.content-table td.section-name { font-weight: 500; color: var(--ink); white-space: nowrap; }
+  .persona-pill { display:inline-block; font-size: 9px; letter-spacing:0.04em; background: var(--cream-mid); color: var(--ink-mid); padding: 2px 7px; border-radius: 2px; margin: 1px 2px 1px 0; }
+  .status { display:inline-block; font-size: 9px; letter-spacing:0.08em; text-transform:uppercase; padding: 2px 8px; border-radius: 2px; font-weight: 500; white-space:nowrap; }
+  .status.confirmed { color: var(--green); border: 1px solid rgba(47,122,61,0.35); }
+  .status.candidate { color: var(--gold); border: 1px solid var(--gold-pale); }
+  .status.open { color: var(--amber); border: 1px solid rgba(138,109,26,0.35); }
+  .status.new { color: #185fa5; border: 1px solid rgba(24,95,165,0.3); }
+
+  .note-box { border: 1px solid rgba(138,109,26,0.3); border-left: 3px solid var(--amber); background: rgba(138,109,26,0.05); padding: 16px 22px; font-size: 12px; color: var(--ink-mid); line-height: 1.8; margin: 20px 28px; }
+  .note-box strong { color: var(--amber); }
+
+  .legend { display:flex; gap:20px; flex-wrap:wrap; margin-bottom: 32px; font-size: 11px; color: var(--ink-muted); }
+  .legend span { display:flex; align-items:center; gap:6px; }
+
+  footer { padding: 40px 48px; text-align:center; font-size: 11px; color: var(--ink-muted); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="eyebrow">ATC Digital Experience — Design Phase</div>
+  <h1>Final information architecture <em>and content requirements</em>, page by page</h1>
+  <p>Every section below is sourced — CEO interview, official Company Profile, Brand Guidelines, UX research, or competitive analysis. Nothing here is invented to fill a gap; where content doesn't exist yet, that's marked Open rather than guessed at.</p>
+  <div class="hero-sources">
+    <span>CEO Interview — Session 1</span>
+    <span>ATC Company Profile</span>
+    <span>Brand Guidelines v4.0</span>
+    <span>UX Research Vol. 01</span>
+    <span>Competitive Analysis</span>
+  </div>
+</header>
+
+<div class="container" style="padding-top:40px;">
+  <div class="legend">
+    <span><i style="width:10px;height:10px;display:inline-block;border:1px solid rgba(47,122,61,0.5);"></i> Confirmed — locked, ready to write final copy against</span>
+    <span><i style="width:10px;height:10px;display:inline-block;border:1px solid var(--gold-pale);"></i> Candidate — raised but not scoped/timelined</span>
+    <span><i style="width:10px;height:10px;display:inline-block;border:1px solid rgba(138,109,26,0.5);"></i> Open — blocked on an external decision</span>
+    <span><i style="width:10px;height:10px;display:inline-block;border:1px solid rgba(24,95,165,0.3);"></i> New — surfaced by Company Profile / Brand Guidelines, not yet placed in any prior document</span>
+  </div>
+</div>
+
+<div class="container">
+
+<section id="home">
+  <div class="section-eyebrow">Page 01</div>
+  <h2 class="section-title">Home</h2>
+  <p class="section-body">First impression for all five personas. Has to route Fadi/Rana/Yousef toward trade paths and Hala toward inspiration within seconds, without either audience feeling like an afterthought.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Home</h3><span class="page-tag">Entry point — all personas</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Establish credibility immediately (heritage, scale, curation), then split traffic into the right journey before the visitor has to think about it.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Top nav</td><td>Links to all 6 top-level sections; persistent trade inquiry CTA visible at all times</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Hero / trust bar</td><td>45+ yrs heritage (verify exact figure — see note below), ~30 exclusive brand partnerships, two showroom locations (Al-Bayader &amp; Al-Wehdat, Amman)</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Dual-journey split</td><td>Visually distinct Trade entry vs. Retail entry — no single generic "Shop Now"</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Showroom teaser</td><td>Photography + one line on the in-person experience, links to Showroom page</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Solutions teaser</td><td>"Shop by need" preview (e.g. small-kitchen solutions), links to Shop by Solution</td><td><span class="persona-pill">Hala</span><span class="persona-pill">Rana</span></td><td><span class="status candidate">Candidate</span></td></tr>
+        <tr><td class="section-name">Footer</td><td>About / Contact / Resources links, showroom addresses and phone numbers, social (Facebook, Instagram, LinkedIn per Company Profile)</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note-box"><strong>Open —</strong> the official Company Profile and the locked site copy both say "45+ years" / Est. 1977, which is internally consistent. But the CEO's own verbal answer in Session 1 said the company started in 1970. Confirm the correct figure before it's printed on the homepage at scale.</div>
+  </div>
+</section>
+
+<section id="brands">
+  <div class="section-eyebrow">Page 02</div>
+  <h2 class="section-title">Brands &amp; Products</h2>
+  <p class="section-body">The core of the site. Has to support brand-first browsing (Rana, Yousef), fast lookup (Fadi), and need-first inspiration (Hala) without becoming three different sites stitched together.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>All Brands</h3><span class="page-tag">Directory</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Curated brand grid — not a full 13,000-SKU catalog. Confirms ATC's exclusive portfolio at a glance.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Brand grid</td><td>All ~30 partner brands, logo + one-line category tag (mechanism / design hardware / appliances) drawn from Company Profile descriptions</td><td><span class="persona-pill">Rana</span><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Search &amp; filter</td><td>By brand, use-case, or item code</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Rana</span></td><td><span class="status candidate">Candidate</span></td></tr>
+        <tr><td class="section-name">ATC private label</td><td>ATC's own product line ("ATC — Quality You Can Trust") — needs a placement decision: one tile among ~30, or its own featured position given it's ATC's own brand</td><td><span class="persona-pill">All</span></td><td><span class="status new">New — unplaced</span></td></tr>
+        <tr><td class="section-name">Shop by Solution</td><td>Needs-based entry — e.g. "small kitchen solutions" — alongside brand-first browsing, per CEO's "what's your problem" reframe</td><td><span class="persona-pill">Hala</span><span class="persona-pill">Rana</span></td><td><span class="status candidate">Candidate</span></td></tr>
+        <tr><td class="section-name">Room-based configurator</td><td>Visual product exploration across room types — larger technical lift, CEO-raised but unscoped</td><td><span class="persona-pill">Hala</span><span class="persona-pill">Rana</span></td><td><span class="status candidate">Candidate</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Brand Page</h3><span class="page-tag">Template — one per brand</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Convince Rana the brand is legitimate to specify; give Fadi a fast reference; give Yousef a sense of scale.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Logo &amp; brand story</td><td>Pulled from Company Profile partner descriptions (e.g. Olivari: est. 1911, Piedmont, brass forging heritage; Simonswerk: 120+ years, German, high-end hinges)</td><td><span class="persona-pill">Rana</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Craftsmanship / pedigree story</td><td>Named-designer or award pedigree where it exists (e.g. Olivari's Compasso d'Oro history, Antonio Citterio collaborations) — price-justification content for luxury-tier items</td><td><span class="persona-pill">Hala</span><span class="persona-pill">Rana</span></td><td><span class="status new">New — from portfolio research</span></td></tr>
+        <tr><td class="section-name">Product lines</td><td>Categorized by function per Company Profile (Kitchen Systems / Furniture Fittings / Hardware)</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Curated best products</td><td>Editorial selection, not full catalog — selection criteria still undefined</td><td><span class="persona-pill">All</span></td><td><span class="status open">Open — criteria unconfirmed</span></td></tr>
+        <tr><td class="section-name">Exclusivity note</td><td>ATC as sole/lead Jordan distributor</td><td><span class="persona-pill">Rana</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Trade inquiry CTA</td><td>Persistent, single, leads to RFQ form</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Rana</span><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Product Page</h3><span class="page-tag">Template — one per curated product</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Let Fadi confirm a part in seconds; let Rana pull spec-grade material for a client document.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Name &amp; brand</td><td>Product name, brand attribution, category</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Photography</td><td>Showroom-quality; per Brand Guidelines — dark background, 60-70% frame fill, natural/diffused light, one consistent editing preset, show function not just form</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed (pending scope check — see below)</span></td></tr>
+        <tr><td class="section-name">Application / use case</td><td>Where and how it's used</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Rana</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Key features + material story</td><td>Specs translated into benefits; material/craft narrative for price justification</td><td><span class="persona-pill">Hala</span><span class="persona-pill">Fadi</span></td><td><span class="status new">New</span></td></tr>
+        <tr><td class="section-name">Spec sheet download</td><td>PDF spec/CAD data</td><td><span class="persona-pill">Rana</span><span class="persona-pill">Fadi</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Installation guide</td><td>From Company Profile's Technical Support offering — currently no product page has this</td><td><span class="persona-pill">Fadi</span></td><td><span class="status new">New — not yet built anywhere</span></td></tr>
+        <tr><td class="section-name">WhatsApp / trade CTA</td><td>Fast contact path, no form wait</td><td><span class="persona-pill">Fadi</span></td><td><span class="status open">Open — WhatsApp channel status unconfirmed</span></td></tr>
+        <tr><td class="section-name">Related products</td><td>Cross-sell / compatible systems</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note-box"><strong>Scope flag —</strong> Brand Guidelines' photography standards (black background, Instagram-oriented crops) were written for social content, not confirmed for the website. Applying them wholesale to Product Pages needs a direct check — the website's locked "quiet authority" direction uses a cream canvas, not black.</div>
+  </div>
+</section>
+
+<section id="tradeb2b">
+  <div class="section-eyebrow">Page 03</div>
+  <h2 class="section-title">Trade / B2B</h2>
+  <p class="section-body">Where Yousef's flow currently has a real dead-end (see prior user-flow work) — this page carries the most business risk if left thin.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Trade / B2B</h3><span class="page-tag">B2B hub</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Let Yousef vet ATC as a supplier of record for an entire project, not one product.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Trade inquiry / RFQ form</td><td>Formal path fitting a procurement workflow, not just a chat message</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Rana</span><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">"Why ATC"</td><td>Single accountable portfolio pitch — one distributor across ~30 fragmented European specialists; supported by Company Profile's Training / Technical Support / End-user Support offering</td><td><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed, content expanded</span></td></tr>
+        <tr><td class="section-name">Support &amp; training</td><td>Certified training for partner technical teams, installation guides, one-to-one showroom demos, after-sales/on-site support — from Company Profile, not previously scoped anywhere</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Yousef</span></td><td><span class="status new">New</span></td></tr>
+        <tr><td class="section-name">Project References</td><td>Institutional/hospitality project history (hotels across Amman, Aqaba, Dead Sea, Petra; possible Royal Court reference)</td><td><span class="persona-pill">Yousef</span><span class="persona-pill">Rana</span></td><td><span class="status open">Open — clearance pending</span></td></tr>
+        <tr><td class="section-name">Certifications</td><td>ISO/quality certifications — several partner brands hold ISO 9001/14001 per Company Profile; ATC's own certifications TBD</td><td><span class="persona-pill">Yousef</span></td><td><span class="status open">Open</span></td></tr>
+      </tbody>
+    </table>
+    <div class="note-box"><strong>Priority flag —</strong> if Project References isn't live at launch, Yousef's documented flow dead-ends and he falls back to a colleague's recommendation. This is the strongest argument for resolving that clearance ahead of other open items.</div>
+  </div>
+</section>
+
+<section id="showroom">
+  <div class="section-eyebrow">Page 04</div>
+  <h2 class="section-title">Showroom</h2>
+  <p class="section-body">ATC's stated, undisputed competitive moat. The site's job is to make the visit worth taking, not to replace it.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Showroom</h3><span class="page-tag">B2C-weighted, relevant to all</span></div>
+    <div class="page-purpose"><strong>Purpose:</strong> Digital preview of the in-person "feel at home" quality, converting interest into a booked visit.</div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Showroom locations</td><td>Al-Bayader (+962 6 5811 896) and Al-Wehdat (+962 6 4707 504), Amman — confirmed via Company Profile</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Showroom philosophy</td><td>The consultative, no-pressure in-person experience</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Book a Visit CTA</td><td>Single, low-pressure — no competing self-service prompts</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="section-eyebrow">Page 05</div>
+  <h2 class="section-title">Resources</h2>
+  <p class="section-body">Supports the consultative sales model without needing a person present — directly relevant to Fadi's need to "trust the mechanism won't fail once installed."</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Resources</h3><span class="page-tag">Reference content</span></div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Brand guides</td><td>Per-brand reference material</td><td><span class="persona-pill">Rana</span><span class="persona-pill">Fadi</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Product care &amp; maintenance</td><td>Aftercare guidance</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Specification tips</td><td>Technical guidance for specifiers</td><td><span class="persona-pill">Rana</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Training &amp; technical support</td><td>Structured training for partner technical teams, installation guides, on-site after-sales support — from Company Profile</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Yousef</span></td><td><span class="status new">New</span></td></tr>
+        <tr><td class="section-name">Articles grid</td><td>Editorial content</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="about">
+  <div class="section-eyebrow">Page 06</div>
+  <h2 class="section-title">About Us</h2>
+  <p class="section-body">Legacy functions as ongoing credibility, not a founding-year stat rolled out once — per locked Core Values.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>About Us</h3><span class="page-tag">Trust / heritage</span></div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">Our Story</td><td>Est. 1977 (verify vs. CEO's stated 1970), founded by the late Ahmad Mustafa Amara, originally registered as ELTAMO, pivoted to fittings/hardware specialization in 1980 — per Company Profile</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed, content expanded</span></td></tr>
+        <tr><td class="section-name">Vision &amp; Mission</td><td>Vision: "a household name for furniture fittings and hardware, a perfect fit in the Jordanian real estate industry." Mission: "luxurious, simple, secure products and innovative solutions" — official statements, not yet used anywhere</td><td><span class="persona-pill">All</span></td><td><span class="status new">New</span></td></tr>
+        <tr><td class="section-name">Quiet Authority</td><td>Brand character narrative — restraint as confidence</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Exclusive brand partnerships</td><td>~30 brands, categorized by function (mechanism specialists / design-statement hardware / appliances)</td><td><span class="persona-pill">Rana</span><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">ATC private label</td><td>ATC's own product line — needs an About Us mention regardless of where it lives in Brands &amp; Products</td><td><span class="persona-pill">All</span></td><td><span class="status new">New</span></td></tr>
+        <tr><td class="section-name">Certifications</td><td>Company and partner-brand certifications (several partners hold ISO 9001/14001)</td><td><span class="persona-pill">Yousef</span></td><td><span class="status open">Open</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="contact" style="border-bottom:none;">
+  <div class="section-eyebrow">Page 07</div>
+  <h2 class="section-title">Contact Us</h2>
+  <p class="section-body">Now backed by real, confirmed contact data instead of placeholders.</p>
+
+  <div class="page-card">
+    <div class="page-head"><h3>Contact Us</h3><span class="page-tag">Utility page</span></div>
+    <table class="content-table">
+      <thead><tr><th>Section</th><th>Content</th><th>Persona</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td class="section-name">General inquiry form</td><td>Routes to sales@atc-jo.com per Company Profile</td><td><span class="persona-pill">Hala</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Showroom locations</td><td>Al-Bayader and Al-Wehdat with direct phone lines; mobile +962 7972 83333; P.O. Box 140288, Amman 11814</td><td><span class="persona-pill">All</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">WhatsApp contact</td><td>Fast trade contact path</td><td><span class="persona-pill">Fadi</span></td><td><span class="status open">Open — formal channel status unconfirmed</span></td></tr>
+        <tr><td class="section-name">Trade inquiry shortcut</td><td>Direct link to the RFQ form</td><td><span class="persona-pill">Fadi</span><span class="persona-pill">Rana</span><span class="persona-pill">Yousef</span></td><td><span class="status confirmed">Confirmed</span></td></tr>
+        <tr><td class="section-name">Social</td><td>Facebook, Instagram (@atc.jo), LinkedIn — per Company Profile</td><td><span class="persona-pill">Hala</span></td><td><span class="status new">New</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<footer>ATC Digital Experience — Final Information Architecture &amp; Content Requirements · Pre-design</footer>
+
+</body>
+</html>
