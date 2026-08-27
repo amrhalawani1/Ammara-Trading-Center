@@ -1,0 +1,1 @@
+- [Clerk staff authorization](clerk-staff-authorization.md) — require exact Auth-tool user IDs before configuring content access; never infer identities.
