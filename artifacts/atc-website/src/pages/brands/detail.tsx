@@ -1,28 +1,18 @@
 import { Link, useParams } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
-
-// Mock data fetcher
-function getBrandData(slug: string) {
-  // In reality this maps to the Sanity CMS -> MySQL migration strategy
-  return {
-    name: slug.charAt(0).toUpperCase() + slug.slice(1),
-    origin: "Germany",
-    description: "Since 1888, they have been setting the global standard for furniture fittings. Known for engineering precision and extreme durability testing, their hinge systems and drawer runners are the hidden force behind the world's finest cabinetry.",
-    coverImage: "/images/brand-hinge.jpg",
-    products: [
-      { name: "Sensys Concealed Hinge", slug: "sensys-hinge", category: "Hinges" },
-      { name: "AvanTech YOU Drawer", slug: "avantech-drawer", category: "Runners" },
-      { name: "TopLine XL Sliding", slug: "topline-xl", category: "Sliding Systems" },
-      { name: "Quadro V6 Runner", slug: "quadro-v6", category: "Runners" },
-    ]
-  };
-}
+import { BRANDS, PRODUCTS } from "@/data/catalog";
+import NotFound from "@/pages/not-found";
 
 export default function BrandDetail() {
   const params = useParams();
-  const slug = params.brandSlug || "brand";
-  const brand = getBrandData(slug);
+  const slug = params.brandSlug || "";
+  const brand = BRANDS.find(b => b.slug === slug);
+  const brandProducts = PRODUCTS.filter(p => p.brandSlug === slug);
+
+  if (!brand) {
+    return <NotFound />;
+  }
 
   return (
     <MainLayout>
@@ -37,9 +27,12 @@ export default function BrandDetail() {
             <p className="text-muted-foreground text-lg leading-relaxed font-light mb-8">
               {brand.description}
             </p>
-            <div className="flex gap-4">
-              <Button asChild size="lg" className="rounded-none tracking-widest uppercase text-xs font-bold">
-                <Link href="/contact">Request Brand Catalog</Link>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button asChild size="lg" className="rounded-none tracking-widest uppercase text-xs font-bold" data-testid="button-catalog">
+                <Link href={`/catalog?brand=${brand.slug}`}>Browse {brand.name} Catalog</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-none tracking-widest uppercase text-xs font-bold border-border hover:bg-accent hover:text-foreground" data-testid="button-inquiry">
+                <Link href="/contact">Trade Inquiry</Link>
               </Button>
             </div>
           </div>
@@ -51,43 +44,54 @@ export default function BrandDetail() {
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
+              data-testid={`img-brand-cover-${brand.slug}`}
             />
           </div>
         </div>
       </section>
 
       {/* Brand Products */}
-      <section className="py-24 bg-accent/10">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-end mb-12">
-            <h2 className="text-3xl font-serif">Featured Systems</h2>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {brand.products.map((product) => (
-              <Link key={product.slug} href={`/products/${product.slug}`} className="group block bg-background border border-border hover:border-primary/40 transition-colors">
-                <div className="aspect-square bg-muted relative border-b border-border overflow-hidden">
-                  <img 
-                    src="/images/product-handle.jpg" 
-                    alt={product.name}
-                    className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
-                  />
-                  <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
-                    <span className="text-xs font-bold uppercase tracking-wider text-primary">View Spec &rarr;</span>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-1">{product.category}</span>
-                  <h3 className="font-serif text-lg leading-tight group-hover:text-primary transition-colors line-clamp-1">{product.name}</h3>
-                </div>
+      {brandProducts.length > 0 && (
+        <section className="py-24 bg-accent/10">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6 mb-12">
+              <h2 className="text-3xl font-serif">Featured Systems</h2>
+              <Link href={`/catalog?brand=${brand.slug}`} className="text-sm font-bold uppercase tracking-widest text-primary hover:text-foreground transition-colors" data-testid="link-view-all">
+                View All {brand.name} Products &rarr;
               </Link>
-            ))}
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {brandProducts.map((product) => (
+                <Link 
+                  key={product.slug} 
+                  href={`/products/${product.slug}`} 
+                  className="group block bg-background border border-border hover:border-primary/40 transition-colors"
+                  data-testid={`card-product-${product.slug}`}
+                >
+                  <div className="aspect-square bg-muted relative border-b border-border overflow-hidden">
+                    <img 
+                      src={product.image} 
+                      alt={product.name}
+                      className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-background to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex justify-end">
+                      <span className="text-xs font-bold uppercase tracking-wider text-primary">View Spec &rarr;</span>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-1">{product.category}</span>
+                    <h3 className="font-serif text-lg leading-tight group-hover:text-primary transition-colors line-clamp-2">{product.name}</h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </MainLayout>
   );
 }

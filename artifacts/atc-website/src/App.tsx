@@ -14,6 +14,7 @@ import Resources from '@/pages/resources';
 import BrandsDirectory from '@/pages/brands/index';
 import BrandDetail from '@/pages/brands/detail';
 import ProductDetail from '@/pages/products/detail';
+import Catalog from '@/pages/catalog/index';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ function Router() {
         <Route path="/showroom" component={Showroom} />
         <Route path="/trade" component={Trade} />
         <Route path="/resources" component={Resources} />
+        <Route path="/catalog" component={Catalog} />
         <Route path="/brands" component={BrandsDirectory} />
         <Route path="/brands/:brandSlug" component={BrandDetail} />
         <Route path="/products/:slug" component={ProductDetail} />

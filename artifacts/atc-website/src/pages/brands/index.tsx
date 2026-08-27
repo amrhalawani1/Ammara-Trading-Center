@@ -1,37 +1,6 @@
 import { Link } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
-import { CandidateFeature } from "@/components/shared/candidate-feature";
-
-const MOCK_BRANDS = [
-  {
-    name: "Hettich",
-    slug: "hettich",
-    origin: "Germany",
-    description: "Global leader in furniture fittings and architectural hardware.",
-    image: "/images/brand-hinge.jpg"
-  },
-  {
-    name: "Salice",
-    slug: "salice",
-    origin: "Italy",
-    description: "Pioneers of the concealed hinge and advanced opening systems.",
-    image: "/images/brand-sliding.jpg"
-  },
-  {
-    name: "Kesseböhmer",
-    slug: "kessebohmer",
-    origin: "Germany",
-    description: "Intelligent kitchen storage solutions and ergonomic lifters.",
-    image: "/images/product-handle.jpg"
-  },
-  {
-    name: "Vibo",
-    slug: "vibo",
-    origin: "Italy",
-    description: "Premium wire storage accessories for wardrobes and kitchens.",
-    image: "/images/brand-hinge.jpg"
-  }
-];
+import { BRANDS } from "@/data/catalog";
 
 export default function BrandsDirectory() {
   return (
@@ -49,13 +18,16 @@ export default function BrandsDirectory() {
         </div>
       </section>
 
-      {/* Candidate Feature Shell: Shop by Solution / Search & Filter */}
+      {/* Catalog CTA */}
       <section className="bg-accent/10 border-b border-border">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            <CandidateFeature label="Search & Filter by Spec" />
-            <CandidateFeature label="Shop by Solution (Kitchen, Wardrobe, Doors)" />
+        <div className="container mx-auto px-4 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h2 className="text-2xl font-serif mb-2">Explore the Full Collection</h2>
+            <p className="text-muted-foreground text-sm font-light">Browse systems by specification, solution, and manufacturer.</p>
           </div>
+          <Link href="/catalog" className="inline-flex items-center justify-center whitespace-nowrap bg-primary text-primary-foreground h-10 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-colors" data-testid="link-full-catalog">
+            Open Catalog &rarr;
+          </Link>
         </div>
       </section>
 
@@ -63,16 +35,22 @@ export default function BrandsDirectory() {
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {MOCK_BRANDS.map((brand) => (
-              <Link key={brand.slug} href={`/brands/${brand.slug}`} className="group block border border-border bg-background hover:border-primary/40 transition-colors">
+            {BRANDS.map((brand) => (
+              <Link 
+                key={brand.slug} 
+                href={`/brands/${brand.slug}`} 
+                className="group block border border-border bg-background hover:border-primary/40 transition-colors"
+                data-testid={`card-brand-${brand.slug}`}
+              >
                 <div className="aspect-[4/3] bg-muted relative overflow-hidden border-b border-border">
                   <img 
-                    src={brand.image} 
+                    src={brand.coverImage} 
                     alt={brand.name}
                     className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
+                    data-testid={`img-brand-${brand.slug}`}
                   />
                   <div className="absolute top-4 left-4 bg-background/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-foreground">
                     {brand.origin}

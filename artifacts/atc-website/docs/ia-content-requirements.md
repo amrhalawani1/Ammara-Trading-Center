@@ -20,8 +20,7 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
   related products without inventing certifications or project references.
 - Product pages should prioritize clear product identity, material/finish,
   technical information, and a trade inquiry path.
-- Search, filtering, and “shop by solution” remain candidate UI shells pending
-  scope confirmation.
+- Centralized Catalogue: Browse products across four represented brands (Hettich, Salice, Kesseböhmer, Vibo) using exact product types (Hinges & Opening Systems, Drawer Runners & Slides, Sliding Door Systems, Kitchen Storage & Ergonomics, Wardrobe & Wire Storage). Supports filtering and clear empty states, while preserving inquiry-safe boundaries.
 
 ## Trade / B2B
 

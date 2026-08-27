@@ -52,6 +52,13 @@ export default function Home() {
                 <Link href="/showroom">Book a Visit</Link>
               </Button>
             </div>
+            <Link
+              href="/catalog"
+              className="inline-flex w-fit items-center text-xs font-bold uppercase tracking-widest text-foreground transition-colors hover:text-primary"
+              data-testid="link-hero-catalog"
+            >
+              Browse the curated catalog <span className="ml-2">&rarr;</span>
+            </Link>
           </div>
         </div>
       </section>

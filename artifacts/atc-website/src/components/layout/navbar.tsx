@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const NAV_LINKS = [
+  { href: "/catalog", label: "Catalog" },
   { href: "/brands", label: "Brands" },
   { href: "/trade", label: "Trade" },
   { href: "/showroom", label: "Showroom" },
@@ -43,6 +44,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              data-testid={`link-nav-${link.label.toLowerCase()}`}
               className={cn(
                 "text-sm font-medium transition-colors hover:text-primary",
                 location.startsWith(link.href) ? "text-primary" : "text-muted-foreground"
@@ -74,6 +76,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                data-testid={`link-mobile-nav-${link.label.toLowerCase()}`}
                 className={cn(
                   "block py-2 text-base font-medium transition-colors",
                   location.startsWith(link.href) ? "text-primary" : "text-foreground"
