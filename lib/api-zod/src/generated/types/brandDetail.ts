@@ -5,7 +5,9 @@
  * ATC catalogue and content workspace API
  * OpenAPI spec version: 0.1.0
  */
+import type { Brand } from './brand';
+import type { Product } from './product';
 
-export interface HealthStatus {
-  status: string;
-}
+export type BrandDetail = Brand & {
+  products: Product[];
+};

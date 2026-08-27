@@ -1,8 +1,12 @@
 import { Link } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
-import { BRANDS } from "@/data/catalog";
+import { useGetPublicCatalog } from "@workspace/api-client-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BrandsDirectory() {
+  const { data: catalog, isLoading, error } = useGetPublicCatalog();
+  const BRANDS = catalog?.brands || [];
+
   return (
     <MainLayout>
       <section className="bg-background py-16 md:py-24 border-b border-border">
@@ -34,8 +38,17 @@ export default function BrandsDirectory() {
       {/* Brands Grid */}
       <section className="py-24 bg-background">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {BRANDS.map((brand) => (
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map(i => <Skeleton key={i} className="aspect-[4/3] w-full rounded-none" />)}
+            </div>
+          ) : error ? (
+            <div className="py-24 text-center border border-border">
+              <p className="text-lg font-serif text-destructive">Failed to load brands.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {BRANDS.map((brand) => (
               <Link 
                 key={brand.slug} 
                 href={`/brands/${brand.slug}`} 
@@ -44,7 +57,7 @@ export default function BrandsDirectory() {
               >
                 <div className="aspect-[4/3] bg-muted relative overflow-hidden border-b border-border">
                   <img 
-                    src={brand.coverImage} 
+                    src={brand.coverImage || undefined} 
                     alt={brand.name}
                     className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out"
                     onError={(e) => {
@@ -63,7 +76,8 @@ export default function BrandsDirectory() {
                 </div>
               </Link>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
     </MainLayout>

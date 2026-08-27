@@ -1,17 +1,41 @@
 import { Link, useParams } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
-import { BRANDS, PRODUCTS } from "@/data/catalog";
+import { useGetPublicProduct, useGetPublicBrand, getGetPublicBrandQueryKey } from "@workspace/api-client-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import NotFound from "@/pages/not-found";
 
 export default function ProductDetail() {
   const params = useParams();
   const slug = params.slug || "";
   
-  const product = PRODUCTS.find(p => p.slug === slug);
-  const brand = product ? BRANDS.find(b => b.slug === product.brandSlug) : null;
+  const { data: product, isLoading: isProductLoading, error: productError } = useGetPublicProduct(slug);
+  const brandSlug = product?.brandSlug || "";
+  const { data: brand, isLoading: isBrandLoading } = useGetPublicBrand(brandSlug, {
+    query: {
+      enabled: !!brandSlug,
+      queryKey: getGetPublicBrandQueryKey(brandSlug),
+    }
+  });
 
-  if (!product || !brand) {
+  if (isProductLoading || isBrandLoading) {
+    return (
+      <MainLayout>
+        <section className="py-12 md:py-24 bg-background">
+          <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 lg:gap-24">
+            <Skeleton className="aspect-square w-full rounded-none" />
+            <div className="flex flex-col justify-center space-y-4">
+              <Skeleton className="h-4 w-24 rounded-none" />
+              <Skeleton className="h-12 w-full rounded-none" />
+              <Skeleton className="h-32 w-full rounded-none" />
+            </div>
+          </div>
+        </section>
+      </MainLayout>
+    );
+  }
+
+  if (productError || !product || !brand) {
     return <NotFound />;
   }
 
@@ -35,7 +59,7 @@ export default function ProductDetail() {
             {/* Product Image */}
             <div className="aspect-square bg-accent/20 border border-border p-8 md:p-16 flex items-center justify-center relative">
               <img 
-                src={product.image} 
+                src={product.image || undefined} 
                 alt={product.name}
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -60,7 +84,7 @@ export default function ProductDetail() {
                 <div>
                   <h3 className="font-serif text-xl mb-4">Technical Specifications</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {product.specs.map((spec, i) => (
+                    {product.specs?.map((spec, i) => (
                       <div key={i} className="border-b border-border/50 pb-2">
                         <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{spec.label}</span>
                         <span className="text-sm font-medium text-foreground">{spec.value}</span>
@@ -72,7 +96,7 @@ export default function ProductDetail() {
                 <div>
                   <h3 className="font-serif text-xl mb-4">Available Finishes</h3>
                   <div className="flex flex-wrap gap-4">
-                    {product.finishes.map((finish, i) => (
+                    {product.finishes?.map((finish, i) => (
                       <div key={i} className="px-4 py-2 border border-border text-sm text-foreground bg-accent/10">
                         {finish}
                       </div>

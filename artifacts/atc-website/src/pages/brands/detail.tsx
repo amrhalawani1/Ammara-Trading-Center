@@ -1,16 +1,37 @@
 import { Link, useParams } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
-import { BRANDS, PRODUCTS } from "@/data/catalog";
+import { useGetPublicBrand } from "@workspace/api-client-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import NotFound from "@/pages/not-found";
 
 export default function BrandDetail() {
   const params = useParams();
   const slug = params.brandSlug || "";
-  const brand = BRANDS.find(b => b.slug === slug);
-  const brandProducts = PRODUCTS.filter(p => p.brandSlug === slug);
+  
+  const { data: brand, isLoading, error } = useGetPublicBrand(slug);
+  const brandProducts = brand?.products || [];
 
-  if (!brand) {
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <section className="bg-background py-16 md:py-24 border-b border-border">
+          <div className="container mx-auto px-4 grid md:grid-cols-12 gap-12 items-center">
+            <div className="md:col-span-5 md:col-start-2">
+              <Skeleton className="h-4 w-32 mb-6 rounded-none" />
+              <Skeleton className="h-16 w-full mb-6 rounded-none" />
+              <Skeleton className="h-24 w-full mb-8 rounded-none" />
+            </div>
+            <div className="md:col-span-5 relative aspect-square">
+              <Skeleton className="w-full h-full rounded-none" />
+            </div>
+          </div>
+        </section>
+      </MainLayout>
+    );
+  }
+
+  if (error || !brand) {
     return <NotFound />;
   }
 
@@ -38,7 +59,7 @@ export default function BrandDetail() {
           </div>
           <div className="md:col-span-5 relative aspect-square">
             <img 
-              src={brand.coverImage} 
+              src={brand.coverImage || undefined} 
               alt={brand.name}
               className="w-full h-full object-cover border border-border"
               onError={(e) => {
@@ -71,7 +92,7 @@ export default function BrandDetail() {
                 >
                   <div className="aspect-square bg-muted relative border-b border-border overflow-hidden">
                     <img 
-                      src={product.image} 
+                      src={product.image || undefined} 
                       alt={product.name}
                       className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
                       onError={(e) => {

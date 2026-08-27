@@ -3,20 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ATC catalogue and content workspace API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: catalogue
+    description: Published catalogue content
+  - name: content
+    description: Staff content workspace
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +27,488 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /catalog:
+    get:
+      operationId: getPublicCatalog
+      tags: [catalogue]
+      summary: List published catalogue content
+      responses:
+        "200":
+          description: Published brands, products, and product categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogResponse"
+  /catalog/brands/{slug}:
+    get:
+      operationId: getPublicBrand
+      tags: [catalogue]
+      summary: Get a published brand and its products
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Published brand
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BrandDetail"
+        "404":
+          description: Brand not found
+  /catalog/products/{slug}:
+    get:
+      operationId: getPublicProduct
+      tags: [catalogue]
+      summary: Get a published product
+      parameters:
+        - $ref: "#/components/parameters/Slug"
+      responses:
+        "200":
+          description: Published product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+  /content/brands:
+    get:
+      operationId: listContentBrands
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: List all brands for the content workspace
+      responses:
+        "200":
+          description: All brands, including drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Brand"
+    post:
+      operationId: createContentBrand
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Create a brand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrandInput"
+      responses:
+        "201":
+          description: Created brand
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Brand"
+        "400":
+          description: Invalid content
+  /content/brands/{id}:
+    put:
+      operationId: updateContentBrand
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Update a brand
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BrandUpdate"
+      responses:
+        "200":
+          description: Updated brand
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Brand"
+        "400":
+          description: Invalid content
+        "404":
+          description: Brand not found
+    delete:
+      operationId: deleteContentBrand
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Delete a brand
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Brand deleted
+        "400":
+          description: Brand has products
+        "404":
+          description: Brand not found
+  /content/products:
+    get:
+      operationId: listContentProducts
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: List all products for the content workspace
+      responses:
+        "200":
+          description: All products, including drafts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createContentProduct
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Create a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Created product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid content
+  /content/products/{id}:
+    put:
+      operationId: updateContentProduct
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Update a product
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdate"
+      responses:
+        "200":
+          description: Updated product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid content
+        "404":
+          description: Product not found
+    delete:
+      operationId: deleteContentProduct
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Delete a product
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "204":
+          description: Product deleted
+        "404":
+          description: Product not found
+  /content/import:
+    post:
+      operationId: importCatalogContent
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Upsert future MySQL catalogue records
+      description: Import records by legacy ID while preserving existing slugs and public URLs.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportInput"
+      responses:
+        "200":
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+        "400":
+          description: Invalid import
 components:
+  securitySchemes:
+    clerkSession:
+      type: apiKey
+      in: cookie
+      name: __session
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: number
+    Slug:
+      name: slug
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
     HealthStatus:
       type: object
       properties:
         status:
           type: string
-      required:
-        - status
-
+      required: [status]
+    ContentStatus:
+      type: string
+      enum: [draft, published, comingSoon]
+    Spec:
+      type: object
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+      required: [label, value]
+    Brand:
+      type: object
+      properties:
+        id:
+          type: number
+        legacyId:
+          type: [string, "null"]
+        name:
+          type: string
+        slug:
+          type: string
+        country:
+          type: [string, "null"]
+        origin:
+          type: string
+        category:
+          type: [string, "null"]
+        summary:
+          type: [string, "null"]
+        description:
+          type: string
+        coverImage:
+          type: [string, "null"]
+        websiteUrl:
+          type: [string, "null"]
+        isFeatured:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/ContentStatus"
+      required: [id, name, slug, origin, description, isFeatured, status]
+    BrandDetail:
+      allOf:
+        - $ref: "#/components/schemas/Brand"
+        - type: object
+          properties:
+            products:
+              type: array
+              items:
+                $ref: "#/components/schemas/Product"
+          required: [products]
+    Product:
+      type: object
+      properties:
+        id:
+          type: number
+        legacyId:
+          type: [string, "null"]
+        title:
+          type: string
+        name:
+          type: string
+        slug:
+          type: string
+        brandId:
+          type: number
+        brandSlug:
+          type: string
+        brandName:
+          type: string
+        sku:
+          type: [string, "null"]
+        category:
+          type: string
+        family:
+          type: [string, "null"]
+        description:
+          type: string
+        image:
+          type: [string, "null"]
+        images:
+          type: array
+          items:
+            type: string
+        material:
+          type: [string, "null"]
+        finish:
+          type: [string, "null"]
+        dimensions:
+          type: [string, "null"]
+        specs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Spec"
+        finishes:
+          type: array
+          items:
+            type: string
+        installationNotes:
+          type: [string, "null"]
+        isFeatured:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/ContentStatus"
+      required: [id, title, name, slug, brandId, brandSlug, brandName, category, description, images, specs, finishes, isFeatured, status]
+    CatalogResponse:
+      type: object
+      properties:
+        brands:
+          type: array
+          items:
+            $ref: "#/components/schemas/Brand"
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        categories:
+          type: array
+          items:
+            type: string
+      required: [brands, products, categories]
+    BrandInput:
+      type: object
+      properties:
+        legacyId:
+          type: [string, "null"]
+        name:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+        country:
+          type: [string, "null"]
+        category:
+          type: [string, "null"]
+        summary:
+          type: [string, "null"]
+        description:
+          type: string
+        coverImage:
+          type: [string, "null"]
+        websiteUrl:
+          type: [string, "null"]
+        isFeatured:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/ContentStatus"
+      required: [name, slug, description, isFeatured, status]
+    BrandUpdate:
+      allOf:
+        - $ref: "#/components/schemas/BrandInput"
+      required: []
+    ProductInput:
+      type: object
+      properties:
+        legacyId:
+          type: [string, "null"]
+        title:
+          type: string
+          minLength: 1
+        slug:
+          type: string
+          minLength: 1
+        brandId:
+          type: number
+        brandSlug:
+          type: string
+        sku:
+          type: [string, "null"]
+        category:
+          type: string
+        family:
+          type: [string, "null"]
+        description:
+          type: string
+        image:
+          type: [string, "null"]
+        images:
+          type: array
+          items:
+            type: string
+        material:
+          type: [string, "null"]
+        finish:
+          type: [string, "null"]
+        dimensions:
+          type: [string, "null"]
+        specs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Spec"
+        finishes:
+          type: array
+          items:
+            type: string
+        installationNotes:
+          type: [string, "null"]
+        isFeatured:
+          type: boolean
+        status:
+          $ref: "#/components/schemas/ContentStatus"
+      required: [title, slug, brandSlug, category, description, image, images, specs, finishes, isFeatured, status]
+    ProductUpdate:
+      allOf:
+        - $ref: "#/components/schemas/ProductInput"
+      required: []
+    ImportBrand:
+      allOf:
+        - $ref: "#/components/schemas/BrandInput"
+        - type: object
+          properties:
+            legacyId:
+              type: string
+              minLength: 1
+          required: [legacyId]
+    ImportProduct:
+      allOf:
+        - $ref: "#/components/schemas/ProductInput"
+        - type: object
+          properties:
+            legacyId:
+              type: string
+              minLength: 1
+          required: [legacyId]
+    ImportInput:
+      type: object
+      properties:
+        brands:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportBrand"
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ImportProduct"
+      required: [brands, products]
+    ImportResult:
+      type: object
+      properties:
+        brandsUpserted:
+          type: number
+        productsUpserted:
+          type: number
+        preservedSlugs:
+          type: number
+      required: [brandsUpserted, productsUpserted, preservedSlugs]

@@ -5,7 +5,9 @@
  * ATC catalogue and content workspace API
  * OpenAPI spec version: 0.1.0
  */
+import type { ProductInput } from './productInput';
 
-export interface HealthStatus {
-  status: string;
-}
+export type ImportProduct = ProductInput & {
+  /** @minLength 1 */
+  legacyId: string;
+};

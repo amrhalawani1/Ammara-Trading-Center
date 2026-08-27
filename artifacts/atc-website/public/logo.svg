@@ -1,0 +1,6 @@
+<svg width="260" height="64" viewBox="0 0 260 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Amara Trading Center">
+  <rect width="260" height="64" fill="#fbfaf9"/>
+  <path d="M20 18h5l-7 28h-5l7-28Zm8 0h5l-7 28h-5l7-28Zm8 0h5l-7 28h-5l7-28Z" fill="#28211f"/>
+  <text x="60" y="31" fill="#2b2422" font-family="Georgia, serif" font-size="22" letter-spacing="4">A<tspan fill="#c41a1a">MARA</tspan></text>
+  <text x="60" y="47" fill="#665d5a" font-family="Arial, sans-serif" font-size="8" letter-spacing="2">TRADING CENTER</text>
+</svg>

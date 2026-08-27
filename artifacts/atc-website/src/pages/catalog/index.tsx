@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { BRANDS, CATEGORIES, PRODUCTS } from "@/data/catalog";
+import { useGetPublicCatalog } from "@workspace/api-client-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Filter, X } from "lucide-react";
 
 export default function Catalog() {
@@ -49,13 +50,18 @@ export default function Catalog() {
     setSelectedTypes([]);
   }, []);
 
+  const { data: catalog, isLoading, error } = useGetPublicCatalog();
+  const BRANDS = catalog?.brands || [];
+  const CATEGORIES = catalog?.categories || [];
+  const PRODUCTS = catalog?.products || [];
+
   const filteredProducts = useMemo(() => {
     return PRODUCTS.filter(p => {
       const matchBrand = selectedBrands.length === 0 || selectedBrands.includes(p.brandSlug);
       const matchType = selectedTypes.length === 0 || selectedTypes.includes(p.category);
       return matchBrand && matchType;
     });
-  }, [selectedBrands, selectedTypes]);
+  }, [selectedBrands, selectedTypes, PRODUCTS]);
 
   const activeFilterCount = selectedBrands.length + selectedTypes.length;
 
@@ -169,7 +175,17 @@ export default function Catalog() {
               </span>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1,2,3,4,5,6].map(i => (
+                  <Skeleton key={i} className="aspect-[4/3] w-full rounded-none" />
+                ))}
+              </div>
+            ) : error ? (
+              <div className="py-24 text-center border border-border flex flex-col items-center justify-center">
+                <p className="text-lg font-serif mb-4 text-destructive">Failed to load catalog.</p>
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="py-24 text-center bg-accent/5 border border-border flex flex-col items-center justify-center">
                 <p className="text-lg font-serif mb-4">No systems match your criteria.</p>
                 <p className="text-muted-foreground font-light mb-6 text-sm max-w-sm">
@@ -197,7 +213,7 @@ export default function Catalog() {
                     >
                       <div className="aspect-[4/3] bg-muted relative border-b border-border overflow-hidden flex items-center justify-center p-4">
                         <img 
-                          src={product.image} 
+                          src={product.image || undefined} 
                           alt={product.name}
                           className="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 group-hover:scale-105 transition-all duration-500 ease-out"
                           onError={(e) => {

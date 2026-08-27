@@ -31,7 +31,7 @@ export default defineConfig({
   base: basePath,
   plugins: [
     react(),
-    tailwindcss(),
+    tailwindcss({ optimize: false }),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
@@ -69,6 +69,8 @@ export default defineConfig({
     strictPort: true,
     host: '0.0.0.0',
     allowedHosts: true,
+    // The managed artifact router forwards /api to the API Server before Vite.
+    // Keep this proxy-free so preview and published routing use the same path.
     fs: {
       strict: true,
     },
