@@ -13,4 +13,5 @@ export const ContentStatus = {
   draft: 'draft',
   published: 'published',
   comingSoon: 'comingSoon',
+  retired: 'retired',
 } as const;

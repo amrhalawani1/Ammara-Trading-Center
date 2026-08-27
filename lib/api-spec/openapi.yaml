@@ -267,7 +267,7 @@ components:
       required: [status]
     ContentStatus:
       type: string
-      enum: [draft, published, comingSoon]
+      enum: [draft, published, comingSoon, retired]
     Spec:
       type: object
       properties:

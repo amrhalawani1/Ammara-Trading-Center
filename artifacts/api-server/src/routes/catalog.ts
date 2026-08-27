@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type RequestHandler } from "express";
 import { eq } from "drizzle-orm";
 import { brandsTable, db, productsTable } from "@workspace/db";
 import {
@@ -39,7 +39,8 @@ import {
 } from "../lib/catalog-content";
 import { requireStaffAuth } from "../middlewares/requireStaffAuth";
 
-const router: IRouter = Router();
+export function createCatalogRouter(staffAuth: RequestHandler = requireStaffAuth): IRouter {
+  const router: IRouter = Router();
 
 function brandValues(input: BrandInput) {
   return {
@@ -95,7 +96,7 @@ router.get("/catalog/products/:slug", async (req, res): Promise<void> => {
   res.json(GetPublicProductResponse.parse(toProductResponse(row.product, row.brand)));
 });
 
-router.use("/content", requireStaffAuth);
+router.use("/content", staffAuth);
 
 router.get("/content/access", (_req, res): void => {
   res.json({ allowed: true });
@@ -325,4 +326,7 @@ router.post("/content/import", async (req, res): Promise<void> => {
   );
 });
 
-export default router;
+return router;
+}
+
+export default createCatalogRouter();

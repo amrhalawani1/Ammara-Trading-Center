@@ -25,7 +25,7 @@ const brandSchema = z.object({
   coverImage: z.string().optional(),
   websiteUrl: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   isFeatured: z.boolean().default(false),
-  status: z.enum(["draft", "published", "comingSoon"]),
+  status: z.enum(["draft", "published", "comingSoon", "retired"]),
   legacyId: z.string().optional()
 });
 
@@ -227,6 +227,7 @@ export function BrandFormDialog({ brand, open, onOpenChange }: BrandFormDialogPr
                       <SelectItem value="draft">Draft</SelectItem>
                       <SelectItem value="published">Published</SelectItem>
                       <SelectItem value="comingSoon">Coming Soon</SelectItem>
+                      <SelectItem value="retired">Retired</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

@@ -33,7 +33,7 @@ export const GetPublicCatalogResponse = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })),
   "products": zod.array(zod.object({
   "id": zod.number(),
@@ -60,7 +60,7 @@ export const GetPublicCatalogResponse = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })),
   "categories": zod.array(zod.string())
 })
@@ -86,7 +86,7 @@ export const GetPublicBrandResponse = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }).and(zod.object({
   "products": zod.array(zod.object({
   "id": zod.number(),
@@ -113,7 +113,7 @@ export const GetPublicBrandResponse = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }))
 }))
 
@@ -150,7 +150,7 @@ export const GetPublicProductResponse = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 
@@ -170,7 +170,7 @@ export const ListContentBrandsResponseItem = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 export const ListContentBrandsResponse = zod.array(ListContentBrandsResponseItem)
 
@@ -193,7 +193,7 @@ export const CreateContentBrandBody = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 export const CreateContentBrandResponse = zod.object({
@@ -209,7 +209,7 @@ export const CreateContentBrandResponse = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 
@@ -235,7 +235,7 @@ export const UpdateContentBrandBody = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 export const UpdateContentBrandResponse = zod.object({
@@ -251,7 +251,7 @@ export const UpdateContentBrandResponse = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 
@@ -293,7 +293,7 @@ export const ListContentProductsResponseItem = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 export const ListContentProductsResponse = zod.array(ListContentProductsResponseItem)
 
@@ -327,7 +327,7 @@ export const CreateContentProductBody = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 export const CreateContentProductResponse = zod.object({
@@ -355,7 +355,7 @@ export const CreateContentProductResponse = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 
@@ -392,7 +392,7 @@ export const UpdateContentProductBody = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 export const UpdateContentProductResponse = zod.object({
@@ -420,7 +420,7 @@ export const UpdateContentProductResponse = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
 
 
@@ -458,7 +458,7 @@ export const ImportCatalogContentBody = zod.object({
   "coverImage": zod.string().nullish(),
   "websiteUrl": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }).and(zod.object({
   "legacyId": zod.string().min(1)
 }))),
@@ -484,7 +484,7 @@ export const ImportCatalogContentBody = zod.object({
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
   "isFeatured": zod.boolean(),
-  "status": zod.enum(['draft', 'published', 'comingSoon'])
+  "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }).and(zod.object({
   "legacyId": zod.string().min(1)
 })))

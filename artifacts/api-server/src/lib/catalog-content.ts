@@ -5,7 +5,7 @@ import { initialBrands, initialProducts } from "./catalog-seed";
 const SEEDED_KEY = "initial-seed-v1";
 let seedPromise: Promise<void> | undefined;
 
-export type ContentStatus = "draft" | "published" | "comingSoon";
+export type ContentStatus = "draft" | "published" | "comingSoon" | "retired";
 export type CatalogSpec = { label: string; value: string };
 
 export type BrandInput = {

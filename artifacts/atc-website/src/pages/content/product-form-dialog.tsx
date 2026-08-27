@@ -38,7 +38,7 @@ const productSchema = z.object({
   finishes: z.string().default("").transform(val => val ? val.split(',').map(s => s.trim()) : []),
   installationNotes: z.string().optional(),
   isFeatured: z.boolean().default(false),
-  status: z.enum(["draft", "published", "comingSoon"]),
+  status: z.enum(["draft", "published", "comingSoon", "retired"]),
   legacyId: z.string().optional()
 });
 
@@ -337,6 +337,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
                       <SelectItem value="draft">Draft</SelectItem>
                       <SelectItem value="published">Published</SelectItem>
                       <SelectItem value="comingSoon">Coming Soon</SelectItem>
+                      <SelectItem value="retired">Retired</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
