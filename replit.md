@@ -1,6 +1,6 @@
-# [Project name]
+# Amara Trading Center Website
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An informative Phase 1 website that translates ATC's showroom credibility into clear trade inquiry and showroom-visit journeys.
 
 ## Run & Operate
 
@@ -22,23 +22,34 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/atc-website/src/App.tsx` — route map and shared app shell
+- `artifacts/atc-website/src/pages/` — Home, Brands, Products, Trade, Showroom, Resources, About, and Contact pages
+- `artifacts/atc-website/src/components/` — layout and reusable content states
+- `artifacts/atc-website/src/index.css` — ATC website design tokens and global typography
+- `artifacts/atc-website/content/schemas/` — Sanity-ready Brand and Product content models
+- `artifacts/atc-website/docs/ia-content-requirements.md` — Phase 1 information architecture and content boundaries
+- `artifacts/atc-website/public/images/` — curated visual assets used by the site
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The site is informative and inquiry-led; commerce, cart, checkout, and payment flows are intentionally excluded from Phase 1.
+- The website system is the source of truth for the UI: cream canvas, dark brown ink, restrained red accents, Cormorant Garamond, and DM Sans.
+- Confirmed content is sourced from the supplied ATC company profile; open and candidate content is labeled in the UI rather than fabricated.
+- Brand and Product schema fields are kept portable and import-friendly for a future Sanity/MySQL catalogue migration.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Visitors can explore ATC's partner brands and product template, learn about the company and showroom locations, submit trade/general inquiries, and plan a showroom visit.
+- The experience is responsive and mobile-first for on-site fabricators and homeowners while remaining presentation-ready for desktop showroom use.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep the tone quiet, credible, and non-promotional; use one clear action per section.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- The attached social-media guideline uses a different black/Montserrat/#7B1A1A system; do not apply it to the website.
+- Project references, formal WhatsApp, curated catalogue selection, and Arabic/RTL are not confirmed scope; retain their visible placeholder or candidate treatment.
 
 ## Pointers
 

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Amara Trading Center Website"
+description = "A responsive Phase 1 website for Amara Trading Center, helping Jordanian trade professionals submit inquiries and homeowners book showroom visits while presenting ATC's heritage, brands, products, showrooms, resources, and support."
+version = "1.0.0"
+id = "artifacts/atc-website"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19774
+
+[services.development]
+run = "pnpm --filter @workspace/atc-website run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/atc-website", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/atc-website/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19774"
+BASE_PATH = "/"
