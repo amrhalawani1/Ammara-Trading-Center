@@ -54,7 +54,7 @@
 
 /* LIGHT MODE */
 :root {
-  --background: 0 18% 97%; /* #FAF5F5 */
+  --background: 0 0% 100%; /* #FFFFFF */
   --foreground: 0 18% 9%; /* #1A1212 */
 
   --card: 0 0% 100%; /* #FFFFFF */

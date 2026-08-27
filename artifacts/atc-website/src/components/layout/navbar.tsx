@@ -14,27 +14,34 @@ const NAV_LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
-export function Navbar() {
+export function Navbar({ overlay = false }: { overlay?: boolean }) {
   const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+    <header
+      className={cn(
+        "z-50 w-full",
+        overlay
+          ? "absolute inset-x-0 top-0 border-transparent bg-transparent"
+          : "sticky top-0 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      )}
+    >
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 md:h-20">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="flex flex-col items-start leading-none tracking-wider">
             {/* Minimal SVG representation inspired by the guidelines /// A MARA style */}
             <div className="flex items-center gap-1.5">
               <div className="flex gap-[2px] h-4">
-                <div className="w-[3px] bg-foreground/70 -skew-x-12" />
-                <div className="w-[3px] bg-foreground/70 -skew-x-12" />
-                <div className="w-[3px] bg-foreground/70 -skew-x-12" />
+                <div className={cn("w-[3px] -skew-x-12", overlay ? "bg-background/70" : "bg-foreground/70")} />
+                <div className={cn("w-[3px] -skew-x-12", overlay ? "bg-background/70" : "bg-foreground/70")} />
+                <div className="w-[3px] bg-primary -skew-x-12" />
               </div>
-              <span className="font-serif text-lg font-medium text-foreground tracking-[0.2em] uppercase">
-                <span className="text-foreground/70">A</span><span className="text-primary">MARA</span>
+              <span className={cn("font-serif text-lg font-medium tracking-[0.2em] uppercase", overlay ? "text-background" : "text-foreground")}>
+                <span className={overlay ? "text-background/70" : "text-foreground/70"}>A</span><span className="text-primary">MARA</span>
               </span>
             </div>
-            <span className="text-[9px] uppercase tracking-widest text-muted-foreground mt-0.5">Trading Center</span>
+            <span className={cn("mt-0.5 text-[9px] uppercase tracking-widest", overlay ? "text-background/60" : "text-muted-foreground")}>Trading Center</span>
           </div>
         </Link>
 
@@ -46,23 +53,28 @@ export function Navbar() {
               href={link.href}
               data-testid={`link-nav-${link.label.toLowerCase()}`}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                location.startsWith(link.href) ? "text-primary" : "text-muted-foreground"
+                "text-sm font-medium transition-colors",
+                overlay
+                  ? "text-background/80 hover:text-background"
+                  : location.startsWith(link.href)
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-primary"
               )}
             >
               {link.label}
             </Link>
           ))}
-          <Button asChild variant="default" className="h-9 px-5">
+          <Button asChild variant="default" className={cn("h-9 px-5", overlay && "bg-primary hover:bg-primary/90")}>
             <Link href="/contact">Trade Inquiry</Link>
           </Button>
         </nav>
 
         {/* Mobile Toggle */}
         <button
-          className="md:hidden p-2 text-foreground"
+          className={cn("p-2 md:hidden", overlay ? "text-background" : "text-foreground")}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMobileMenuOpen}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -70,7 +82,7 @@ export function Navbar() {
 
       {/* Mobile Nav */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="border-t border-border bg-background md:hidden">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-4">
             {NAV_LINKS.map((link) => (
               <Link
