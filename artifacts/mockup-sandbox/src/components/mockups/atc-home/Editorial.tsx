@@ -58,14 +58,14 @@ function Header() {
   return (
     <header className="absolute inset-x-0 top-0 z-20">
       <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-6 md:px-12 md:py-8">
-        <Anchor href="/" aria-label="Amara Trading Center home"><Mark /></Anchor>
+         <Anchor href="/" aria-label="Amara Trading Center home"><Mark light /></Anchor>
         <nav className="hidden items-center gap-8 md:flex">
           {links.map(([label, href]) => (
-            <Anchor key={href} href={href} className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#2b211c]/70 transition-colors hover:text-[#9d2f24]">
+             <Anchor key={href} href={href} className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f2ede5]/75 transition-colors hover:text-[#f2ede5]">
               {label}
             </Anchor>
           ))}
-          <Anchor href="/contact" className="border-b border-[#9d2f24] pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9d2f24]">
+           <Anchor href="/contact" className="border-b border-[#e2a093] pb-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#f2ede5]">
             Start an inquiry
           </Anchor>
         </nav>
@@ -74,7 +74,7 @@ function Header() {
           aria-label={open ? "Close navigation" : "Open navigation"}
           aria-expanded={open}
           onClick={() => setOpen(!open)}
-          className="rounded-full p-2 text-[#2b211c] transition-colors hover:bg-[#2b211c]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9d2f24] md:hidden"
+           className="rounded-full p-2 text-[#f2ede5] transition-colors hover:bg-[#f2ede5]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e2a093] md:hidden"
         >
           {open ? <X size={20} strokeWidth={1.5} /> : <Menu size={20} strokeWidth={1.5} />}
         </button>
@@ -180,6 +180,56 @@ export function Editorial() {
                 <p className="mt-6 text-sm leading-6 text-[#2b211c]/65">We represent a considered group of international partners, selected for the integrity of their systems and the depth of their craft.</p>
                 <Anchor href="/brands" className="mt-8 inline-flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9d2f24] md:hidden">View partners <ArrowUpRight size={15} /></Anchor>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#f2ede5] px-6 py-24 md:px-12 md:py-32">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="grid gap-12 md:grid-cols-12 md:items-end">
+              <div className="md:col-span-4">
+                <SectionKicker>Study the detail</SectionKicker>
+                <h2 className="mt-7 max-w-sm font-serif text-5xl leading-[0.92] tracking-[-0.035em] md:text-7xl">Material, movement, context.</h2>
+                <p className="mt-7 max-w-xs text-sm leading-6 text-[#2b211c]/60">
+                  A visual reference wall for the qualities we look for: honest finishes, precise motion, and hardware that belongs to the room.
+                </p>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 md:col-span-7 md:col-start-6">
+                <div className="group">
+                  <div className="aspect-[1.4] overflow-hidden bg-[#ded5c9]">
+                    <img
+                      src={`${assetRoot}editorial-dnd-bronze.webp`}
+                      alt="Bronze handle finishes photographed as a material study"
+                      className="h-full w-full object-cover grayscale-[18%] transition-transform duration-700 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="mt-4 flex items-start justify-between gap-4 border-t border-[#2b211c]/15 pt-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em]">Material / bronze</span>
+                    <span className="text-[9px] uppercase tracking-[0.16em] text-[#2b211c]/45">D&amp;D reference</span>
+                  </div>
+                </div>
+                <div className="group sm:mt-16">
+                  <div className="aspect-[1.4] overflow-hidden bg-[#ded5c9]">
+                    <img
+                      src={`${assetRoot}editorial-blum-hinges.jpg`}
+                      alt="Blum hinge system shown in a cabinet application"
+                      className="h-full w-full object-cover grayscale-[28%] transition-transform duration-700 group-hover:scale-[1.03]"
+                    />
+                  </div>
+                  <div className="mt-4 flex items-start justify-between gap-4 border-t border-[#2b211c]/15 pt-3">
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em]">Movement / hinge</span>
+                    <span className="text-[9px] uppercase tracking-[0.16em] text-[#2b211c]/45">Blum reference</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-12 grid gap-5 border-t border-[#2b211c]/15 pt-5 sm:grid-cols-[1fr_auto] sm:items-center">
+              <p className="max-w-xl text-xs leading-5 text-[#2b211c]/55">
+                Reference imagery shown for visual direction only. ATC’s curated collection is presented separately through its partner catalog.
+              </p>
+              <Anchor href="/catalog" className="group inline-flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9d2f24]">
+                Enter the ATC catalog <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+              </Anchor>
             </div>
           </div>
         </section>
