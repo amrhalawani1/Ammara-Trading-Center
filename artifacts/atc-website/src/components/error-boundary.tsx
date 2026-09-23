@@ -3,7 +3,8 @@ import {
   type ComponentType,
   type ErrorInfo,
   type ReactNode,
-} from 'react';
+} from "react";
+import { BrandLogo } from "@/components/brand-logo";
 
 export interface ErrorFallbackProps {
   error: Error;
@@ -13,7 +14,6 @@ export interface ErrorFallbackProps {
 interface ErrorBoundaryProps {
   children: ReactNode;
   FallbackComponent?: ComponentType<ErrorFallbackProps>;
-  /** Changing this clears a caught error. Pass the route to recover on navigation. */
   resetKey?: unknown;
 }
 
@@ -25,7 +25,7 @@ function toError(value: unknown): Error {
   if (value instanceof Error) {
     return value;
   }
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     return new Error(value);
   }
   try {
@@ -37,25 +37,27 @@ function toError(value: unknown): Error {
 
 function DefaultFallback({ error, resetError }: ErrorFallbackProps) {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 p-6">
-      <div className="max-w-lg w-full text-center">
-        <h1 className="text-xl font-semibold text-gray-900">
-          Something went wrong
-        </h1>
-        <p className="mt-2 text-sm text-gray-600">
-          This part of the app hit an error. The rest of the app is still
-          running.
+    <div className="flex min-h-[100dvh] w-full flex-col items-center justify-center gap-12 bg-background p-6">
+      <a href={import.meta.env.BASE_URL} aria-label="Amara Trading Center home">
+        <BrandLogo size="md" priority />
+      </a>
+      <div className="w-full max-w-lg border border-border bg-card p-8 text-center">
+        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+          Interrupted
         </p>
-        {/* Dev only: messages can carry API responses and other internals. */}
+        <h1 className="font-display text-3xl text-foreground">Something went wrong</h1>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          This part of the site hit an error. The rest of the site is still available.
+        </p>
         {import.meta.env.DEV ? (
-          <pre className="mt-4 overflow-x-auto rounded bg-gray-100 p-3 text-left text-xs text-gray-800">
+          <pre className="mt-4 overflow-x-auto border border-border bg-muted p-3 text-left text-xs text-foreground">
             {error.message || String(error)}
           </pre>
         ) : null}
         <button
           type="button"
           onClick={resetError}
-          className="mt-4 rounded bg-gray-900 px-4 py-2 text-sm text-white hover:bg-gray-700"
+          className="mt-6 bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground hover:bg-primary/90"
         >
           Try again
         </button>
@@ -75,18 +77,11 @@ export class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo): void {
-    console.error(
-      'ErrorBoundary caught an error:',
-      toError(error),
-      info.componentStack,
-    );
+    console.error("ErrorBoundary caught an error:", toError(error), info.componentStack);
   }
 
   componentDidUpdate(prevProps: ErrorBoundaryProps): void {
-    if (
-      this.state.error !== null &&
-      prevProps.resetKey !== this.props.resetKey
-    ) {
+    if (this.state.error !== null && prevProps.resetKey !== this.props.resetKey) {
       this.resetError();
     }
   }

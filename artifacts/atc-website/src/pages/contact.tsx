@@ -1,14 +1,12 @@
-import { Link } from "wouter";
 import { MainLayout } from "@/components/layout/main-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
+import { useInquiryForm } from "@/hooks/use-inquiry-form";
+import { company } from "@/lib/content";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -19,34 +17,27 @@ const formSchema = z.object({
 });
 
 export default function Contact() {
-  const { toast } = useToast();
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      message: "",
-    },
+  const { form, onSubmit, isPending } = useInquiryForm({
+    schema: formSchema,
+    defaultValues: { name: "", email: "", phone: "", company: "", message: "" },
+    toPayload: (values) => ({
+      name: values.name,
+      email: values.email,
+      phone: values.phone || null,
+      company: values.company || null,
+      message: values.message,
+    }),
+    successTitle: "Inquiry sent",
+    successDescription: "We have received your message and will respond shortly.",
+    errorTitle: "Unable to send inquiry",
   });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, this would be an API call
-    console.log(values);
-    toast({
-      title: "Inquiry Sent",
-      description: "We have received your message and will respond shortly.",
-    });
-    form.reset();
-  }
 
   return (
     <MainLayout>
       <div className="bg-muted py-12 md:py-24">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-serif mb-6">Contact Us</h1>
+            <h1 className="text-4xl md:text-5xl font-display mb-6">Contact Us</h1>
             <p className="text-muted-foreground text-lg leading-relaxed max-w-xl">
               Whether you are looking for specific technical details or ready to begin a project consultation, our team is available to assist you.
             </p>
@@ -58,51 +49,43 @@ export default function Contact() {
         <div className="grid md:grid-cols-12 gap-16">
           <div className="md:col-span-5 space-y-12">
             <div>
-              <h3 className="font-serif text-2xl mb-6">Showrooms</h3>
+              <h3 className="font-display text-2xl mb-6">Showrooms</h3>
               <div className="space-y-8">
-                <div>
-                  <h4 className="font-bold text-sm uppercase tracking-wider mb-2">Al-Bayader</h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Industrial Area, 8th Circle<br />
-                    Amman, Jordan
-                  </p>
-                  <p className="text-sm mt-2 font-medium">+962 6 581 0000</p>
-                </div>
-                
-                <div>
-                  <h4 className="font-bold text-sm uppercase tracking-wider mb-2">Al-Wehdat</h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Building Materials St.<br />
-                    Amman, Jordan
-                  </p>
-                  <p className="text-sm mt-2 font-medium">+962 6 477 0000</p>
-                </div>
+                {company.showrooms.map((showroom) => (
+                  <div key={showroom.name}>
+                    <h4 className="font-bold text-sm uppercase tracking-wider mb-2">{showroom.name}</h4>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {showroom.addressLines.map((line) => (
+                        <span key={line}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
+                    </p>
+                    <p className="text-sm mt-2 font-medium">{showroom.phone}</p>
+                  </div>
+                ))}
               </div>
+              {company.contactUnconfirmed ? (
+                <p className="mt-6 text-xs leading-relaxed text-muted-foreground">{company.contactNote}</p>
+              ) : null}
             </div>
 
             <div>
-              <h3 className="font-serif text-2xl mb-6">Direct Channels</h3>
+              <h3 className="font-display text-2xl mb-6">Direct Channels</h3>
               <div className="space-y-4 text-sm">
                 <div>
                   <span className="block text-muted-foreground mb-1">General Inquiries</span>
-                  <a href="mailto:info@amara.jo" className="font-medium hover:text-primary transition-colors">info@amara.jo</a>
+                  <a href={`mailto:${company.email}`} className="font-medium hover:text-primary transition-colors">
+                    {company.email}
+                  </a>
                 </div>
               </div>
-            </div>
-
-            <div className="p-6 bg-accent/30 border border-border/50">
-              <h4 className="font-serif text-lg mb-2">Trade Professional?</h4>
-              <p className="text-sm text-muted-foreground mb-4">
-                Skip the general inquiry and access our dedicated portal for fabricators and architects.
-              </p>
-              <Link href="/trade" className="text-xs font-bold uppercase tracking-wider text-primary hover:text-foreground transition-colors inline-flex items-center">
-                Go to Trade Hub &rarr;
-              </Link>
             </div>
           </div>
 
           <div className="md:col-span-7">
-            <h3 className="font-serif text-2xl mb-8">Send an Inquiry</h3>
+            <h3 className="font-display text-2xl mb-8">Send an Inquiry</h3>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
@@ -111,9 +94,9 @@ export default function Contact() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <Label>Full Name *</Label>
+                        <Label htmlFor="contact-name">Full Name *</Label>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input id="contact-name" placeholder="John Doe" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -124,9 +107,9 @@ export default function Contact() {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <Label>Email Address *</Label>
+                        <Label htmlFor="contact-email">Email Address *</Label>
                         <FormControl>
-                          <Input type="email" placeholder="john@example.com" {...field} />
+                          <Input id="contact-email" type="email" placeholder="john@example.com" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -140,9 +123,9 @@ export default function Contact() {
                     name="company"
                     render={({ field }) => (
                       <FormItem>
-                        <Label>Company (Optional)</Label>
+                        <Label htmlFor="contact-company">Company (Optional)</Label>
                         <FormControl>
-                          <Input placeholder="Architecture Firm LLC" {...field} />
+                          <Input id="contact-company" placeholder="Architecture Firm LLC" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -153,9 +136,9 @@ export default function Contact() {
                     name="phone"
                     render={({ field }) => (
                       <FormItem>
-                        <Label>Phone Number (Optional)</Label>
+                        <Label htmlFor="contact-phone">Phone Number (Optional)</Label>
                         <FormControl>
-                          <Input type="tel" placeholder="+962 79 000 0000" {...field} />
+                          <Input id="contact-phone" type="tel" placeholder="+962 79 000 0000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -168,12 +151,13 @@ export default function Contact() {
                   name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <Label>Message *</Label>
+                      <Label htmlFor="contact-message">Message *</Label>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Please provide details about your inquiry..." 
+                        <Textarea
+                          id="contact-message"
+                          placeholder="Please provide details about your inquiry..."
                           className="min-h-[150px]"
-                          {...field} 
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -181,8 +165,13 @@ export default function Contact() {
                   )}
                 />
 
-                <Button type="submit" size="lg" className="rounded-none tracking-widest uppercase text-xs font-bold w-full md:w-auto">
-                  Submit Inquiry
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={isPending}
+                  className="rounded-none tracking-widest uppercase text-xs font-bold w-full md:w-auto"
+                >
+                  {isPending ? "Sending…" : "Submit Inquiry"}
                 </Button>
               </form>
             </Form>

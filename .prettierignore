@@ -1,0 +1,7 @@
+dist
+node_modules
+generated
+pnpm-lock.yaml
+artifacts/mockup-sandbox
+lib/api-client-react/src/generated
+lib/api-zod/src/generated

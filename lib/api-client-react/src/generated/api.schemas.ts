@@ -22,6 +22,8 @@ export const ContentStatus = {
 export interface Spec {
   label: string;
   value: string;
+  /** @nullable */
+  group?: string | null;
 }
 
 export interface Brand {
@@ -44,6 +46,102 @@ export interface Brand {
   websiteUrl?: string | null;
   isFeatured: boolean;
   status: ContentStatus;
+}
+
+export type ProductEditorialChaptersItem = {
+  title: string;
+  body: string;
+  /** @nullable */
+  image?: string | null;
+};
+
+export type ProductEditorialDesigner = {
+  name: string;
+  bio: string;
+  /** @nullable */
+  url?: string | null;
+};
+
+export interface ProductEditorial {
+  statement?: string;
+  awards?: string[];
+  chapters?: ProductEditorialChaptersItem[];
+  designer?: ProductEditorialDesigner;
+  gallery?: string[];
+}
+
+export type ProductDetailsVariantsItemKind = typeof ProductDetailsVariantsItemKind[keyof typeof ProductDetailsVariantsItemKind];
+
+
+export const ProductDetailsVariantsItemKind = {
+  finish: 'finish',
+  size: 'size',
+  model: 'model',
+  colour: 'colour',
+} as const;
+
+export type ProductDetailsMediaItemRole = typeof ProductDetailsMediaItemRole[keyof typeof ProductDetailsMediaItemRole];
+
+
+export const ProductDetailsMediaItemRole = {
+  cutout: 'cutout',
+  finish: 'finish',
+  detail: 'detail',
+  ambient: 'ambient',
+  technical: 'technical',
+} as const;
+
+export type ProductDetailsFeaturesItem = {
+  title: string;
+  /** @nullable */
+  body?: string | null;
+  /** @nullable */
+  image?: string | null;
+};
+
+export type ProductDetailsVariantsItemAttributes = {[key: string]: string};
+
+export type ProductDetailsVariantsItem = {
+  code: string;
+  label: string;
+  kind: ProductDetailsVariantsItemKind;
+  /** @nullable */
+  articleNumber?: string | null;
+  attributes?: ProductDetailsVariantsItemAttributes;
+  /** @nullable */
+  image?: string | null;
+};
+
+export type ProductDetailsDownloadsItem = {
+  label: string;
+  fileType: string;
+};
+
+export type ProductDetailsMediaItem = {
+  src: string;
+  role: ProductDetailsMediaItemRole;
+  /** @nullable */
+  variantCode?: string | null;
+  /** @nullable */
+  alt?: string | null;
+};
+
+export interface ProductDetails {
+  /** @nullable */
+  sourceUrl?: string | null;
+  /** @nullable */
+  collection?: string | null;
+  brandCategoryPath?: string[];
+  badges?: string[];
+  /** @nullable */
+  summary?: string | null;
+  features?: ProductDetailsFeaturesItem[];
+  variants?: ProductDetailsVariantsItem[];
+  applications?: string[];
+  downloads?: ProductDetailsDownloadsItem[];
+  media?: ProductDetailsMediaItem[];
+  related?: string[];
+  videos?: number;
 }
 
 export interface Product {
@@ -75,6 +173,8 @@ export interface Product {
   finishes: string[];
   /** @nullable */
   installationNotes?: string | null;
+  editorial?: ProductEditorial | null;
+  details?: ProductDetails | null;
   isFeatured: boolean;
   status: ContentStatus;
 }
@@ -141,6 +241,8 @@ export interface ProductInput {
   finishes: string[];
   /** @nullable */
   installationNotes?: string | null;
+  editorial?: ProductEditorial | null;
+  details?: ProductDetails | null;
   isFeatured: boolean;
   status: ContentStatus;
 }
@@ -166,5 +268,32 @@ export interface ImportResult {
   brandsUpserted: number;
   productsUpserted: number;
   preservedSlugs: number;
+}
+
+export type InquiryInputKind = typeof InquiryInputKind[keyof typeof InquiryInputKind];
+
+
+export const InquiryInputKind = {
+  general: 'general',
+} as const;
+
+export interface InquiryInput {
+  kind: InquiryInputKind;
+  /** @minLength 2 */
+  name: string;
+  /** @minLength 3 */
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  /** @nullable */
+  projectType?: string | null;
+  /** @minLength 10 */
+  message: string;
+}
+
+export interface InquiryResult {
+  accepted: boolean;
 }
 

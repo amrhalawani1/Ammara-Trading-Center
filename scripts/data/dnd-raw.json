@@ -1,0 +1,1893 @@
+{
+  "extractedAt": "2026-09-16T02:03:07.416Z",
+  "results": [
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte/lucrezia/",
+      "setting": "Interior doors",
+      "sectionSlug": "maniglie-per-porte",
+      "handleSlug": "lucrezia",
+      "title": "lucrezia",
+      "designer": "Marco Pisati",
+      "breadcrumb": [
+        "Products",
+        "Handles for doors",
+        "lucrezia"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=678&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "BSO",
+          "label": "Matt sandblasted bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "lucrezia",
+        "lucrezia 02",
+        "lucrezia 03"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 66
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte/pencil/",
+      "setting": "Interior doors",
+      "sectionSlug": "maniglie-per-porte",
+      "handleSlug": "pencil",
+      "title": "pencil",
+      "designer": "BIG – Bjarke Ingels Group",
+      "breadcrumb": [
+        "Products",
+        "Handles for doors",
+        "pencil"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [
+        "New"
+      ],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=16468&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ANT",
+          "label": "Natural aluminium",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ARO",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ASV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ANE",
+          "label": "Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "pencil new"
+      ],
+      "awards": [],
+      "videos": 2,
+      "imageCount": 68
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte/zeppelin/",
+      "setting": "Interior doors",
+      "sectionSlug": "maniglie-per-porte",
+      "handleSlug": "zeppelin",
+      "title": "zeppelin",
+      "designer": "Jaime Hayon",
+      "breadcrumb": [
+        "Products",
+        "Handles for doors",
+        "zeppelin"
+      ],
+      "design": "Round",
+      "roses": [
+        "standard",
+        "unico"
+      ],
+      "unico": true,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=828&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OVE",
+          "label": "Green",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Unico rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Unico rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Unico rose"
+        },
+        {
+          "code": "OVE",
+          "label": "Green",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Unico rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "zeppelin"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 91
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte/minima/",
+      "setting": "Interior doors",
+      "sectionSlug": "maniglie-per-porte",
+      "handleSlug": "minima",
+      "title": "minima",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "Handles for doors",
+        "minima"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=698&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ZCCS",
+          "label": "Polished chrome + Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZCBI",
+          "label": "Polished chrome + White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZCNE",
+          "label": "Polished chrome + Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "minima"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 29
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte/interna-new-flush-minimalist-door-handle/",
+      "setting": "Flush interior doors",
+      "sectionSlug": "maniglie-per-porte",
+      "handleSlug": "interna-new-flush-minimalist-door-handle",
+      "title": "interna",
+      "designer": "Giulio Iacchetti",
+      "breadcrumb": [
+        "Products",
+        "Handles for doors",
+        "interna"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "ZBC",
+          "label": "Blue dove",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZBN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZBR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZBT",
+          "label": "Turquoise",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZGO",
+          "label": "Yellow olive",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZNE",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZRA",
+          "label": "Gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZSV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZVP",
+          "label": "Pastel violet",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [
+        "Winner Archiproducts Design Awards 2024 Immediacy released from mechanics"
+      ],
+      "videos": 2,
+      "imageCount": 74
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-finestre/ginkgo-dk/",
+      "setting": "Windows",
+      "sectionSlug": "maniglie-per-finestre",
+      "handleSlug": "ginkgo-dk",
+      "title": "ginkgo",
+      "designer": "Giulio Iacchetti",
+      "breadcrumb": [
+        "Products",
+        "Handles for windows",
+        "ginkgo"
+      ],
+      "design": "Round",
+      "roses": [
+        "standard",
+        "unico"
+      ],
+      "unico": true,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=3607&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ONT",
+          "label": "Natural brass",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Unico rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Unico rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Unico rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Unico rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Finishes"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Finishes"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Finishes"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Finishes"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Finishes"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Finishes"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Finishes"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Finishes"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Finishes"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "ginkgo quadra",
+        "ginkgo tonda",
+        "gingko quadra",
+        "ginkgo"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 97
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-finestre/timeless-dk/",
+      "setting": "Windows",
+      "sectionSlug": "maniglie-per-finestre",
+      "handleSlug": "timeless-dk",
+      "title": "timeless",
+      "designer": "Marco Pisati",
+      "breadcrumb": [
+        "Products",
+        "Handles for windows",
+        "timeless"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=13461&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ANT",
+          "label": "Natural aluminium",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ASV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ARO",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ANE",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABT",
+          "label": "Turquoise",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AGO",
+          "label": "Yellow olive",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AVP",
+          "label": "Pastel violet",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABC",
+          "label": "Blue dove",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "timeless"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 54
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-finestre/minima-dk/",
+      "setting": "Windows",
+      "sectionSlug": "maniglie-per-finestre",
+      "handleSlug": "minima-dk",
+      "title": "minima",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "Handles for windows",
+        "minima"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4034&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ZCCS",
+          "label": "Polished chrome + Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZCBI",
+          "label": "Polished chrome + White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZCNE",
+          "label": "Polished chrome + Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ZCCS",
+          "label": "Polished chrome + Satin chrome",
+          "group": "Finishes"
+        },
+        {
+          "code": "ZCBI",
+          "label": "Polished chrome + White",
+          "group": "Finishes"
+        },
+        {
+          "code": "ZCNE",
+          "label": "Polished chrome + Black",
+          "group": "Finishes"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "minima"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 30
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte-scorrevoli/master-tonda-sd501/",
+      "setting": "Sliding doors",
+      "sectionSlug": "maniglie-per-porte-scorrevoli",
+      "handleSlug": "master-tonda-sd501",
+      "title": "master tonda",
+      "designer": null,
+      "breadcrumb": [
+        "Products",
+        "Handles for sliding doors",
+        "master tonda"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "OLV",
+          "label": "Polished",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OS",
+          "label": "Satin",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AB",
+          "label": "Antique bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "BSO",
+          "label": "Matt sandblasted bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONS",
+          "label": "Satin nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ORA",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OVP",
+          "label": "Pastel violet",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBC",
+          "label": "Blue dove",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBT",
+          "label": "Turquoise",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGO",
+          "label": "Yellow olive",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OSV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "TAN",
+          "label": "Anthracite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 109
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte-scorrevoli/ring-sd222/",
+      "setting": "Sliding doors",
+      "sectionSlug": "maniglie-per-porte-scorrevoli",
+      "handleSlug": "ring-sd222",
+      "title": "ring",
+      "designer": null,
+      "breadcrumb": [
+        "Products",
+        "Handles for sliding doors",
+        "ring"
+      ],
+      "design": "Square",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "OLV",
+          "label": "Polished",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AB",
+          "label": "Antique bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "BSO",
+          "label": "Matt sandblasted bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONS",
+          "label": "Satin nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [
+        "ring"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 70
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglie-per-porte-scorrevoli/ginkgo-tonda-sd501/",
+      "setting": "Sliding doors",
+      "sectionSlug": "maniglie-per-porte-scorrevoli",
+      "handleSlug": "ginkgo-tonda-sd501",
+      "title": "gingko tonda",
+      "designer": null,
+      "breadcrumb": [
+        "Products",
+        "Handles for sliding doors",
+        "gingko tonda"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OBN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 29
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglioni-porte/maniglione-zeppelin/",
+      "setting": "Entrance doors",
+      "sectionSlug": "maniglioni-porte",
+      "handleSlug": "maniglione-zeppelin",
+      "title": "zeppelin",
+      "designer": "Jaime Hayon",
+      "breadcrumb": [
+        "Products",
+        "Door and gate pull handles",
+        "zeppelin"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4135&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OVE",
+          "label": "Green",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "zeppelin"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 53
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglioni-porte/maniglione-pencil/",
+      "setting": "Entrance doors",
+      "sectionSlug": "maniglioni-porte",
+      "handleSlug": "maniglione-pencil",
+      "title": "pencil",
+      "designer": "BIG – Bjarke Ingels Group",
+      "breadcrumb": [],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [
+        "New"
+      ],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=16494&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ANT",
+          "label": "Natural aluminium",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ARO",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ASV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ANE",
+          "label": "Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "pencil new"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 41
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglioni-porte/maniglione-tube-round/",
+      "setting": "Entrance doors",
+      "sectionSlug": "maniglioni-porte",
+      "handleSlug": "maniglione-tube-round",
+      "title": "tube round",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "Door and gate pull handles",
+        "tube round"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4134&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "tube round zancato"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 34
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglioni-per-alzante-scorrevole/edra/",
+      "setting": "Lift-and-slide doors",
+      "sectionSlug": "maniglioni-per-alzante-scorrevole",
+      "handleSlug": "edra",
+      "title": "edra",
+      "designer": "Mauro Ronchi",
+      "breadcrumb": [
+        "Products",
+        "Pull handles for lift sliding system",
+        "edra"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4666&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONS",
+          "label": "Satin nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "edra 02 corto",
+        "edra 02",
+        "edra corto"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 61
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/maniglioni-per-alzante-scorrevole/slide/",
+      "setting": "Lift-and-slide doors",
+      "sectionSlug": "maniglioni-per-alzante-scorrevole",
+      "handleSlug": "slide",
+      "title": "slide",
+      "designer": "Mauro Ronchi",
+      "breadcrumb": [
+        "Products",
+        "Pull handles for lift sliding system",
+        "slide"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4773&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 42
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomoli-per-porte/pomoli-sfera/",
+      "setting": "Interior doors",
+      "sectionSlug": "pomoli-per-porte",
+      "handleSlug": "pomoli-sfera",
+      "title": "sfera",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "Door knobs",
+        "sfera"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=3846&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 23
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomoli-per-porte/pomolo-timeless/",
+      "setting": "Interior doors",
+      "sectionSlug": "pomoli-per-porte",
+      "handleSlug": "pomolo-timeless",
+      "title": "timeless",
+      "designer": "Marco Pisati",
+      "breadcrumb": [
+        "Products",
+        "Door knobs",
+        "timeless"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=3848&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ASV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ARO",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ANE",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABC",
+          "label": "Blue dove",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AVP",
+          "label": "Pastel violet",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABT",
+          "label": "Turquoise",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AGO",
+          "label": "Yellow olive",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "timeless"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 55
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomoli-per-porte/pomoli-olive/",
+      "setting": "Interior doors",
+      "sectionSlug": "pomoli-per-porte",
+      "handleSlug": "pomoli-olive",
+      "title": "olive",
+      "designer": "Park",
+      "breadcrumb": [
+        "Products",
+        "Door knobs",
+        "olive"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [
+        "New"
+      ],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=16411&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "BSO",
+          "label": "Matt sandblasted bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 46
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomolini-e-accessori-per-mobili/crisalide-knob/",
+      "setting": "Furniture",
+      "sectionSlug": "pomolini-e-accessori-per-mobili",
+      "handleSlug": "crisalide-knob",
+      "title": "crisalide",
+      "designer": "Elena Salmistraro",
+      "breadcrumb": [
+        "Products",
+        "Furniture knobs and accessories",
+        "crisalide"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=11218&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ANE+PSW",
+          "label": "Black + white glossy porcelain",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "crisalide",
+        "crisalide mini"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 33
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomolini-e-accessori-per-mobili/lucrezia-knob/",
+      "setting": "Furniture",
+      "sectionSlug": "pomolini-e-accessori-per-mobili",
+      "handleSlug": "lucrezia-knob",
+      "title": "lucrezia",
+      "designer": "Marco Pisati",
+      "breadcrumb": [
+        "Products",
+        "Furniture knobs and accessories",
+        "lucrezia"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4923&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "OLV",
+          "label": "Polished",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "BSO",
+          "label": "Matt sandblasted bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "lucrezia",
+        "lucrezia 02",
+        "lucrezia 03"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 53
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/pomolini-e-accessori-per-mobili/timeless-knob/",
+      "setting": "Furniture",
+      "sectionSlug": "pomolini-e-accessori-per-mobili",
+      "handleSlug": "timeless-knob",
+      "title": "timeless",
+      "designer": "Marco Pisati",
+      "breadcrumb": [
+        "Products",
+        "Furniture knobs and accessories",
+        "timeless"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=4919&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ASV",
+          "label": "Silver",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ARO",
+          "label": "Satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABR",
+          "label": "Bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABN",
+          "label": "White",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ANE",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABC",
+          "label": "Blue dove",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AVP",
+          "label": "Pastel violet",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ABT",
+          "label": "Turquoise",
+          "group": "Standard rose"
+        },
+        {
+          "code": "AGO",
+          "label": "Yellow olive",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "timeless"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 60
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/fermaporta/chiocciola/",
+      "setting": "Door stops",
+      "sectionSlug": "fermaporta",
+      "handleSlug": "chiocciola",
+      "title": "chiocciola",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "chiocciola",
+        "chiocciola"
+      ],
+      "design": null,
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "OLV",
+          "label": "Polished",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONS",
+          "label": "Satin nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 37
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/fermaporta/ring/",
+      "setting": "Door stops",
+      "sectionSlug": "fermaporta",
+      "handleSlug": "ring",
+      "title": "ring",
+      "designer": "Dnd technical division",
+      "breadcrumb": [
+        "Products",
+        "ring",
+        "ring"
+      ],
+      "design": null,
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [
+        {
+          "code": "OLV",
+          "label": "Polished",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OGH",
+          "label": "Matt satin bronze",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OC",
+          "label": "Polished chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "OCS",
+          "label": "Satin chrome",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONS",
+          "label": "Satin nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "ONO",
+          "label": "Black",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVN",
+          "label": "Bright nickel",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PGS",
+          "label": "Satin graphite",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-BG",
+          "label": "Antique bright gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SG",
+          "label": "Antique satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SH",
+          "label": "Champagne satin gold",
+          "group": "Standard rose"
+        },
+        {
+          "code": "PVD-SB",
+          "label": "Satin bronze",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [
+        "ring"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 66
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/sistemi-di-chiusura/dynamic/",
+      "setting": "Locking systems",
+      "sectionSlug": "sistemi-di-chiusura",
+      "handleSlug": "dynamic",
+      "title": "dynamic",
+      "designer": null,
+      "breadcrumb": [],
+      "design": null,
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [],
+      "downloads": [],
+      "family": [],
+      "awards": [
+        "Winner Archiproducts Design Awards 2024 download installation instruction"
+      ],
+      "videos": 0,
+      "imageCount": 49
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/sistemi-di-chiusura/vertical/",
+      "setting": "Locking systems",
+      "sectionSlug": "sistemi-di-chiusura",
+      "handleSlug": "vertical",
+      "title": "vertical",
+      "designer": null,
+      "breadcrumb": [],
+      "design": null,
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": null,
+      "finishes": [],
+      "downloads": [],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 67
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/chiavi/dnd/",
+      "setting": "Keys",
+      "sectionSlug": "chiavi",
+      "handleSlug": "dnd",
+      "title": "dnd",
+      "designer": "Giulio Iacchetti",
+      "breadcrumb": [
+        "Products",
+        "dnd",
+        "dnd"
+      ],
+      "design": null,
+      "roses": [],
+      "unico": false,
+      "badges": [
+        "New"
+      ],
+      "techSheetUrl": null,
+      "finishes": [],
+      "downloads": [
+        "Catalogue sheet"
+      ],
+      "family": [],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 24
+    },
+    {
+      "sourceUrl": "https://www.dndhandles.it/en/products/appendini/crisalide-appendino/",
+      "setting": "Hangers",
+      "sectionSlug": "appendini",
+      "handleSlug": "crisalide-appendino",
+      "title": "crisalide",
+      "designer": "Elena Salmistraro",
+      "breadcrumb": [
+        "Products",
+        "crisalide",
+        "crisalide"
+      ],
+      "design": "Round",
+      "roses": [],
+      "unico": false,
+      "badges": [],
+      "techSheetUrl": "https://magic.dndhandles.it/wp-json/dnd/v1/tech-sheet?id=12577&output=stream&lang=en",
+      "finishes": [
+        {
+          "code": "ANE+PSD",
+          "label": "Black + decorated glossy porcelain",
+          "group": "Standard rose"
+        }
+      ],
+      "downloads": [
+        "Drawings and technical info",
+        "Catalogue sheet"
+      ],
+      "family": [
+        "crisalide",
+        "crisalide mini"
+      ],
+      "awards": [],
+      "videos": 0,
+      "imageCount": 28
+    }
+  ],
+  "failures": []
+}

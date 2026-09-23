@@ -2,6 +2,16 @@ import { useState } from "react";
 import { useListContentBrands, useDeleteContentBrand, getListContentBrandsQueryKey, getGetPublicCatalogQueryKey } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Edit2, Trash2 } from "lucide-react";
 import { BrandFormDialog } from "./brand-form-dialog";
@@ -13,9 +23,10 @@ export function BrandsTab() {
   const deleteBrand = useDeleteContentBrand();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const handleEdit = (brand: Brand) => {
     setSelectedBrand(brand);
@@ -28,17 +39,21 @@ export function BrandsTab() {
   };
 
   const handleDelete = (id: number) => {
-    if (!confirm("Are you sure you want to delete this brand?")) return;
-    
-    deleteBrand.mutate({ id }, {
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = () => {
+    if (pendingDeleteId === null) return;
+    deleteBrand.mutate({ id: pendingDeleteId }, {
       onSuccess: () => {
         toast({ title: "Brand deleted successfully." });
         queryClient.invalidateQueries({ queryKey: getListContentBrandsQueryKey() });
-        queryClient.invalidateQueries();
+        queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
       },
       onError: () => {
         toast({ title: "Failed to delete brand.", variant: "destructive" });
-      }
+      },
+      onSettled: () => setPendingDeleteId(null),
     });
   };
 
@@ -57,7 +72,7 @@ export function BrandsTab() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-serif">Brand Management</h2>
+        <h2 className="text-2xl font-display">Brand Management</h2>
         <Button onClick={handleCreate} className="rounded-none text-xs font-bold uppercase tracking-widest">
           <Plus className="w-4 h-4 mr-2" /> Add Brand
         </Button>
@@ -77,7 +92,7 @@ export function BrandsTab() {
                     <div className="w-12 h-12 bg-muted border border-border flex items-center justify-center text-[10px] text-muted-foreground uppercase tracking-wider">No Img</div>
                   )}
                   <div>
-                    <h3 className="font-serif text-lg leading-none mb-1">{brand.name}</h3>
+                    <h3 className="font-display text-lg leading-none mb-1">{brand.name}</h3>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span>/{brand.slug}</span>
                       <span className={`px-2 py-0.5 border border-border uppercase tracking-widest text-[9px] font-bold ${brand.status === 'published' ? 'text-primary' : ''}`}>
@@ -100,11 +115,31 @@ export function BrandsTab() {
         )}
       </div>
 
-      <BrandFormDialog 
-        brand={selectedBrand} 
-        open={isDialogOpen} 
-        onOpenChange={setIsDialogOpen} 
+      <BrandFormDialog
+        brand={selectedBrand}
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
       />
+
+      <AlertDialog open={pendingDeleteId !== null} onOpenChange={(open) => !open && setPendingDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this brand?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the brand from the catalogue. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -9,4 +9,6 @@
 export interface Spec {
   label: string;
   value: string;
+  /** @nullable */
+  group?: string | null;
 }

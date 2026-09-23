@@ -10,7 +10,7 @@ export function CandidateFeature({ label }: { label: string }) {
         <div className="h-20 bg-border/40 w-full"></div>
       </div>
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
-        <span className="font-serif text-lg">{label}</span>
+        <span className="font-display text-lg">{label}</span>
         <span className="text-xs text-muted-foreground">Pending Scope Confirmation</span>
       </div>
     </div>

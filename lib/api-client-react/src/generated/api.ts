@@ -28,6 +28,8 @@ import type {
   HealthStatus,
   ImportInput,
   ImportResult,
+  InquiryInput,
+  InquiryResult,
   Product,
   ProductInput,
   ProductUpdate
@@ -367,6 +369,77 @@ export function useGetPublicProduct<TData = Awaited<ReturnType<typeof getPublicP
 
 
 
+
+export const getCreateInquiryUrl = () => {
+
+
+
+
+  return `/api/inquiries`
+}
+
+/**
+ * @summary Submit a general inquiry
+ */
+export const createInquiry = async (inquiryInput: InquiryInput, options?: Parameters<typeof customFetch>[1]): Promise<InquiryResult> => {
+
+  return customFetch<InquiryResult>(getCreateInquiryUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(inquiryInput)
+  }
+);}
+
+
+
+
+
+export const getCreateInquiryMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInquiry>>, TError,{data: BodyType<InquiryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createInquiry>>, TError,{data: BodyType<InquiryInput>}, TContext> => {
+
+const mutationKey = ['createInquiry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createInquiry>>, {data: BodyType<InquiryInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createInquiry(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateInquiryMutationResult = NonNullable<Awaited<ReturnType<typeof createInquiry>>>
+    export type CreateInquiryMutationBody = BodyType<InquiryInput>
+    export type CreateInquiryMutationError = ErrorType<void>
+
+    /**
+ * @summary Submit a general inquiry
+ */
+export const useCreateInquiry = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInquiry>>, TError,{data: BodyType<InquiryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createInquiry>>,
+        TError,
+        {data: BodyType<InquiryInput>},
+        TContext
+      > => {
+      return useMutation(getCreateInquiryMutationOptions(options));
+    }
 
 export const getListContentBrandsUrl = () => {
 

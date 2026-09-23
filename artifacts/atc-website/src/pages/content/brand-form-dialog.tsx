@@ -72,7 +72,7 @@ export function BrandFormDialog({ brand, open, onOpenChange }: BrandFormDialogPr
         coverImage: brand.coverImage || "",
         websiteUrl: brand.websiteUrl || "",
         isFeatured: brand.isFeatured,
-        status: brand.status as any,
+        status: brand.status as BrandFormValues["status"],
         legacyId: brand.legacyId || ""
       });
     } else if (!brand && open) {
@@ -109,7 +109,7 @@ export function BrandFormDialog({ brand, open, onOpenChange }: BrandFormDialogPr
         onSuccess: () => {
           toast({ title: "Brand updated." });
           queryClient.invalidateQueries({ queryKey: getListContentBrandsQueryKey() });
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
           onOpenChange(false);
         },
         onError: () => toast({ title: "Failed to update brand.", variant: "destructive" })
@@ -119,7 +119,7 @@ export function BrandFormDialog({ brand, open, onOpenChange }: BrandFormDialogPr
         onSuccess: () => {
           toast({ title: "Brand created." });
           queryClient.invalidateQueries({ queryKey: getListContentBrandsQueryKey() });
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
           onOpenChange(false);
         },
         onError: () => toast({ title: "Failed to create brand.", variant: "destructive" })
@@ -133,7 +133,7 @@ export function BrandFormDialog({ brand, open, onOpenChange }: BrandFormDialogPr
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-none border-border">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">{brand ? "Edit Brand" : "New Brand"}</DialogTitle>
+          <DialogTitle className="font-display text-2xl">{brand ? "Edit Brand" : "New Brand"}</DialogTitle>
           <DialogDescription className="font-light">
             Fill out the details for this brand below.
           </DialogDescription>

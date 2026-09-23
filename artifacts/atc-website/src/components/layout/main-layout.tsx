@@ -11,8 +11,14 @@ export function MainLayout({
 }) {
   return (
     <div className="min-h-[100dvh] flex flex-col w-full bg-background text-foreground selection:bg-primary/20">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:bg-primary focus:px-4 focus:py-2 focus:text-xs focus:font-bold focus:uppercase focus:tracking-widest focus:text-primary-foreground"
+      >
+        Skip to content
+      </a>
       <Navbar overlay={immersiveHeader} />
-      <main className="flex-1 w-full flex flex-col">
+      <main id="main-content" className="flex-1 w-full flex flex-col">
         {children}
       </main>
       <Footer />

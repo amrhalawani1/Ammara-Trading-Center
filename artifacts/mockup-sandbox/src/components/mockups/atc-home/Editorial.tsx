@@ -3,7 +3,7 @@ import { createContext, useContext, useState, type FormEvent, type ReactNode } f
 import "./_group.css";
 
 const assetRoot = "/__mockup/images/";
-type View = "home" | "catalog" | "brands" | "product" | "trade" | "showroom" | "resources" | "about" | "contact";
+type View = "home" | "catalog" | "brands" | "product" | "showroom" | "resources" | "about" | "contact";
 const NavContext = createContext<((href: string) => void) | null>(null);
 
 function Anchor({
@@ -57,7 +57,6 @@ function Header() {
     ["The collection", "/catalog"],
     ["Our partners", "/brands"],
     ["Showroom", "/showroom"],
-    ["Trade", "/trade"],
   ];
   return (
     <header className="absolute inset-x-0 top-0 z-20">
@@ -208,26 +207,13 @@ function FlowPage({ view }: { view: Exclude<View, "home"> }) {
               <p className="flex justify-between gap-5"><span>Movement</span><span className="text-right text-[#f2ede5]">Integrated soft close</span></p>
               <p className="flex justify-between gap-5"><span>Support</span><span className="text-right text-[#f2ede5]">ATC trade guidance</span></p>
             </div>
-            <Anchor href="/trade" className="mt-12 inline-flex items-center gap-3 bg-[#9d2f24] px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5]">Request specification <ArrowUpRight size={15} /></Anchor>
+            <Anchor href="/contact" className="mt-12 inline-flex items-center gap-3 bg-[#9d2f24] px-5 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5]">Request specification <ArrowUpRight size={15} /></Anchor>
           </div>
         </section>
       </>
     );
   }
 
-  if (view === "trade") {
-    return (
-      <>
-        <FlowHeader view={view} eyebrow="Trade / B2B" title="Bring us the detail your project depends on." detail="A direct route for architects, fabricators, contractors, and procurement teams who need one accountable partner across the specification." />
-        <section className="grid gap-16 px-6 py-16 md:grid-cols-12 md:px-12 md:py-24">
-          <div className="md:col-span-5"><SectionKicker>Why ATC</SectionKicker><h2 className="mt-7 font-serif text-5xl leading-[0.94] md:text-7xl">One conversation. A deeper portfolio.</h2><p className="mt-8 max-w-sm text-sm leading-7 text-[#2b211c]/60">From product selection to technical support, we help your team move with confidence through the details that make a project hold together.</p></div>
-          <form onSubmit={submit} className="space-y-5 md:col-span-5 md:col-start-8">
-            {submitted ? <div className="border border-[#9d2f24]/35 bg-[#f2e3dc] p-8"><SectionKicker>Inquiry received</SectionKicker><h3 className="mt-6 font-serif text-4xl">We will come back to you shortly.</h3><p className="mt-5 text-sm leading-6 text-[#2b211c]/65">Your project context is the right place to begin.</p><button type="button" onClick={() => setSubmitted(false)} className="mt-8 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9d2f24]">Send another inquiry</button></div> : <><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Your name<input required name="name" className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">Project type<input required name="project" className="mt-3 block w-full border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><label className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-[#2b211c]/55">What are you specifying?<textarea required name="message" rows={4} className="mt-3 block w-full resize-none border-b border-[#2b211c]/25 bg-transparent px-0 py-3 text-base outline-none focus:border-[#9d2f24]" /></label><button type="submit" className="mt-6 bg-[#9d2f24] px-6 py-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f2ede5] transition-colors hover:bg-[#7e261e]">Start the conversation <ArrowUpRight className="ml-2 inline" size={15} /></button></>}
-          </form>
-        </section>
-      </>
-    );
-  }
 
   if (view === "showroom") {
     return (
@@ -421,8 +407,8 @@ export function Editorial() {
               <div className="md:col-span-5 md:col-start-8 md:pt-12">
                 <p className="text-base leading-7 text-[#f2ede5]/65">Whether you are working through a specification or imagining one perfect kitchen, our team can help you move from an idea to the right system.</p>
                 <div className="mt-12 space-y-5 border-t border-[#f2ede5]/20 pt-5">
-                  <Anchor href="/trade" className="group flex items-center justify-between border-b border-[#f2ede5]/20 pb-5 text-xl transition-colors hover:text-[#e2a093]">
-                    <span><small className="mr-4 text-[9px] uppercase tracking-[0.2em] text-[#9d2f24]">01</small> Trade inquiries</span>
+                  <Anchor href="/contact" className="group flex items-center justify-between border-b border-[#f2ede5]/20 pb-5 text-xl transition-colors hover:text-[#e2a093]">
+                    <span><small className="mr-4 text-[9px] uppercase tracking-[0.2em] text-[#9d2f24]">01</small> Contact us</span>
                     <ArrowUpRight size={19} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                   </Anchor>
                   <Anchor href="/showroom" className="group flex items-center justify-between border-b border-[#f2ede5]/20 pb-5 text-xl transition-colors hover:text-[#e2a093]">
@@ -446,7 +432,7 @@ export function Editorial() {
             <div className="max-w-2xl">
               <h2 className="font-serif text-5xl leading-[0.92] tracking-[-0.04em] md:text-8xl">For rooms that earn their place.</h2>
               <p className="mt-8 max-w-md text-sm leading-6 text-[#f2ede5]/75">Technical support, considered recommendations, and a direct line to the details your project depends on.</p>
-              <Anchor href="/trade" className="group mt-8 inline-flex items-center gap-3 border-b border-[#f2ede5]/50 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-[#e2a093] hover:text-[#e2a093]">Enter the trade route <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></Anchor>
+              <Anchor href="/contact" className="group mt-8 inline-flex items-center gap-3 border-b border-[#f2ede5]/50 pb-2 text-[10px] font-semibold uppercase tracking-[0.2em] transition-colors hover:border-[#e2a093] hover:text-[#e2a093]">Contact us <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" /></Anchor>
             </div>
           </div>
         </section>

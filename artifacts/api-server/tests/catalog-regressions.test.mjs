@@ -144,6 +144,8 @@ before(async () => {
       specs jsonb NOT NULL DEFAULT '[]',
       finishes text[] NOT NULL DEFAULT '{}',
       installation_notes text,
+      editorial jsonb,
+      details jsonb,
       is_featured boolean NOT NULL DEFAULT false,
       status text NOT NULL DEFAULT 'draft',
       created_at timestamptz NOT NULL DEFAULT now(),
@@ -153,6 +155,17 @@ before(async () => {
       key text PRIMARY KEY,
       value text NOT NULL,
       updated_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE ${testSchema}.catalog_inquiries (
+      id serial PRIMARY KEY,
+      kind text NOT NULL,
+      name text NOT NULL,
+      email text NOT NULL,
+      phone text,
+      company text,
+      project_type text,
+      message text NOT NULL,
+      created_at timestamptz NOT NULL DEFAULT now()
     );
   `);
   const isolatedUrl = new URL(testDatabaseUrl);
@@ -342,4 +355,30 @@ test("staff can create, publish, retire, and import records without leaking non-
   assert.equal(failedImportResponse.status, 400);
   const contentProducts = await json(await request("/api/content/products", { userId: STAFF_ID }));
   assert.ok(!contentProducts.some((product) => product.slug === `${fixtureKey}-invalid-product`));
+});
+
+test("public visitors can submit a valid inquiry and invalid bodies are rejected", async () => {
+  const invalid = await request("/api/inquiries", {
+    method: "POST",
+    body: { kind: "general", name: "A", email: "not-an-email", message: "short" },
+  });
+  assert.equal(invalid.status, 400);
+
+  const created = await request("/api/inquiries", {
+    method: "POST",
+    body: {
+      kind: "general",
+      name: "Amara Visitor",
+      email: "visitor@example.com",
+      phone: "+962 6 581 0000",
+      company: "Studio",
+      projectType: "Kitchen",
+      message: "I would like a showroom visit and a quotation.",
+    },
+  });
+  assert.equal(created.status, 201);
+  assert.equal((await json(created)).accepted, true);
+
+  const anonymousProtected = await request("/api/content/access");
+  assert.equal(anonymousProtected.status, 401);
 });

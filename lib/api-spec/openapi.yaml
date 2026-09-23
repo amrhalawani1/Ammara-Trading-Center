@@ -12,6 +12,8 @@ tags:
     description: Health operations
   - name: catalogue
     description: Published catalogue content
+  - name: inquiries
+    description: Public inquiries from the contact page
   - name: content
     description: Staff content workspace
 paths:
@@ -71,6 +73,26 @@ paths:
                 $ref: "#/components/schemas/Product"
         "404":
           description: Product not found
+  /inquiries:
+    post:
+      operationId: createInquiry
+      tags: [inquiries]
+      summary: Submit a general inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryInput"
+      responses:
+        "201":
+          description: Inquiry accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InquiryResult"
+        "400":
+          description: Invalid inquiry
   /content/brands:
     get:
       operationId: listContentBrands
@@ -275,6 +297,8 @@ components:
           type: string
         value:
           type: string
+        group:
+          type: [string, "null"]
       required: [label, value]
     Brand:
       type: object
@@ -365,11 +389,139 @@ components:
             type: string
         installationNotes:
           type: [string, "null"]
+        editorial:
+          anyOf:
+            - $ref: "#/components/schemas/ProductEditorial"
+            - type: "null"
+        details:
+          anyOf:
+            - $ref: "#/components/schemas/ProductDetails"
+            - type: "null"
         isFeatured:
           type: boolean
         status:
           $ref: "#/components/schemas/ContentStatus"
       required: [id, title, name, slug, brandId, brandSlug, brandName, category, description, images, specs, finishes, isFeatured, status]
+    ProductDetails:
+      type: object
+      properties:
+        sourceUrl:
+          type: [string, "null"]
+        collection:
+          type: [string, "null"]
+        brandCategoryPath:
+          type: array
+          items:
+            type: string
+        badges:
+          type: array
+          items:
+            type: string
+        summary:
+          type: [string, "null"]
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              body:
+                type: [string, "null"]
+              image:
+                type: [string, "null"]
+            required: [title]
+        variants:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              label:
+                type: string
+              kind:
+                type: string
+                enum: [finish, size, model, colour]
+              articleNumber:
+                type: [string, "null"]
+              attributes:
+                type: object
+                additionalProperties:
+                  type: string
+              image:
+                type: [string, "null"]
+            required: [code, label, kind]
+        applications:
+          type: array
+          items:
+            type: string
+        downloads:
+          type: array
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+              fileType:
+                type: string
+            required: [label, fileType]
+        media:
+          type: array
+          items:
+            type: object
+            properties:
+              src:
+                type: string
+              role:
+                type: string
+                enum: [cutout, finish, detail, ambient, technical]
+              variantCode:
+                type: [string, "null"]
+              alt:
+                type: [string, "null"]
+            required: [src, role]
+        related:
+          type: array
+          items:
+            type: string
+        videos:
+          type: number
+    ProductEditorial:
+      type: object
+      properties:
+        statement:
+          type: string
+        awards:
+          type: array
+          items:
+            type: string
+        chapters:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              body:
+                type: string
+              image:
+                type: [string, "null"]
+            required: [title, body]
+        designer:
+          type: object
+          properties:
+            name:
+              type: string
+            bio:
+              type: string
+            url:
+              type: [string, "null"]
+          required: [name, bio]
+        gallery:
+          type: array
+          items:
+            type: string
     CatalogResponse:
       type: object
       properties:
@@ -463,6 +615,14 @@ components:
             type: string
         installationNotes:
           type: [string, "null"]
+        editorial:
+          anyOf:
+            - $ref: "#/components/schemas/ProductEditorial"
+            - type: "null"
+        details:
+          anyOf:
+            - $ref: "#/components/schemas/ProductDetails"
+            - type: "null"
         isFeatured:
           type: boolean
         status:
@@ -512,3 +672,31 @@ components:
         preservedSlugs:
           type: number
       required: [brandsUpserted, productsUpserted, preservedSlugs]
+    InquiryInput:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [general]
+        name:
+          type: string
+          minLength: 2
+        email:
+          type: string
+          minLength: 3
+        phone:
+          type: [string, "null"]
+        company:
+          type: [string, "null"]
+        projectType:
+          type: [string, "null"]
+        message:
+          type: string
+          minLength: 10
+      required: [kind, name, email, message]
+    InquiryResult:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+      required: [accepted]

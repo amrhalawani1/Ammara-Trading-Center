@@ -1,6 +1,6 @@
 # Amara Trading Center Website
 
-An informative Phase 1 website that translates ATC's showroom credibility into clear trade inquiry and showroom-visit journeys.
+An informative Phase 1 website that translates ATC's showroom credibility into clear contact and showroom-visit journeys.
 
 ## Run & Operate
 
@@ -23,7 +23,7 @@ An informative Phase 1 website that translates ATC's showroom credibility into c
 ## Where things live
 
 - `artifacts/atc-website/src/App.tsx` — route map and shared app shell
-- `artifacts/atc-website/src/pages/` — Home, Brands, Products, Trade, Showroom, Resources, About, and Contact pages
+- `artifacts/atc-website/src/pages/` — Home, Brands, Products, Showroom, Resources, About, and Contact pages
 - `artifacts/atc-website/src/components/` — layout and reusable content states
 - `artifacts/atc-website/src/index.css` — ATC website design tokens and global typography
 - `artifacts/atc-website/content/schemas/` — Sanity-ready Brand and Product content models
@@ -39,7 +39,7 @@ An informative Phase 1 website that translates ATC's showroom credibility into c
 
 ## Product
 
-- Visitors can explore ATC's partner brands and product template, learn about the company and showroom locations, submit trade/general inquiries, and plan a showroom visit.
+- Visitors can explore ATC's partner brands and product template, learn about the company and showroom locations, send an inquiry, and plan a showroom visit.
 - The experience is responsive and mobile-first for on-site fabricators and homeowners while remaining presentation-ready for desktop showroom use.
 
 ## User preferences

@@ -38,6 +38,7 @@ import {
   toProductResponse,
 } from "../lib/catalog-content";
 import { requireStaffAuth } from "../middlewares/requireStaffAuth";
+import { sendError } from "../lib/http";
 
 export function createCatalogRouter(staffAuth: RequestHandler = requireStaffAuth): IRouter {
   const router: IRouter = Router();
@@ -68,12 +69,12 @@ router.get("/catalog", async (_req, res): Promise<void> => {
 router.get("/catalog/brands/:slug", async (req, res): Promise<void> => {
   const params = GetPublicBrandParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   const brand = await getBrandRow(params.data.slug, true);
   if (!brand) {
-    res.status(404).json({ error: "Brand not found" });
+    sendError(res, 404, "Brand not found");
     return;
   }
   const products = (await listProductRows(true))
@@ -85,12 +86,12 @@ router.get("/catalog/brands/:slug", async (req, res): Promise<void> => {
 router.get("/catalog/products/:slug", async (req, res): Promise<void> => {
   const params = GetPublicProductParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   const row = await getProductRow(params.data.slug, true);
   if (!row) {
-    res.status(404).json({ error: "Product not found" });
+    sendError(res, 404, "Product not found");
     return;
   }
   res.json(GetPublicProductResponse.parse(toProductResponse(row.product, row.brand)));
@@ -110,7 +111,7 @@ router.get("/content/brands", async (_req, res): Promise<void> => {
 router.post("/content/brands", async (req, res): Promise<void> => {
   const parsed = CreateContentBrandBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    sendError(res, 400, "Invalid request", parsed.error.flatten());
     return;
   }
   try {
@@ -118,7 +119,7 @@ router.post("/content/brands", async (req, res): Promise<void> => {
     res.status(201).json(CreateContentBrandResponse.parse(toBrandResponse(brand)));
   } catch (error) {
     req.log.warn({ error }, "Could not create brand");
-    res.status(400).json({ error: "A brand with this slug already exists." });
+    sendError(res, 400, "A brand with this slug already exists.");
   }
 });
 
@@ -126,11 +127,11 @@ router.put("/content/brands/:id", async (req, res): Promise<void> => {
   const params = UpdateContentBrandParams.safeParse(req.params);
   const parsed = UpdateContentBrandBody.safeParse(req.body);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    sendError(res, 400, "Invalid request", parsed.error.flatten());
     return;
   }
   try {
@@ -140,31 +141,31 @@ router.put("/content/brands/:id", async (req, res): Promise<void> => {
       .where(eq(brandsTable.id, params.data.id))
       .returning();
     if (!brand) {
-      res.status(404).json({ error: "Brand not found" });
+      sendError(res, 404, "Brand not found");
       return;
     }
     res.json(UpdateContentBrandResponse.parse(toBrandResponse(brand)));
   } catch (error) {
     req.log.warn({ error }, "Could not update brand");
-    res.status(400).json({ error: "A brand with this slug already exists." });
+    sendError(res, 400, "A brand with this slug already exists.");
   }
 });
 
 router.delete("/content/brands/:id", async (req, res): Promise<void> => {
   const params = DeleteContentBrandParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   await ensureCatalogSeeded();
   const [product] = await db.select({ id: productsTable.id }).from(productsTable).where(eq(productsTable.brandId, params.data.id)).limit(1);
   if (product) {
-    res.status(400).json({ error: "Retire this brand instead; products are still connected to it." });
+    sendError(res, 400, "Retire this brand instead; products are still connected to it.");
     return;
   }
   const [brand] = await db.delete(brandsTable).where(eq(brandsTable.id, params.data.id)).returning();
   if (!brand) {
-    res.status(404).json({ error: "Brand not found" });
+    sendError(res, 404, "Brand not found");
     return;
   }
   res.sendStatus(204);
@@ -178,13 +179,13 @@ router.get("/content/products", async (_req, res): Promise<void> => {
 router.post("/content/products", async (req, res): Promise<void> => {
   const parsed = CreateContentProductBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    sendError(res, 400, "Invalid request", parsed.error.flatten());
     return;
   }
   const input = parsed.data as ProductInput;
   const brand = await getBrandForProductInput(input);
   if (!brand) {
-    res.status(400).json({ error: "Choose an existing brand before creating a product." });
+    sendError(res, 400, "Choose an existing brand before creating a product.");
     return;
   }
   try {
@@ -192,7 +193,7 @@ router.post("/content/products", async (req, res): Promise<void> => {
     res.status(201).json(CreateContentProductResponse.parse(toProductResponse(product, brand)));
   } catch (error) {
     req.log.warn({ error }, "Could not create product");
-    res.status(400).json({ error: "A product with this slug already exists." });
+    sendError(res, 400, "A product with this slug already exists.");
   }
 });
 
@@ -200,17 +201,17 @@ router.put("/content/products/:id", async (req, res): Promise<void> => {
   const params = UpdateContentProductParams.safeParse(req.params);
   const parsed = UpdateContentProductBody.safeParse(req.body);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    sendError(res, 400, "Invalid request", parsed.error.flatten());
     return;
   }
   const input = parsed.data as ProductInput;
   const brand = await getBrandForProductInput(input);
   if (!brand) {
-    res.status(400).json({ error: "Choose an existing brand before updating a product." });
+    sendError(res, 400, "Choose an existing brand before updating a product.");
     return;
   }
   try {
@@ -220,25 +221,25 @@ router.put("/content/products/:id", async (req, res): Promise<void> => {
       .where(eq(productsTable.id, params.data.id))
       .returning();
     if (!product) {
-      res.status(404).json({ error: "Product not found" });
+      sendError(res, 404, "Product not found");
       return;
     }
     res.json(UpdateContentProductResponse.parse(toProductResponse(product, brand)));
   } catch (error) {
     req.log.warn({ error }, "Could not update product");
-    res.status(400).json({ error: "A product with this slug already exists." });
+    sendError(res, 400, "A product with this slug already exists.");
   }
 });
 
 router.delete("/content/products/:id", async (req, res): Promise<void> => {
   const params = DeleteContentProductParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    sendError(res, 400, "Invalid request", params.error.flatten());
     return;
   }
   const [product] = await db.delete(productsTable).where(eq(productsTable.id, params.data.id)).returning();
   if (!product) {
-    res.status(404).json({ error: "Product not found" });
+    sendError(res, 404, "Product not found");
     return;
   }
   res.sendStatus(204);
@@ -247,7 +248,7 @@ router.delete("/content/products/:id", async (req, res): Promise<void> => {
 router.post("/content/import", async (req, res): Promise<void> => {
   const parsed = ImportCatalogContentBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    sendError(res, 400, "Invalid request", parsed.error.flatten());
     return;
   }
   const brandLegacyIds = parsed.data.brands.map((brand) => brand.legacyId);
@@ -255,7 +256,7 @@ router.post("/content/import", async (req, res): Promise<void> => {
   const hasInvalidLegacyIds = (legacyIds: string[]) =>
     legacyIds.some((legacyId) => !legacyId) || new Set(legacyIds).size !== legacyIds.length;
   if (hasInvalidLegacyIds(brandLegacyIds) || hasInvalidLegacyIds(productLegacyIds)) {
-    res.status(400).json({ error: "Each brand and product needs a unique MySQL legacyId within its own source table." });
+    sendError(res, 400, "Each brand and product needs a unique MySQL legacyId within its own source table.");
     return;
   }
   await ensureCatalogSeeded();
@@ -313,7 +314,7 @@ router.post("/content/import", async (req, res): Promise<void> => {
     });
   } catch (error) {
     req.log.warn({ error }, "Catalogue import rejected");
-    res.status(400).json({ error: error instanceof Error ? error.message : "Import could not be completed." });
+    sendError(res, 400, error instanceof Error ? error.message : "Import could not be completed.");
     return;
   }
 

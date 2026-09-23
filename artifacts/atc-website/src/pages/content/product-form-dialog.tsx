@@ -30,12 +30,16 @@ const productSchema = z.object({
   family: z.string().optional(),
   description: z.string().min(1, "Description is required"),
   image: z.string().optional(),
-  images: z.string().default("").transform(val => val ? val.split(',').map(s => s.trim()) : []),
+  // Kept as plain comma-separated strings in the form itself (split into
+  // string[] in onSubmit, not via a zod .transform() here) — a transform
+  // makes the form's input type and its resolved output type diverge, which
+  // doesn't play well with react-hook-form's zodResolver type inference.
+  images: z.string().default(""),
   material: z.string().optional(),
   finish: z.string().optional(),
   dimensions: z.string().optional(),
   specs: z.array(specSchema).default([]),
-  finishes: z.string().default("").transform(val => val ? val.split(',').map(s => s.trim()) : []),
+  finishes: z.string().default(""),
   installationNotes: z.string().optional(),
   isFeatured: z.boolean().default(false),
   status: z.enum(["draft", "published", "comingSoon", "retired"]),
@@ -43,6 +47,10 @@ const productSchema = z.object({
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
+
+function splitCommaList(value: string): string[] {
+  return value ? value.split(',').map(s => s.trim()) : [];
+}
 
 interface ProductFormDialogProps {
   product: Product | null;
@@ -57,7 +65,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
   const updateProduct = useUpdateContentProduct();
   const { data: brands } = useListContentBrands();
 
-  const form = useForm<any>({ // use any to handle transform input easily for text areas
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       title: "",
@@ -105,7 +113,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
         finishes: product.finishes?.join(", ") || "",
         installationNotes: product.installationNotes || "",
         isFeatured: product.isFeatured,
-        status: product.status as any,
+        status: product.status as ProductFormValues["status"],
         legacyId: product.legacyId || ""
       });
     } else if (!product && open) {
@@ -132,8 +140,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
     }
   }, [product, open, form]);
 
-  const onSubmit = (data: any) => {
-    // data is transformed by zod
+  const onSubmit = (data: ProductFormValues) => {
     const payload: ProductInput = {
       title: data.title,
       slug: data.slug,
@@ -141,8 +148,8 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
       category: data.category,
       description: data.description,
       specs: data.specs,
-      finishes: data.finishes,
-      images: data.images,
+      finishes: splitCommaList(data.finishes),
+      images: splitCommaList(data.images),
       isFeatured: data.isFeatured,
       status: data.status,
       
@@ -161,7 +168,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
         onSuccess: () => {
           toast({ title: "Product updated." });
           queryClient.invalidateQueries({ queryKey: getListContentProductsQueryKey() });
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
           onOpenChange(false);
         },
         onError: () => toast({ title: "Failed to update product.", variant: "destructive" })
@@ -171,7 +178,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
         onSuccess: () => {
           toast({ title: "Product created." });
           queryClient.invalidateQueries({ queryKey: getListContentProductsQueryKey() });
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
           onOpenChange(false);
         },
         onError: () => toast({ title: "Failed to create product.", variant: "destructive" })
@@ -185,7 +192,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto rounded-none border-border">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">{product ? "Edit Product" : "New Product"}</DialogTitle>
+          <DialogTitle className="font-display text-2xl">{product ? "Edit Product" : "New Product"}</DialogTitle>
           <DialogDescription className="font-light">
             Fill out the product catalog details.
           </DialogDescription>
@@ -298,7 +305,7 @@ export function ProductFormDialog({ product, open, onOpenChange }: ProductFormDi
 
             <div className="space-y-4 border border-border p-4 bg-accent/5">
               <div className="flex justify-between items-center">
-                <Label className="text-base font-serif">Technical Specifications</Label>
+                <Label className="text-base font-display">Technical Specifications</Label>
                 <Button type="button" variant="outline" size="sm" onClick={() => appendSpec({ label: "", value: "" })} className="rounded-none border-border">
                   <Plus className="w-3 h-3 mr-2" /> Add Spec
                 </Button>

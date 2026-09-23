@@ -2,20 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Amara Trading Center Website</title>
-    <meta name="description" content="Amara Trading Center Website — built on Replit. Update this description to reflect the app." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amara Trading Center</title>
+    <meta
+      name="description"
+      content="Amara Trading Center — kitchen systems, furniture fittings, and hardware in Amman since 1977."
+    />
     <meta name="robots" content="index, follow" />
-    <meta property="og:title" content="Amara Trading Center Website" />
-    <meta property="og:description" content="Amara Trading Center Website — built on Replit. Update this description to reflect the app." />
+    <meta property="og:title" content="Amara Trading Center" />
+    <meta
+      property="og:description"
+      content="A considered collection of kitchen systems, furniture fittings, and hardware serving Jordan since 1977."
+    />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Amara Trading Center" />
+    <!-- Relative for now: crawlers need an absolute URL. Prefix with the production domain at launch. -->
+    <meta property="og:image" content="/brand/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Amara Trading Center logo" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Amara Trading Center Website" />
-    <meta name="twitter:description" content="Amara Trading Center Website — built on Replit. Update this description to reflect the app." />
+    <meta name="twitter:image" content="/brand/og-image.png" />
+    <meta name="twitter:title" content="Amara Trading Center" />
+    <meta
+      name="twitter:description"
+      content="A considered collection of kitchen systems, furniture fittings, and hardware serving Jordan since 1977."
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fonts are self-hosted (see src/main.tsx) — no Google Fonts CDN round trip. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/images/hero-kitchen-1536.webp"
+      imagesrcset="/images/hero-kitchen-480.webp 480w, /images/hero-kitchen-960.webp 960w, /images/hero-kitchen-1536.webp 1536w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
   </head>
   <body>
     <div id="root"></div>

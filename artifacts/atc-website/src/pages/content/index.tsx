@@ -12,7 +12,7 @@ export default function ContentWorkspace() {
           <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-3">
             Internal Area
           </span>
-          <h1 className="text-3xl md:text-4xl font-serif mb-2">Content Workspace</h1>
+          <h1 className="text-3xl md:text-4xl font-display mb-2">Content Workspace</h1>
           <p className="text-muted-foreground font-light max-w-2xl">
             Manage catalogue content, brands, systems, and bulk imports.
           </p>

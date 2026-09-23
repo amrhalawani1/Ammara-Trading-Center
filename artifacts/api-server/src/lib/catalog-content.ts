@@ -2,11 +2,11 @@ import { and, asc, eq } from "drizzle-orm";
 import { catalogMetaTable, db, brandsTable, productsTable } from "@workspace/db";
 import { initialBrands, initialProducts } from "./catalog-seed";
 
-const SEEDED_KEY = "initial-seed-v1";
+const SEEDED_KEY = "partner-extraction-v3";
 let seedPromise: Promise<void> | undefined;
 
 export type ContentStatus = "draft" | "published" | "comingSoon" | "retired";
-export type CatalogSpec = { label: string; value: string };
+export type CatalogSpec = { label: string; value: string; group?: string | null };
 
 export type BrandInput = {
   legacyId?: string | null;
@@ -39,48 +39,60 @@ export type ProductInput = {
   specs: CatalogSpec[];
   finishes: string[];
   installationNotes?: string | null;
+  editorial?: ProductEditorial | null;
+  details?: ProductDetails | null;
   isFeatured: boolean;
   status: ContentStatus;
 };
 
 type BrandRow = typeof brandsTable.$inferSelect;
 type ProductRow = typeof productsTable.$inferSelect;
+export type ProductEditorial = NonNullable<ProductRow["editorial"]>;
+export type ProductDetails = NonNullable<ProductRow["details"]>;
 
 export async function ensureCatalogSeeded(): Promise<void> {
   if (!seedPromise) {
     seedPromise = (async () => {
-      const seeded = await db.query.catalogMetaTable.findFirst({
-        where: (meta, { eq: equals }) => equals(meta.key, SEEDED_KEY),
-      });
-      if (seeded) return;
-
       await db.transaction(async (tx) => {
-        const alreadySeeded = await tx.query.catalogMetaTable.findFirst({
-      where: (meta, { eq: equals }) => equals(meta.key, SEEDED_KEY),
-        });
-        if (alreadySeeded) return;
+        // Seeding fills gaps: rows a previous seed created, or staff have since edited in the
+        // content workspace, are left untouched. Only slugs that do not exist are added. It runs
+        // on every boot rather than once, so products added to the seed later still arrive; the
+        // work is two selects when there is nothing to add.
+        await tx.insert(brandsTable).values(initialBrands).onConflictDoNothing({ target: brandsTable.slug });
+        const brandRows = await tx.select({ id: brandsTable.id, slug: brandsTable.slug }).from(brandsTable);
+        const brandIds = new Map(brandRows.map((brand) => [brand.slug, brand.id]));
 
-        const seededBrands = await tx
-          .insert(brandsTable)
-          .values(initialBrands.map((brand) => ({ ...brand, isFeatured: true, status: "published" })))
-          .returning();
-        const brandIds = new Map(seededBrands.map((brand) => [brand.slug, brand.id]));
-
-        await tx.insert(productsTable).values(
-          initialProducts.map(([title, slug, brandSlug, category, description, specs, finishes]) => ({
-            title,
-            slug,
-            brandId: brandIds.get(brandSlug)!,
-            category,
-            description,
-            images: [brandSlug === "salice" ? "/images/brand-sliding.jpg" : "/images/product-handle.jpg"],
-            specs: specs.map(([label, value]) => ({ label, value })),
-            finishes: [...finishes],
-            isFeatured: true,
-            status: "published",
-          })),
+        const existing = await tx.select({ slug: productsTable.slug }).from(productsTable);
+        const existingSlugs = new Set(existing.map((product) => product.slug));
+        const missing = initialProducts.filter(
+          (product) => !existingSlugs.has(product.slug) && brandIds.has(product.brandSlug),
         );
-        await tx.insert(catalogMetaTable).values({ key: SEEDED_KEY, value: "true" });
+
+        if (missing.length > 0) {
+          await tx
+            .insert(productsTable)
+            .values(
+              missing.map((product) => ({
+                title: product.title,
+                slug: product.slug,
+                brandId: brandIds.get(product.brandSlug)!,
+                category: product.category,
+                family: product.family ?? null,
+                sku: product.sku ?? null,
+                description: product.description,
+                images: product.images,
+                specs: product.specs,
+                finishes: [...product.finishes],
+                editorial: product.editorial ?? null,
+                details: product.details ?? null,
+                isFeatured: product.isFeatured,
+                status: product.status,
+              })),
+            )
+            .onConflictDoNothing({ target: productsTable.slug });
+        }
+
+        await tx.insert(catalogMetaTable).values({ key: SEEDED_KEY, value: "true" }).onConflictDoNothing({ target: catalogMetaTable.key });
       });
     })().catch((error) => {
       seedPromise = undefined;
@@ -130,6 +142,8 @@ export function toProductResponse(product: ProductRow, brand: BrandRow) {
     specs: product.specs,
     finishes: product.finishes,
     installationNotes: product.installationNotes,
+    editorial: product.editorial ?? null,
+    details: product.details ?? null,
     isFeatured: product.isFeatured,
     status: product.status as ContentStatus,
   };
@@ -196,6 +210,8 @@ export function productValues(input: ProductInput, brandId: number) {
     finish: input.finish ?? null,
     dimensions: input.dimensions ?? null,
     installationNotes: input.installationNotes ?? null,
+    editorial: input.editorial ?? null,
+    details: input.details ?? null,
     isFeatured: input.isFeatured,
     status: input.status,
   };

@@ -1,0 +1,24 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "atc-website",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "dev"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "atc-website-alt-api",
+      "runtimeExecutable": "env",
+      "runtimeArgs": [
+        "API_PORT=8797",
+        "API_ORIGIN=http://127.0.0.1:8797",
+        "pnpm",
+        "dev"
+      ],
+      "port": 5173
+    }
+  ]
+}

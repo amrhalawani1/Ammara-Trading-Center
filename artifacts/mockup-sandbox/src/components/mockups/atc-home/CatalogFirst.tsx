@@ -48,10 +48,10 @@ export function CatalogFirst() {
     <div className="catalog-first">
       <header className="border-b border-[#d8d0c3] bg-[#f4f0e8]/95 px-5 py-5 backdrop-blur md:px-10">
         <div className="mx-auto flex max-w-[1380px] items-center justify-between"><a href="/" onClick={(e) => e.preventDefault()}><BrandMark /></a>
-          <nav className="hidden items-center gap-8 md:flex"><NavLink active>Catalog</NavLink><NavLink>Brands</NavLink><NavLink>Trade</NavLink><NavLink>Showroom</NavLink><NavLink>About</NavLink><button className="ml-4 border border-[#9c392b] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-[#9c392b] transition-colors hover:bg-[#9c392b] hover:text-[#f4f0e8]">Trade inquiry</button></nav>
+          <nav className="hidden items-center gap-8 md:flex"><NavLink active>Catalog</NavLink><NavLink>Brands</NavLink><NavLink>Showroom</NavLink><NavLink>About</NavLink><button className="ml-4 border border-[#9c392b] px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-[#9c392b] transition-colors hover:bg-[#9c392b] hover:text-[#f4f0e8]">Contact us</button></nav>
           <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Toggle navigation">{mobileOpen ? <X /> : <Menu />}</button>
         </div>
-        {mobileOpen && <div className="mt-5 flex flex-col gap-3 border-t border-[#d8d0c3] pt-4 md:hidden"><NavLink active onClick={() => setMobileOpen(false)}>Catalog</NavLink><NavLink>Brands</NavLink><NavLink>Trade</NavLink><NavLink>Showroom</NavLink></div>}
+        {mobileOpen && <div className="mt-5 flex flex-col gap-3 border-t border-[#d8d0c3] pt-4 md:hidden"><NavLink active onClick={() => setMobileOpen(false)}>Catalog</NavLink><NavLink>Brands</NavLink><NavLink>Showroom</NavLink></div>}
       </header>
 
       <main className="mx-auto max-w-[1380px] px-5 md:px-10">

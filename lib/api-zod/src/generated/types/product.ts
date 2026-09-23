@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ContentStatus } from './contentStatus';
+import type { ProductDetails } from './productDetails';
+import type { ProductEditorial } from './productEditorial';
 import type { Spec } from './spec';
 
 export interface Product {
@@ -37,6 +39,8 @@ export interface Product {
   finishes: string[];
   /** @nullable */
   installationNotes?: string | null;
+  editorial?: ProductEditorial | null;
+  details?: ProductDetails | null;
   isFeatured: boolean;
   status: ContentStatus;
 }

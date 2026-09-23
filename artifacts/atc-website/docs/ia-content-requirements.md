@@ -9,7 +9,7 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
   and hardware distributor operating since 1977.
 - Trust bar: established 1977, approximately 30 exclusive brands, showrooms in
   Al-Bayader and Al-Wehdat.
-- Give visitors two clear journeys: trade inquiry for architects, fabricators,
+- Give visitors two clear journeys: a contact inquiry for architects, fabricators,
   and procurement; showroom visit for homeowners.
 - Introduce the tactile showroom experience and route to showroom details.
 
@@ -19,17 +19,8 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
 - Brand pages should show the manufacturer, country, category, description, and
   related products without inventing certifications or project references.
 - Product pages should prioritize clear product identity, material/finish,
-  technical information, and a trade inquiry path.
+  technical information, and a contact path.
 - Centralized Catalogue: Browse products across four represented brands (Hettich, Salice, Kesseböhmer, Vibo) using exact product types (Hinges & Opening Systems, Drawer Runners & Slides, Sliding Door Systems, Kitchen Storage & Ergonomics, Wardrobe & Wire Storage). Supports filtering and clear empty states, while preserving inquiry-safe boundaries.
-
-## Trade / B2B
-
-- Speak directly to architects, fabricators, and institutional or hospitality
-  procurement teams.
-- Explain ATC’s single-accountable-portfolio value, training, technical
-  guidance, and project support.
-- Provide the RFQ / trade inquiry form.
-- Keep project references as a visible “Coming soon” state until clearance.
 
 ## Showroom
 
@@ -54,7 +45,7 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
 
 - Include showroom addresses and available public phone details from the
   supplied company profile.
-- Provide a general inquiry form and a direct trade shortcut.
+- Provide a general inquiry form.
 - WhatsApp as a formal channel and Arabic/RTL remain open scope; show a clear
   placeholder instead of fabricating implementation.
 

@@ -55,10 +55,59 @@ export const GetPublicCatalogResponse = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })),
@@ -108,10 +157,59 @@ export const GetPublicBrandResponse = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }))
@@ -145,12 +243,87 @@ export const GetPublicProductResponse = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
+})
+
+
+/**
+ * @summary Submit a general inquiry
+ */
+export const createInquiryBodyNameMin = 2;
+
+export const createInquiryBodyEmailMin = 3;
+
+export const createInquiryBodyMessageMin = 10;
+
+
+
+export const CreateInquiryBody = zod.object({
+  "kind": zod.enum(['general']),
+  "name": zod.string().min(createInquiryBodyNameMin),
+  "email": zod.string().min(createInquiryBodyEmailMin),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "projectType": zod.string().nullish(),
+  "message": zod.string().min(createInquiryBodyMessageMin)
+})
+
+export const CreateInquiryResponse = zod.object({
+  "accepted": zod.boolean()
 })
 
 
@@ -288,10 +461,59 @@ export const ListContentProductsResponseItem = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
@@ -322,10 +544,59 @@ export const CreateContentProductBody = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
@@ -350,10 +621,59 @@ export const CreateContentProductResponse = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
@@ -387,10 +707,59 @@ export const UpdateContentProductBody = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
@@ -415,10 +784,59 @@ export const UpdateContentProductResponse = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 })
@@ -479,10 +897,59 @@ export const ImportCatalogContentBody = zod.object({
   "dimensions": zod.string().nullish(),
   "specs": zod.array(zod.object({
   "label": zod.string(),
-  "value": zod.string()
+  "value": zod.string(),
+  "group": zod.string().nullish()
 })),
   "finishes": zod.array(zod.string()),
   "installationNotes": zod.string().nullish(),
+  "editorial": zod.union([zod.object({
+  "statement": zod.string().optional(),
+  "awards": zod.array(zod.string()).optional(),
+  "chapters": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string(),
+  "image": zod.string().nullish()
+})).optional(),
+  "designer": zod.object({
+  "name": zod.string(),
+  "bio": zod.string(),
+  "url": zod.string().nullish()
+}).optional(),
+  "gallery": zod.array(zod.string()).optional()
+}),zod.null()]).optional(),
+  "details": zod.union([zod.object({
+  "sourceUrl": zod.string().nullish(),
+  "collection": zod.string().nullish(),
+  "brandCategoryPath": zod.array(zod.string()).optional(),
+  "badges": zod.array(zod.string()).optional(),
+  "summary": zod.string().nullish(),
+  "features": zod.array(zod.object({
+  "title": zod.string(),
+  "body": zod.string().nullish(),
+  "image": zod.string().nullish()
+})).optional(),
+  "variants": zod.array(zod.object({
+  "code": zod.string(),
+  "label": zod.string(),
+  "kind": zod.enum(['finish', 'size', 'model', 'colour']),
+  "articleNumber": zod.string().nullish(),
+  "attributes": zod.record(zod.string(), zod.string()).optional(),
+  "image": zod.string().nullish()
+})).optional(),
+  "applications": zod.array(zod.string()).optional(),
+  "downloads": zod.array(zod.object({
+  "label": zod.string(),
+  "fileType": zod.string()
+})).optional(),
+  "media": zod.array(zod.object({
+  "src": zod.string(),
+  "role": zod.enum(['cutout', 'finish', 'detail', 'ambient', 'technical']),
+  "variantCode": zod.string().nullish(),
+  "alt": zod.string().nullish()
+})).optional(),
+  "related": zod.array(zod.string()).optional(),
+  "videos": zod.number().optional()
+}),zod.null()]).optional(),
   "isFeatured": zod.boolean(),
   "status": zod.enum(['draft', 'published', 'comingSoon', 'retired'])
 }).and(zod.object({

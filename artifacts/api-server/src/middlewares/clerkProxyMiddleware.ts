@@ -6,6 +6,7 @@
 import type { IncomingHttpHeaders } from "http";
 import type { RequestHandler } from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import { getEnv } from "../lib/env";
 
 const CLERK_FAPI = "https://frontend-api.clerk.dev";
 export const CLERK_PROXY_PATH = "/api/__clerk";
@@ -17,7 +18,9 @@ export function getClerkProxyHost(req: { headers: IncomingHttpHeaders }): string
 }
 
 export function clerkProxyMiddleware(): RequestHandler {
-  if (process.env.NODE_ENV !== "production" || !process.env.CLERK_SECRET_KEY) {
+  const env = getEnv();
+  const clerkSecretKey = env.CLERK_SECRET_KEY;
+  if (env.NODE_ENV !== "production" || !clerkSecretKey) {
     return (_req, _res, next) => next();
   }
 
@@ -31,7 +34,7 @@ export function clerkProxyMiddleware(): RequestHandler {
         const protocol = req.headers["x-forwarded-proto"] || "https";
         const host = getClerkProxyHost(req) || "";
         proxyReq.setHeader("Clerk-Proxy-Url", `${protocol}://${host}${CLERK_PROXY_PATH}`);
-        proxyReq.setHeader("Clerk-Secret-Key", process.env.CLERK_SECRET_KEY!);
+        proxyReq.setHeader("Clerk-Secret-Key", clerkSecretKey);
       },
       proxyRes: (proxyRes, req, res) => {
         const headers = { ...proxyRes.headers };

@@ -29,7 +29,7 @@ export function ImportTab() {
           });
           queryClient.invalidateQueries({ queryKey: getListContentBrandsQueryKey() });
           queryClient.invalidateQueries({ queryKey: getListContentProductsQueryKey() });
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ queryKey: getGetPublicCatalogQueryKey() });
           setJsonInput("");
         },
         onError: () => {
@@ -45,7 +45,7 @@ export function ImportTab() {
   return (
     <div className="space-y-6 max-w-4xl">
       <div>
-        <h2 className="text-2xl font-serif mb-2">Legacy Data Import</h2>
+        <h2 className="text-2xl font-display mb-2">Legacy Data Import</h2>
         <p className="text-muted-foreground font-light text-sm">
           Paste the legacy MySQL export JSON here. It must contain <code className="bg-accent px-1">brands</code> and <code className="bg-accent px-1">products</code> arrays matching the current schema. Existing slugs will be preserved to maintain SEO URLs.
         </p>
