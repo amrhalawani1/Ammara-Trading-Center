@@ -8,4 +8,5 @@
 
 export interface InquiryResult {
   accepted: boolean;
+  reference: string;
 }

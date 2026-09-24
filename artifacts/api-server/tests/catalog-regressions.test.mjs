@@ -165,6 +165,10 @@ before(async () => {
       company text,
       project_type text,
       message text NOT NULL,
+      reference text UNIQUE,
+      list_name text,
+      timeline text,
+      items jsonb,
       created_at timestamptz NOT NULL DEFAULT now()
     );
   `);
@@ -357,6 +361,47 @@ test("staff can create, publish, retire, and import records without leaking non-
   assert.ok(!contentProducts.some((product) => product.slug === `${fixtureKey}-invalid-product`));
 });
 
+const REFERENCE_PATTERN = /^ATC-\d{6}-[A-HJ-NP-Z2-9]{4}$/;
+
+test("shortlist inquiries are stored with a unique reference and rejected when empty", async () => {
+  const items = [
+    { slug: "ginkgo", name: "Ginkgo", brandName: "DND", reference: "GK11-F7", variant: "F7 - Satin chrome", quantity: 12 },
+    { slug: "arcitech", name: "ArciTech drawer", brandName: "Hettich", reference: null, variant: null, quantity: 3 },
+  ];
+  const body = {
+    kind: "shortlist",
+    name: "Nour Haddad",
+    email: "nour@example.com",
+    company: "Haddad Kitchens",
+    projectType: "Kitchen",
+    timeline: "1 to 3 months",
+    listName: "Villa kitchen, phase two",
+    message: "Project shortlist: Villa kitchen, phase two. Two references attached.",
+    items,
+  };
+  const first = await request("/api/inquiries", { method: "POST", body });
+  assert.equal(first.status, 201);
+  const firstBody = await json(first);
+  assert.match(firstBody.reference, REFERENCE_PATTERN);
+
+  const second = await request("/api/inquiries", { method: "POST", body });
+  assert.equal(second.status, 201);
+  assert.notEqual((await json(second)).reference, firstBody.reference);
+
+  const stored = await adminClient.query(`SELECT reference, list_name, timeline, items FROM ${testSchema}.catalog_inquiries WHERE reference = $1`, [firstBody.reference]);
+  assert.equal(stored.rows[0].list_name, body.listName);
+  assert.equal(stored.rows[0].timeline, body.timeline);
+  assert.equal(stored.rows[0].items.length, 2);
+  assert.equal(stored.rows[0].items[0].quantity, 12);
+
+  const empty = await request("/api/inquiries", { method: "POST", body: { ...body, items: [] } });
+  assert.equal(empty.status, 400);
+  const missing = await request("/api/inquiries", { method: "POST", body: { ...body, items: undefined } });
+  assert.equal(missing.status, 400);
+  const zero = await request("/api/inquiries", { method: "POST", body: { ...body, items: [{ ...items[0], quantity: 0 }] } });
+  assert.equal(zero.status, 400);
+});
+
 test("public visitors can submit a valid inquiry and invalid bodies are rejected", async () => {
   const invalid = await request("/api/inquiries", {
     method: "POST",
@@ -377,7 +422,9 @@ test("public visitors can submit a valid inquiry and invalid bodies are rejected
     },
   });
   assert.equal(created.status, 201);
-  assert.equal((await json(created)).accepted, true);
+  const createdBody = await json(created);
+  assert.equal(createdBody.accepted, true);
+  assert.match(createdBody.reference, REFERENCE_PATTERN);
 
   const anonymousProtected = await request("/api/content/access");
   assert.equal(anonymousProtected.status, 401);

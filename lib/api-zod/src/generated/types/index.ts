@@ -34,4 +34,5 @@ export * from './productEditorialChaptersItem';
 export * from './productEditorialDesigner';
 export * from './productInput';
 export * from './productUpdate';
+export * from './shortlistItemInput';
 export * from './spec';

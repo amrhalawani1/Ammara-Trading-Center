@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight, Check, Copy, MessageCircle } from "lucide-react";
 import { ProductGallery } from "@/components/product/product-gallery";
+import { PROJECT_TYPES, TIMINGS } from "@/lib/inquiry-options";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
@@ -36,10 +37,10 @@ interface VariantConfiguratorProps {
   activeImage: number;
   onImageChange: (index: number) => void;
   documentsHref: string;
+  /** The "add to project shortlist" control, rendered under the configure button. */
+  shortlist?: ReactNode;
 }
 
-const PROJECT_TYPES = ["Residential", "Hospitality", "Commercial", "Institutional"] as const;
-const TIMINGS = ["Within a month", "1 to 3 months", "3 to 12 months", "Still planning"] as const;
 
 const fieldClass =
   "h-11 w-full border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-foreground";
@@ -51,7 +52,7 @@ const fieldClass =
  * specification that lands in WhatsApp, never a price.
  */
 export function VariantConfigurator(props: VariantConfiguratorProps) {
-  const { productName, brandName, reference, designer, designLine, variants, selected, onSelect, images, activeImage, onImageChange, documentsHref } = props;
+  const { productName, brandName, reference, designer, designLine, variants, selected, onSelect, images, activeImage, onImageChange, documentsHref, shortlist } = props;
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -201,6 +202,7 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
           >
             {open ? "Close" : `Configure ${productName}`}
           </button>
+          {shortlist}
         </div>
       </div>
 

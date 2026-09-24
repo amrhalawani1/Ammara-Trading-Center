@@ -11,4 +11,5 @@ export type InquiryInputKind = typeof InquiryInputKind[keyof typeof InquiryInput
 
 export const InquiryInputKind = {
   general: 'general',
+  shortlist: 'shortlist',
 } as const;

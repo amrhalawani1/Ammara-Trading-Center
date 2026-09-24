@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { InquiryInputKind } from './inquiryInputKind';
+import type { ShortlistItemInput } from './shortlistItemInput';
 
 export interface InquiryInput {
   kind: InquiryInputKind;
@@ -19,6 +20,21 @@ export interface InquiryInput {
   company?: string | null;
   /** @nullable */
   projectType?: string | null;
-  /** @minLength 10 */
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  timeline?: string | null;
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  listName?: string | null;
+  /**
+     * @minLength 10
+     * @maxLength 20000
+     */
   message: string;
+  /** @maxItems 200 */
+  items?: ShortlistItemInput[];
 }

@@ -379,7 +379,7 @@ export const getCreateInquiryUrl = () => {
 }
 
 /**
- * @summary Submit a general inquiry
+ * @summary Submit a general or shortlist inquiry
  */
 export const createInquiry = async (inquiryInput: InquiryInput, options?: Parameters<typeof customFetch>[1]): Promise<InquiryResult> => {
 
@@ -428,7 +428,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateInquiryMutationError = ErrorType<void>
 
     /**
- * @summary Submit a general inquiry
+ * @summary Submit a general or shortlist inquiry
  */
 export const useCreateInquiry = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInquiry>>, TError,{data: BodyType<InquiryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}

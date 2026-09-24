@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion, useInView, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { MediaImage } from "@/components/media-image";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { ARCHITECT_SERVICES } from "@/lib/home-content";
@@ -47,7 +47,7 @@ function StatementHeader({ counter }: { counter?: number }) {
 /** One detail: the photograph beside its numbered title and body. Text never sits on the image. */
 function DetailPanel({ detail, index, active, className }: { detail: Detail; index: number; active: boolean; className?: string }) {
   return (
-    <li
+    <div
       className={cn("grid gap-5 transition-opacity duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]", active ? "opacity-100" : "opacity-40", className)}
       data-testid={`detail-panel-${index}`}
       data-active={active}
@@ -69,7 +69,7 @@ function DetailPanel({ detail, index, active, className }: { detail: Detail; ind
           <p className="mt-4 max-w-[36ch] text-base leading-7 text-muted-foreground">{detail.body}</p>
         </div>
       </div>
-    </li>
+    </div>
   );
 }
 
@@ -117,7 +117,9 @@ function PinnedDetails() {
         <div className="mx-auto mt-8 w-full min-h-0 max-w-[1440px] flex-1 px-6 md:px-12">
           <motion.ol ref={trackRef} style={{ x }} className="flex h-full gap-4 will-change-transform" aria-label="What attention to detail means">
             {DETAILS.map((detail, index) => (
-              <DetailPanel key={detail.title} detail={detail} index={index} active={index === active} className="h-full w-[min(76vw,1080px)] flex-none md:grid-cols-12" />
+              <li key={detail.title} className="h-full w-[min(76vw,1080px)] flex-none">
+                <DetailPanel detail={detail} index={index} active={index === active} className="h-full md:grid-cols-12" />
+              </li>
             ))}
           </motion.ol>
         </div>
@@ -162,58 +164,130 @@ const SERVICE_IMAGES = [
   { src: "/images/trade-workshop.webp", alt: "A consultant at the workshop bench" },
 ] as const;
 
-/**
- * One service as a sheet: the photograph grows to full size as it arrives and the whole row dims
- * once it has been read, so the sheet the reader is on is always the brightest.
- */
-function ServiceSheet({ index, title, body }: { index: number; title: string; body: string }) {
-  const ref = useRef<HTMLLIElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 0.35], reduce ? [1, 1] : [0.88, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.7, 1], reduce ? [1, 1, 1, 1] : [0.35, 1, 1, 0.3]);
-  const image = SERVICE_IMAGES[index] ?? SERVICE_IMAGES[0];
+const SERVICE_MS = 4500;
 
+/** One service in the index: the number, the title, and the body once the row is open. */
+function ServiceRow({ index, title, body, open, stacked, onOpen }: { index: number; title: string; body: string; open: boolean; stacked: boolean; onOpen: () => void }) {
+  const reduce = useReducedMotion();
+  const image = SERVICE_IMAGES[index] ?? SERVICE_IMAGES[0];
   return (
-    <motion.li ref={ref} style={{ opacity }} className="grid gap-6 border-t border-border py-10 first:border-t-0 first:pt-0 md:grid-cols-12 md:items-center md:gap-8 md:py-12" data-testid={`service-sheet-${index}`}>
-      <motion.div style={{ scale }} className="relative aspect-[16/10] origin-bottom-left overflow-hidden bg-card will-change-transform md:col-span-5">
-        <MediaImage src={image.src} alt={image.alt} width={900} height={563} sizes="(min-width: 1024px) 24vw, (min-width: 768px) 40vw, 100vw" className="absolute inset-0 h-full w-full object-cover" />
-      </motion.div>
-      <div className="md:col-span-7">
-        <h3 className="font-display text-3xl font-medium leading-[0.98] tracking-[-0.035em] md:text-4xl">{title}</h3>
-        <p className="mt-4 max-w-md text-base leading-7 text-muted-foreground">{body}</p>
-      </div>
-    </motion.li>
+    <li className="relative border-t border-border" data-testid={`service-row-${index}`} data-open={open}>
+      {open && <motion.span layoutId="service-marker" className="absolute -left-px top-0 h-full w-0.5 bg-primary" transition={{ type: "spring", stiffness: 300, damping: 32 }} aria-hidden />}
+      <button
+        type="button"
+        onClick={onOpen}
+        onPointerEnter={() => !stacked && onOpen()}
+        onFocus={onOpen}
+        aria-expanded={open}
+        className="grid w-full grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-4 py-6 text-left outline-none focus-visible:bg-background md:py-7"
+      >
+        <span className={cn("font-mono text-xs tracking-[0.12em] transition-colors", open ? "text-primary" : "text-muted-foreground")}>{String(index + 1).padStart(2, "0")}</span>
+        <span className={cn("font-display text-2xl font-medium leading-[1.02] tracking-[-0.03em] transition-colors md:text-3xl", open ? "text-foreground" : "text-foreground/60")}>{title}</span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="body"
+            initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            animate={reduce ? { opacity: 1 } : { height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-[3rem_minmax(0,1fr)] gap-4 pb-7">
+              <span aria-hidden />
+              <div>
+                <p className="max-w-md text-base leading-7 text-muted-foreground">{body}</p>
+                {stacked && (
+                  <div className="mt-5 aspect-[16/10] overflow-hidden bg-background">
+                    <MediaImage src={image.src} alt={image.alt} width={900} height={563} sizes="100vw" className="h-full w-full object-cover" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
   );
 }
 
 /**
- * For architects: the red panel stays pinned on the left while the four services pass on the
- * right as photographed sheets. One headline, one call to action, and a wide enough measure that
- * the headline never falls past three lines.
+ * For architects: a numbered index of the four services on the left, one photograph on the
+ * right that changes with the open row. The index steps on its own, waits under the pointer,
+ * and on phones each row carries its own picture instead of the sticky one.
  */
 function ForArchitects() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { amount: 0.4 });
+  const reduce = useReducedMotion();
+  const stacked = !useMediaQuery("(min-width: 1024px)");
+  const image = SERVICE_IMAGES[active] ?? SERVICE_IMAGES[0];
+
+  useEffect(() => {
+    if (reduce || paused || !inView) return;
+    const timer = window.setInterval(() => setActive((i) => (i + 1) % ARCHITECT_SERVICES.length), SERVICE_MS);
+    return () => window.clearInterval(timer);
+  }, [reduce, paused, inView]);
+
   return (
     <Section tone="panel">
-      <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-5">
-          <Reveal className="flex flex-col justify-between bg-primary p-8 text-primary-foreground md:p-10 lg:sticky lg:top-32 lg:min-h-[520px]">
-            <div>
-              <h2 className="max-w-[14ch] font-display text-[clamp(2.5rem,3.6vw,3.75rem)] font-medium leading-[0.94] tracking-[-0.04em]">For architects and the practices that specify.</h2>
-              <p className="mt-6 max-w-sm text-base leading-7 text-primary-foreground/85">
-                Send a door schedule or a joinery package. We return item numbers, finishes and drawings, and we sit at the mock-up with you.
-              </p>
-            </div>
-            <div className="mt-12">
-              <SolidLink href="/contact" tone="light">Contact us</SolidLink>
-            </div>
+      <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
+        <Reveal className="lg:col-span-7">
+          <h2 className="max-w-[16ch] font-display text-[clamp(2.5rem,4.6vw,4.5rem)] font-medium leading-[0.94] tracking-[-0.04em]">For architects and the practices that specify.</h2>
+        </Reveal>
+        <Reveal className="lg:col-span-4 lg:col-start-9">
+          <p className="max-w-sm text-base leading-7 text-muted-foreground">
+            Send a door schedule or a joinery package. We return item numbers, finishes and drawings, and we sit at the mock-up with you.
+          </p>
+          <SolidLink href="/contact" className="mt-7">Send a schedule</SolidLink>
+        </Reveal>
+      </div>
+
+      <div
+        ref={ref}
+        className="mt-14 grid gap-10 md:mt-20 lg:grid-cols-12 lg:gap-8"
+        onPointerEnter={() => setPaused(true)}
+        onPointerLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={() => setPaused(false)}
+      >
+        <Reveal className="lg:col-span-6">
+          <LayoutGroup id="architect-services">
+            <ol className="border-b border-border" aria-label="Services for architects" data-testid="service-index">
+              {ARCHITECT_SERVICES.map((service, index) => (
+                <ServiceRow key={service.title} index={index} title={service.title} body={service.body} open={index === active} stacked={stacked} onOpen={() => setActive(index)} />
+              ))}
+            </ol>
+          </LayoutGroup>
+        </Reveal>
+
+        {!stacked && (
+          <Reveal className="lg:col-span-5 lg:col-start-8">
+            <figure className="sticky top-28">
+              <div className="relative aspect-[4/5] overflow-hidden bg-background">
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={image.src}
+                    initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 1.04 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                    className="absolute inset-0"
+                  >
+                    <MediaImage src={image.src} alt={image.alt} width={900} height={1125} sizes="(min-width: 1024px) 40vw, 100vw" className="h-full w-full object-cover" />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+              <figcaption className="mt-4 flex items-center justify-between font-mono text-xs tracking-[0.12em] text-muted-foreground" data-testid="text-service-caption">
+                <span>{ARCHITECT_SERVICES[active]?.title}</span>
+                <span className="tabular-nums"><span className="text-foreground">{String(active + 1).padStart(2, "0")}</span> / {String(ARCHITECT_SERVICES.length).padStart(2, "0")}</span>
+              </figcaption>
+            </figure>
           </Reveal>
-        </div>
-        <ul className="lg:col-span-7" aria-label="Services for architects">
-          {ARCHITECT_SERVICES.map((service, index) => (
-            <ServiceSheet key={service.title} index={index} title={service.title} body={service.body} />
-          ))}
-        </ul>
+        )}
       </div>
     </Section>
   );

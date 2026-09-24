@@ -10,10 +10,11 @@ import NotFound from "@/pages/not-found";
 import { ProductHero } from "@/components/product/product-hero";
 import { EditorialChapters } from "@/components/product/editorial-chapters";
 import { VariantConfigurator, type ConfiguratorVariant } from "@/components/product/variant-configurator";
+import { AddToShortlist } from "@/components/product/add-to-shortlist";
 import { FeatureList } from "@/components/product/feature-list";
 import { TechnicalDrawings } from "@/components/product/technical-drawings";
 import { VariantTable } from "@/components/product/variant-table";
-import { mediaByRole, productType, variantImage } from "@/lib/product-media";
+import { mediaByRole, primaryImage, productType, variantImage } from "@/lib/product-media";
 import { finishCode } from "@/lib/finishes";
 import { solutionByName } from "@/lib/solutions";
 import { NumberedGallery } from "@/components/product/numbered-gallery";
@@ -277,6 +278,19 @@ export default function ProductDetail() {
               activeImage={activeImage}
               onImageChange={setActiveImage}
               documentsHref={documentsHref("Catalogue sheet")}
+              shortlist={
+                <AddToShortlist
+                  item={{
+                    key: variant ? `${product.slug}::${variant.code}` : product.slug,
+                    slug: product.slug,
+                    name: product.name,
+                    brandName: brand.name,
+                    reference,
+                    variant: variant ? `${variant.code} - ${variant.label}` : null,
+                    image: variant?.image ?? primaryImage(product),
+                  }}
+                />
+              }
             />
           </div>
         </section>

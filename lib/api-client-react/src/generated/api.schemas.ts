@@ -275,7 +275,41 @@ export type InquiryInputKind = typeof InquiryInputKind[keyof typeof InquiryInput
 
 export const InquiryInputKind = {
   general: 'general',
+  shortlist: 'shortlist',
 } as const;
+
+export interface ShortlistItemInput {
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  slug: string;
+  /**
+     * @minLength 1
+     * @maxLength 200
+     */
+  name: string;
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  brandName: string;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  reference?: string | null;
+  /**
+     * @maxLength 200
+     * @nullable
+     */
+  variant?: string | null;
+  /**
+     * @minimum 1
+     * @maximum 9999
+     */
+  quantity: number;
+}
 
 export interface InquiryInput {
   kind: InquiryInputKind;
@@ -289,11 +323,27 @@ export interface InquiryInput {
   company?: string | null;
   /** @nullable */
   projectType?: string | null;
-  /** @minLength 10 */
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  timeline?: string | null;
+  /**
+     * @maxLength 80
+     * @nullable
+     */
+  listName?: string | null;
+  /**
+     * @minLength 10
+     * @maxLength 20000
+     */
   message: string;
+  /** @maxItems 200 */
+  items?: ShortlistItemInput[];
 }
 
 export interface InquiryResult {
   accepted: boolean;
+  reference: string;
 }
 

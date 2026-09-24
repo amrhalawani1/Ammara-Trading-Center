@@ -35,6 +35,12 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
 - Unreleased resources must be labeled clearly rather than filled with invented
   documents or claims.
 
+## Project shortlists (`/lists`)
+
+- Device-local lists of product references, one per project. Created and renamed on the page; the default list is "New project shortlist".
+- Product pages carry "Choose project shortlist" and "Add to shortlist"; the same finish or size added twice raises the quantity instead of adding a line.
+- Each list can be sent as an enquiry to ATC (project details form, reference `ATC-YYMMDD-XXXX`), on WhatsApp, or by email. Empty lists cannot be sent.
+
 ## About Us
 
 - Tell the ATC story from its 1977 founding and growth in Jordan.

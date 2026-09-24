@@ -302,28 +302,59 @@ export const GetPublicProductResponse = zod.object({
 
 
 /**
- * @summary Submit a general inquiry
+ * @summary Submit a general or shortlist inquiry
  */
 export const createInquiryBodyNameMin = 2;
 
 export const createInquiryBodyEmailMin = 3;
 
+export const createInquiryBodyTimelineMax = 80;
+
+export const createInquiryBodyListNameMax = 80;
+
 export const createInquiryBodyMessageMin = 10;
+export const createInquiryBodyMessageMax = 20000;
+
+export const createInquiryBodyItemsItemSlugMax = 200;
+
+export const createInquiryBodyItemsItemNameMax = 200;
+
+export const createInquiryBodyItemsItemBrandNameMax = 120;
+
+export const createInquiryBodyItemsItemReferenceMax = 120;
+
+export const createInquiryBodyItemsItemVariantMax = 200;
+
+export const createInquiryBodyItemsItemQuantityMax = 9999;
+export const createInquiryBodyItemsItemQuantityMultipleOf = 1;
+
+export const createInquiryBodyItemsMax = 200;
 
 
 
 export const CreateInquiryBody = zod.object({
-  "kind": zod.enum(['general']),
+  "kind": zod.enum(['general', 'shortlist']),
   "name": zod.string().min(createInquiryBodyNameMin),
   "email": zod.string().min(createInquiryBodyEmailMin),
   "phone": zod.string().nullish(),
   "company": zod.string().nullish(),
   "projectType": zod.string().nullish(),
-  "message": zod.string().min(createInquiryBodyMessageMin)
+  "timeline": zod.string().max(createInquiryBodyTimelineMax).nullish(),
+  "listName": zod.string().max(createInquiryBodyListNameMax).nullish(),
+  "message": zod.string().min(createInquiryBodyMessageMin).max(createInquiryBodyMessageMax),
+  "items": zod.array(zod.object({
+  "slug": zod.string().min(1).max(createInquiryBodyItemsItemSlugMax),
+  "name": zod.string().min(1).max(createInquiryBodyItemsItemNameMax),
+  "brandName": zod.string().min(1).max(createInquiryBodyItemsItemBrandNameMax),
+  "reference": zod.string().max(createInquiryBodyItemsItemReferenceMax).nullish(),
+  "variant": zod.string().max(createInquiryBodyItemsItemVariantMax).nullish(),
+  "quantity": zod.number().min(1).max(createInquiryBodyItemsItemQuantityMax).multipleOf(createInquiryBodyItemsItemQuantityMultipleOf)
+})).max(createInquiryBodyItemsMax).optional()
 })
 
 export const CreateInquiryResponse = zod.object({
-  "accepted": zod.boolean()
+  "accepted": zod.boolean(),
+  "reference": zod.string()
 })
 
 

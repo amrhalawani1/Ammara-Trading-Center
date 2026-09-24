@@ -7,7 +7,7 @@
     "dev": "tsx watch --exclude '../**/node_modules' --exclude '../../node_modules' --exclude '**/node_modules/**' src/index.ts",
     "build": "node ./build.mjs",
     "start": "node --enable-source-maps ./dist/index.mjs",
-    "test": "pnpm run build && NODE_ENV=test node --test ./tests/catalog-regressions.test.mjs",
+    "test": "pnpm run build && NODE_ENV=test node --test --test-force-exit ./tests/catalog-regressions.test.mjs",
     "test:catalog": "pnpm run test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed:catalog": "tsx ./src/seed-cli.ts"

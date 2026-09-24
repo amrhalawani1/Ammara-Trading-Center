@@ -15,6 +15,7 @@ const BrandsDirectory = lazy(() => import("@/pages/brands/index"));
 const BrandDetail = lazy(() => import("@/pages/brands/detail"));
 const ProductDetail = lazy(() => import("@/pages/products/detail"));
 const Catalog = lazy(() => import("@/pages/catalog/index"));
+const Lists = lazy(() => import("@/pages/lists"));
 const ContentRoute = lazy(() => import("@/pages/content/route"));
 const SignInPage = lazy(() => import("@/pages/sign-in"));
 const NotFound = lazy(() => import("@/pages/not-found"));
@@ -46,6 +47,7 @@ function Router() {
           <Route path="/showroom" component={Showroom} />
           <Route path="/resources" component={Resources} />
           <Route path="/catalog" component={Catalog} />
+          <Route path="/lists" component={Lists} />
           <Route path="/brands" component={BrandsDirectory} />
           <Route path="/brands/:brandSlug" component={BrandDetail} />
           <Route path="/products/:slug" component={ProductDetail} />

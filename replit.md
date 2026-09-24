@@ -23,7 +23,7 @@ An informative Phase 1 website that translates ATC's showroom credibility into c
 ## Where things live
 
 - `artifacts/atc-website/src/App.tsx` — route map and shared app shell
-- `artifacts/atc-website/src/pages/` — Home, Brands, Products, Showroom, Resources, About, and Contact pages
+- `artifacts/atc-website/src/pages/` — Home, Brands, Products, Showroom, Resources, Lists (project shortlists), About, and Contact pages
 - `artifacts/atc-website/src/components/` — layout and reusable content states
 - `artifacts/atc-website/src/index.css` — ATC website design tokens and global typography
 - `artifacts/atc-website/content/schemas/` — Sanity-ready Brand and Product content models
@@ -40,6 +40,7 @@ An informative Phase 1 website that translates ATC's showroom credibility into c
 ## Product
 
 - Visitors can explore ATC's partner brands and product template, learn about the company and showroom locations, send an inquiry, and plan a showroom visit.
+- Project shortlists (`/lists`): visitors collect product references per project on their own device (localStorage key `atc-store`, no account), set quantities, and send the list to ATC as a structured enquiry (`POST /api/inquiries` with `kind: shortlist`, answered with a reference like `ATC-260924-7R36`), on WhatsApp, or by email. Nothing about lists is stored server-side until an enquiry is sent.
 - The experience is responsive and mobile-first for on-site fabricators and homeowners while remaining presentation-ready for desktop showroom use.
 
 ## User preferences
