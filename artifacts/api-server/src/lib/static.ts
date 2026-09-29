@@ -6,9 +6,11 @@ import { getEnv } from "./env";
 
 export function attachStaticSite(app: Express): void {
   const env = getEnv();
+  // On Vercel the website is its own service. This process only owns /api.
   const shouldServe =
-    env.SERVE_STATIC === "true" ||
-    (env.NODE_ENV === "production" && env.SERVE_STATIC !== "false");
+    !process.env.VERCEL &&
+    (env.SERVE_STATIC === "true" ||
+      (env.NODE_ENV === "production" && env.SERVE_STATIC !== "false"));
 
   if (!shouldServe) return;
 
