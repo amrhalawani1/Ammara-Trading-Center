@@ -70,6 +70,8 @@ function subscribe(listener: () => void) {
 
 const getSnapshot = () => state;
 
+export const getShortlistSnapshot = getSnapshot;
+
 export const shortlistActions = {
   createList(name: string): { list?: Shortlist; error?: ListNameError } {
     const result = createListIn(state, name);
@@ -82,6 +84,7 @@ export const shortlistActions = {
   addItem: (listId: string, item: NewItem) => commit(addItemTo(state, listId, item)),
   setQuantity: (listId: string, key: string, quantity: unknown) => commit(setQuantityIn(state, listId, key, quantity)),
   removeItem: (listId: string, key: string) => commit(removeItemFrom(state, listId, key)),
+  replaceState: (next: ShortlistState) => commit(normaliseState(next)),
 };
 
 export function useShortlists() {

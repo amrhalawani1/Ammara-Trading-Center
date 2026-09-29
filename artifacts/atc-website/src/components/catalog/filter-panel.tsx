@@ -51,7 +51,7 @@ export function FilterPanel({ groups, onToggle, onClearGroup, onClearAll, hasFil
         type="button"
         onClick={onClearAll}
         disabled={!hasFilters}
-        className="mt-6 h-11 w-full border border-border text-xs font-semibold uppercase tracking-[0.16em] text-foreground transition hover:border-foreground disabled:cursor-not-allowed disabled:opacity-40"
+        className="mt-6 h-10 w-full text-left text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition hover:text-primary disabled:cursor-not-allowed disabled:opacity-40"
         data-testid="button-clear-all-filters"
       >
         Clear all
@@ -86,7 +86,7 @@ function FilterSection({ group, defaultOpen, onToggle, onClearGroup }: { group: 
   const hidden = matching.length - shown.length;
 
   return (
-    <section className="border-t border-dashed border-border py-5 first:border-t-0 first:pt-0" data-testid={`facet-${group.key}`} data-open={open}>
+    <section className="border-t border-border py-5 first:border-t-0 first:pt-2" data-testid={`facet-${group.key}`} data-open={open}>
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -96,7 +96,7 @@ function FilterSection({ group, defaultOpen, onToggle, onClearGroup }: { group: 
           className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left"
           data-testid={`button-toggle-facet-${group.key}`}
         >
-          <span className="flex items-baseline gap-2 text-base font-medium text-foreground">
+          <span className="flex items-baseline gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground">
             {group.title}
             <span className="font-mono text-[11px] tabular-nums text-muted-foreground">{group.selected.length > 0 ? <span className="text-primary">{group.selected.length} of {group.options.length}</span> : group.options.length}</span>
           </span>
@@ -117,7 +117,7 @@ function FilterSection({ group, defaultOpen, onToggle, onClearGroup }: { group: 
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={`Find in ${group.title.toLowerCase()}`}
                 autoComplete="off"
-                className="h-9 w-full border-b border-border bg-transparent pl-6 pr-7 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-foreground [&::-webkit-search-cancel-button]:hidden"
+                className="h-9 w-full border-b border-border bg-transparent pl-6 pr-7 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus:border-primary [&::-webkit-search-cancel-button]:hidden"
                 data-testid={`input-facet-search-${group.key}`}
               />
               {query && (

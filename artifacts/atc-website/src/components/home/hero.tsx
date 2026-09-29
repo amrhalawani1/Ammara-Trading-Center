@@ -98,7 +98,7 @@ export function Hero() {
           />
         </motion.div>
       </motion.div>
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/55 to-background/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/45" />
 
       <motion.div style={reduce ? undefined : { x: copyX, y: copyY, opacity: copyOpacity }} className="relative mx-auto w-full max-w-[1440px] will-change-transform" data-testid="hero-copy-layer">
         <motion.div initial={reduce ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ ...SPRING, delay: 0.1 }}>
@@ -127,17 +127,28 @@ export function Hero() {
           transition={{ ...SPRING, delay: 0.7 }}
           className="mt-10 flex flex-col gap-8 md:flex-row md:items-end md:justify-between"
         >
-          <p className="max-w-md text-lg leading-8 text-foreground/80">Kitchen systems, furniture fittings and the small mechanisms that make a room feel resolved.</p>
-          <Magnetic>
+          <p className="max-w-xl text-lg leading-8 text-foreground">
+            Kitchen systems, furniture fittings and the small mechanisms that make a room feel resolved.
+          </p>
+          <div className="flex shrink-0 flex-wrap items-center gap-3">
+            <Magnetic>
+              <Link
+                href="/catalog"
+                className="group inline-flex h-14 items-center gap-3 bg-primary px-8 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground transition-colors duration-200 hover:bg-foreground hover:text-background active:scale-[0.98]"
+                data-testid="link-hero-catalog"
+              >
+                Browse products
+                <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2} />
+              </Link>
+            </Magnetic>
             <Link
-              href="/catalog"
-              className="group inline-flex h-14 items-center gap-3 bg-primary px-8 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary-foreground transition-colors duration-200 hover:bg-foreground hover:text-background active:scale-[0.98]"
-              data-testid="link-hero-catalog"
+              href="/showroom"
+              className="inline-flex h-14 items-center gap-2 border border-foreground/25 px-6 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground transition-colors hover:border-foreground active:translate-y-px"
+              data-testid="link-hero-showroom"
             >
-              Explore the collection
-              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={2} />
+              Book a showroom visit
             </Link>
-          </Magnetic>
+          </div>
         </motion.div>
       </motion.div>
     </section>

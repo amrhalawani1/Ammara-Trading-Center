@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } fro
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
 import {
   ArrowUpDown,
-  ChevronDown,
   LayoutGrid,
   MessageCircle,
   Rows3,
@@ -20,8 +19,8 @@ import {
   COMPARE_LIMIT,
   useCompare,
 } from "@/components/catalog/compare";
+import { CategoryNav } from "@/components/catalog/category-nav";
 import { FilterPanel, type FilterGroup } from "@/components/catalog/filter-panel";
-import { ScrollStrip } from "@/components/catalog/scroll-strip";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
 import {
   Select,
@@ -46,7 +45,7 @@ import {
   type FacetKey,
   type SortKey,
 } from "@/lib/catalog-filters";
-import { SOLUTIONS, solutionBySlug } from "@/lib/solutions";
+import { SOLUTIONS } from "@/lib/solutions";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
@@ -118,8 +117,16 @@ export default function Catalog() {
     }
   }, [sidebarOpen]);
 
-  const activeSolution = solutionBySlug(filters.solution) ?? null;
-  const solutionName = activeSolution?.name ?? null;
+  const categoryNameBySlug = useMemo(() => {
+    const map = new Map(SOLUTIONS.map((solution) => [solution.slug, solution.name]));
+    for (const product of products) {
+      if (!product.category || SOLUTIONS.some((solution) => solution.name === product.category)) continue;
+      const slug = product.category.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+      if (slug && !map.has(slug)) map.set(slug, product.category);
+    }
+    return map;
+  }, [products]);
+  const solutionName = filters.solution ? (categoryNameBySlug.get(filters.solution) ?? null) : null;
 
   const brandName = useCallback(
     (slug: string) =>
@@ -168,17 +175,26 @@ export default function Catalog() {
     return counts;
   }, [products, filters, solutionName]);
   const allCount = [...solutionCounts.values()].reduce((sum, n) => sum + n, 0);
-  const solutions = SOLUTIONS.filter((solution) =>
-    products.some((p) => p.category === solution.name),
-  );
-  const tabs = [
-    { slug: null as string | null, name: "Everything", count: allCount },
-    ...solutions.map((s) => ({
-      slug: s.slug as string | null,
-      name: s.name,
-      count: solutionCounts.get(s.name) ?? 0,
-    })),
-  ];
+  const categories = useMemo(() => {
+    const names = new Set(products.map((product) => product.category).filter(Boolean));
+    const known = SOLUTIONS.filter((solution) => names.has(solution.name));
+    const extra = [...names]
+      .filter((name) => !SOLUTIONS.some((solution) => solution.name === name))
+      .sort((a, b) => a.localeCompare(b));
+    return [
+      { slug: null as string | null, name: "Everything", count: allCount },
+      ...known.map((solution) => ({
+        slug: solution.slug as string | null,
+        name: solution.name,
+        count: solutionCounts.get(solution.name) ?? 0,
+      })),
+      ...extra.map((name) => ({
+        slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+        name,
+        count: solutionCounts.get(name) ?? 0,
+      })),
+    ];
+  }, [products, solutionCounts, allCount]);
 
   const toggleFacet = (key: FacetKey, value: string) =>
     setFilters((current) => ({
@@ -219,17 +235,20 @@ export default function Catalog() {
   const askHref = whatsappUrl(
     filters.query.trim()
       ? `Hello ATC, I am looking for "${filters.query.trim()}". Do you carry it?`
-      : `Hello ATC, I am looking for ${activeSolution ? activeSolution.name.toLowerCase() : "a product"} that is not in the online catalogue.`,
+      : `Hello ATC, I am looking for ${solutionName ? solutionName.toLowerCase() : "a product"} that I could not find on the site.`,
   );
 
   const filterPanel = (
-    <FilterPanel
-      groups={groups}
-      onToggle={toggleFacet}
-      onClearGroup={clearFacet}
-      onClearAll={clearAll}
-      hasFilters={facetCount > 0}
-    />
+    <>
+      <CategoryNav items={categories} activeSlug={filters.solution} onSelect={setSolution} />
+      <FilterPanel
+        groups={groups}
+        onToggle={toggleFacet}
+        onClearGroup={clearFacet}
+        onClearAll={clearAll}
+        hasFilters={facetCount > 0 || Boolean(filters.solution)}
+      />
+    </>
   );
   const enter = (delay: number) =>
     reduce
@@ -244,37 +263,24 @@ export default function Catalog() {
     <MainLayout>
       {/* The desk: graphite band with the search in display type and the solutions as tabs. */}
       <section className="dark bg-background text-foreground" data-testid="section-catalogue-desk">
-        <div className="container mx-auto px-4 pt-12 md:pt-20">
-          <div className="grid gap-8 md:grid-cols-12 md:items-end">
-            <motion.h1
-              {...enter(0)}
-              className="font-display text-[clamp(3.5rem,11vw,9.5rem)] font-medium leading-[0.86] tracking-[-0.06em] md:col-span-8"
-            >
-              Catalogue
-              <span
-                className="ml-3 inline-block translate-y-[-0.9em] font-mono text-[0.16em] font-normal tracking-normal text-foreground/50 tabular-nums md:ml-4"
-                data-testid="text-catalogue-total"
-              >
-                {isLoading ? "" : products.length}
-              </span>
+        <div className="container mx-auto px-4 pb-6 pt-6 md:pt-8">
+          <div className="flex items-baseline justify-between gap-4">
+            <motion.h1 {...enter(0)} className="font-display text-3xl font-medium leading-none tracking-[-0.04em] md:text-4xl">
+              Products
             </motion.h1>
-            <motion.p
-              {...enter(0.08)}
-              className="max-w-sm text-base leading-7 text-foreground/65 md:col-span-4 md:justify-self-end md:pb-3"
-            >
-              Every item as the manufacturer publishes it: numbers, finishes, drawings. Compare up
-              to four side by side.
+            <motion.p {...enter(0)} className="font-mono text-sm tabular-nums text-foreground/60" data-testid="text-catalogue-total">
+              {isLoading ? "" : products.length}
             </motion.p>
           </div>
 
           <motion.form
-            {...enter(0.16)}
+            {...enter(0.06)}
             onSubmit={submitSearch}
             role="search"
-            className="relative mt-10 md:mt-14"
+            className="relative mt-4"
           >
             <label className="block">
-              <span className="sr-only">Search the catalogue</span>
+              <span className="sr-only">Search products</span>
               <input
                 ref={searchRef}
                 type="search"
@@ -282,9 +288,9 @@ export default function Catalog() {
                 onChange={(event) =>
                   setFilters((current) => ({ ...current, query: event.target.value }))
                 }
-                placeholder="Search a name, item number, designer or finish"
+                placeholder="Name, brand, item no. or finish"
                 autoComplete="off"
-                className="peer h-auto w-full border-0 border-b border-foreground/25 bg-transparent py-4 pr-14 font-display text-2xl font-medium tracking-[-0.03em] text-foreground outline-none transition-colors placeholder:font-normal placeholder:text-foreground/35 focus:border-transparent md:py-6 md:text-4xl lg:text-5xl [&::-webkit-search-cancel-button]:hidden"
+                className="peer h-auto w-full border-0 border-b border-foreground/25 bg-transparent py-3 pr-12 font-display text-2xl font-medium tracking-[-0.03em] text-foreground outline-none transition-colors placeholder:font-normal placeholder:text-foreground/35 focus:border-transparent md:text-3xl [&::-webkit-search-cancel-button]:hidden"
                 data-testid="input-catalog-search"
               />
               <span
@@ -300,185 +306,124 @@ export default function Catalog() {
                 aria-label="Clear search"
                 data-testid="button-clear-search"
               >
-                <X className="h-6 w-6" strokeWidth={1.75} />
+                <X className="h-5 w-5" strokeWidth={1.75} />
               </button>
             ) : (
               <Search
-                className="pointer-events-none absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 text-foreground/40 md:h-7 md:w-7"
+                className="pointer-events-none absolute right-1 top-1/2 h-5 w-5 -translate-y-1/2 text-foreground/40"
                 strokeWidth={1.5}
                 aria-hidden
               />
             )}
           </motion.form>
-
-          <motion.nav {...enter(0.24)} aria-label="Solutions" className="-mx-4 mt-8 md:mt-10">
-            <ScrollStrip>
-              <LayoutGroup id="catalogue-solutions">
-                <ul className="flex gap-6 md:gap-8">
-                  {tabs.map((item) => {
-                    const active = item.slug === (activeSolution?.slug ?? null);
-                    return (
-                      <li key={item.name} className="relative shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setSolution(item.slug)}
-                          aria-pressed={active}
-                          disabled={!active && item.count === 0}
-                          className={cn(
-                            "flex h-12 items-baseline gap-2 whitespace-nowrap text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-30 md:text-base",
-                            active ? "text-foreground" : "text-foreground/55 hover:text-foreground",
-                          )}
-                          data-testid={`filter-solution-${item.slug ?? "all"}`}
-                        >
-                          {item.name}
-                          <span className="font-mono text-[11px] tabular-nums opacity-70">
-                            {item.count}
-                          </span>
-                        </button>
-                        {active && (
-                          <motion.span
-                            layoutId="solution-indicator"
-                            className="absolute inset-x-0 bottom-0 h-0.5 bg-primary"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            aria-hidden
-                          />
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </LayoutGroup>
-            </ScrollStrip>
-          </motion.nav>
         </div>
       </section>
 
-      {/* Rail: facets, count, sort and view. Sticks under the navbar and follows it out of view. */}
+      {/* Rail: a graphite toolbar under the catalogue header. */}
       <div
-        className="sticky z-30 border-b border-border bg-background/95 backdrop-blur-md transition-[top] duration-300"
+        className="dark sticky z-30 border-b border-white/10 bg-background text-foreground transition-[top] duration-300"
         style={{ top: "var(--nav-offset, 76px)" }}
         data-testid="catalogue-rail"
       >
-        <div className="container mx-auto flex h-14 items-center gap-1 px-4">
-          {/* Desktop: the label is the switch for the facet column. */}
+        <div className="container mx-auto flex h-14 items-center gap-3 px-4">
           <button
             type="button"
             onClick={() => setSidebarOpen((open) => !open)}
             aria-expanded={sidebarOpen}
             aria-controls="catalogue-facets"
-            className="group -ml-3 hidden h-10 items-center gap-2.5 px-3 transition-colors hover:bg-tile lg:inline-flex"
+            className="hidden h-10 items-center gap-2.5 text-sm lg:inline-flex"
             data-testid="button-toggle-filters"
           >
-            <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} aria-hidden />
-            <span className="font-display text-lg font-medium tracking-[-0.02em]">Filters</span>
-            {facetCount > 0 && (
-              <span className="font-mono text-xs tabular-nums text-primary">
-                {facetCount} active
+            <SlidersHorizontal className={cn("h-4 w-4", sidebarOpen ? "text-primary" : "text-foreground/70")} strokeWidth={1.75} aria-hidden />
+            <span className="font-medium tracking-[-0.01em]">Filters</span>
+            {(facetCount > 0 || filters.solution) && (
+              <span className="font-mono text-[11px] tabular-nums text-primary">
+                {(facetCount + (filters.solution ? 1 : 0))} active
               </span>
             )}
-            <ChevronDown
-              className={cn(
-                "h-4 w-4 text-muted-foreground transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:text-foreground",
-                sidebarOpen ? "rotate-180" : "rotate-0",
-              )}
-              strokeWidth={1.75}
-              aria-hidden
-            />
           </button>
           <button
             type="button"
             onClick={() => setFiltersOpen(true)}
-            className={cn(
-              "inline-flex h-10 items-center gap-2 px-3 text-sm transition lg:hidden",
-              facetCount > 0 ? "bg-foreground text-background" : "text-foreground hover:bg-tile",
-            )}
+            className="inline-flex h-10 items-center gap-2.5 text-sm lg:hidden"
             data-testid="button-open-filters"
           >
             <SlidersHorizontal className="h-4 w-4" strokeWidth={1.75} />
             Filters
-            {facetCount > 0 && (
-              <span className="font-mono text-[11px] tabular-nums">{facetCount}</span>
+            {(facetCount > 0 || filters.solution) && (
+              <span className="font-mono text-[11px] tabular-nums text-primary">
+                {facetCount + (filters.solution ? 1 : 0)}
+              </span>
             )}
           </button>
 
-          <p className="ml-auto whitespace-nowrap text-sm text-muted-foreground">
-            <span
-              className="font-mono tabular-nums text-foreground"
-              aria-live="polite"
-              data-testid="text-result-count"
-            >
+          <span className="hidden h-4 w-px bg-foreground/15 sm:block" aria-hidden />
+          <p className="whitespace-nowrap text-sm text-foreground/70">
+            <span className="font-mono tabular-nums text-foreground" aria-live="polite" data-testid="text-result-count">
               {isLoading ? "" : results.length}
             </span>
-            <span className="hidden sm:inline">
-              {" "}
-              {results.length === 1 ? "product" : "products"}
-            </span>
+            <span className="hidden sm:inline"> {results.length === 1 ? "product" : "products"}</span>
           </p>
 
-          <Select
-            value={filters.sort}
-            onValueChange={(value) =>
-              setFilters((current) => ({ ...current, sort: value as SortKey }))
-            }
-          >
-            <SelectTrigger
-              className="h-10 w-auto gap-2 rounded-none border-0 bg-transparent px-3 text-sm shadow-none hover:bg-tile focus:ring-0"
-              aria-label="Sort products"
-              data-testid="select-sort"
+          <div className="ml-auto flex items-center gap-1">
+            <Select
+              value={filters.sort}
+              onValueChange={(value) => setFilters((current) => ({ ...current, sort: value as SortKey }))}
             >
-              <ArrowUpDown className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
-              <span className="hidden md:inline">
-                <SelectValue />
-              </span>
-            </SelectTrigger>
-            <SelectContent align="end" className="rounded-none">
-              {SORTS.map((option) => (
-                <SelectItem key={option.key} value={option.key} className="rounded-none">
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              <SelectTrigger
+                className="h-10 w-auto gap-2 rounded-none border-0 bg-transparent px-2 text-sm text-foreground shadow-none hover:bg-white/10 focus:ring-0"
+                aria-label="Sort products"
+                data-testid="select-sort"
+              >
+                <ArrowUpDown className="h-3.5 w-3.5 text-foreground/50" strokeWidth={1.75} />
+                <span className="hidden md:inline">
+                  <SelectValue />
+                </span>
+              </SelectTrigger>
+              <SelectContent align="end" className="rounded-none">
+                {SORTS.map((option) => (
+                  <SelectItem key={option.key} value={option.key} className="rounded-none">
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <div
-            className="relative flex h-10 items-center border border-border p-0.5"
-            role="group"
-            aria-label="View"
-          >
-            <LayoutGroup id="catalogue-view">
-              {(
-                [
-                  { key: "grid", label: "Grid", Icon: LayoutGrid },
-                  { key: "index", label: "Index", Icon: Rows3 },
-                ] as const
-              ).map(({ key, label, Icon }) => (
-                <button
-                  key={key}
-                  type="button"
-                  onClick={() => setView(key)}
-                  aria-pressed={view === key}
-                  aria-label={`${label} view`}
-                  title={`${label} view`}
-                  className={cn(
-                    "relative flex h-full w-9 items-center justify-center transition-colors",
-                    view === key
-                      ? "text-background"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                  data-testid={`button-view-${key}`}
-                >
-                  {view === key && (
-                    <motion.span
-                      layoutId="view-indicator"
-                      className="absolute inset-0 bg-foreground"
-                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                      aria-hidden
-                    />
-                  )}
-                  <Icon className="relative h-4 w-4" strokeWidth={1.75} />
-                </button>
-              ))}
-            </LayoutGroup>
+            <div className="relative flex h-9 items-center" role="group" aria-label="View">
+              <LayoutGroup id="catalogue-view">
+                {(
+                  [
+                    { key: "grid", label: "Grid", Icon: LayoutGrid },
+                    { key: "index", label: "List", Icon: Rows3 },
+                  ] as const
+                ).map(({ key, label, Icon }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setView(key)}
+                    aria-pressed={view === key}
+                    aria-label={`${label} view`}
+                    title={`${label} view`}
+                    className={cn(
+                      "relative flex h-9 items-center gap-1.5 px-2.5 text-xs transition-colors",
+                      view === key ? "text-foreground" : "text-foreground/45 hover:text-foreground",
+                    )}
+                    data-testid={`button-view-${key}`}
+                  >
+                    {view === key && (
+                      <motion.span
+                        layoutId="view-indicator"
+                        className="absolute inset-x-2 bottom-1 h-px bg-primary"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        aria-hidden
+                      />
+                    )}
+                    <Icon className="relative h-3.5 w-3.5" strokeWidth={1.75} />
+                    <span className="relative hidden sm:inline">{label}</span>
+                  </button>
+                ))}
+              </LayoutGroup>
+            </div>
           </div>
         </div>
       </div>
@@ -486,9 +431,9 @@ export default function Catalog() {
       <div
         ref={resultsRef}
         className={cn(
-          "container mx-auto grid scroll-mt-32 gap-10 px-4 pb-28 pt-8 transition-[grid-template-columns,column-gap] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:pt-10",
+          "container mx-auto grid scroll-mt-32 gap-10 px-4 pb-28 pt-0 transition-[grid-template-columns,column-gap] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           sidebarOpen
-            ? "lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-x-12 xl:gap-x-16"
+            ? "lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-x-10 xl:gap-x-14"
             : "lg:grid-cols-[0px_minmax(0,1fr)] lg:gap-x-0",
         )}
       >
@@ -496,7 +441,7 @@ export default function Catalog() {
         <aside
           id="catalogue-facets"
           className={cn(
-            "hidden min-w-0 overflow-hidden transition-opacity duration-300 lg:block",
+            "hidden min-w-0 overflow-hidden border-border transition-opacity duration-300 lg:block lg:self-start lg:border-r",
             sidebarOpen ? "opacity-100" : "pointer-events-none opacity-0",
           )}
           aria-label="Filters"
@@ -505,17 +450,20 @@ export default function Catalog() {
           data-open={sidebarOpen}
         >
           <div
-            className="sticky w-[260px] max-h-[calc(100dvh-var(--nav-offset,76px)-5rem)] overflow-y-auto pb-6 pr-3 transition-[top] duration-300 [scrollbar-width:thin]"
-            style={{ top: "calc(var(--nav-offset, 76px) + 4.5rem)" }}
+            className="sticky w-[280px] max-h-[calc(100dvh-var(--nav-offset,76px)-3.5rem)] overflow-y-auto pb-6 pr-5 pt-3 transition-[top] duration-300 [scrollbar-width:thin]"
+            style={{ top: "calc(var(--nav-offset, 76px) + 3.5rem)" }}
           >
             {isLoading ? <SidebarSkeleton /> : filterPanel}
           </div>
         </aside>
 
-        <div className="min-w-0">
+        <div className="min-w-0 pt-6 lg:pt-8">
           {/* Active filters */}
-          {(chips.length > 0 || filters.query.trim()) && (
+          {(chips.length > 0 || filters.query.trim() || solutionName) && (
             <div className="mb-8 flex flex-wrap items-center gap-2" aria-label="Active filters">
+              {solutionName && (
+                <FilterChip label={solutionName} onRemove={() => setSolution(null)} />
+              )}
               {filters.query.trim() && (
                 <FilterChip
                   label={`"${filters.query.trim()}"`}
@@ -558,21 +506,21 @@ export default function Catalog() {
           ) : error ? (
             <div className="border border-border px-6 py-20 text-center">
               <p className="font-display text-2xl text-foreground">
-                {apiErrorMessage(error, "The collection could not be loaded.")}
+                {apiErrorMessage(error, "Products did not load.")}
               </p>
               <p className="mt-3 text-sm text-muted-foreground">
-                Refresh the page, or message us and we will send what you need.
+                Refresh the page. If it keeps happening, ask on WhatsApp and we will send what you need.
               </p>
             </div>
           ) : results.length === 0 ? (
             <div className="grid gap-8 border border-border px-6 py-14 md:grid-cols-12 md:px-10 md:py-20">
               <div className="md:col-span-7">
                 <h2 className="font-display text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-5xl">
-                  Not in this selection.
+                  Not on the site yet.
                 </h2>
                 <p className="mt-4 max-w-md text-sm leading-7 text-muted-foreground">
-                  The online catalogue shows part of what we supply. Send us the name or item number
-                  and our team will confirm availability.
+                  The site shows a selection of what we supply. Send the name or item no. and a
+                  consultant will confirm whether we can supply it.
                 </p>
               </div>
               <div className="flex flex-col items-start gap-4 md:col-span-5 md:justify-end">
@@ -677,10 +625,10 @@ export default function Catalog() {
             <div className="dark mt-20 grid gap-8 bg-background p-8 text-foreground md:mt-28 md:grid-cols-12 md:items-end md:p-12">
               <div className="md:col-span-8">
                 <p className="font-display text-3xl font-medium leading-[0.95] tracking-[-0.04em] md:text-5xl">
-                  Not seeing it? The trade desk works from the full manufacturer ranges.
+                  Not seeing it? We supply from each brand's full range, not only what is shown here.
                 </p>
                 <p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">
-                  Send a name, a photograph or an item number and we will confirm availability.
+                  Send a name, a photo or an item no. and a consultant will confirm.
                 </p>
               </div>
               <div className="md:col-span-4 md:justify-self-end">

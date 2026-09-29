@@ -1,5 +1,7 @@
 # Product page - design direction
 
+> **Superseded.** Layout and behaviour for the product page, catalogue, and brand pages are defined in [specs/product-page.md](specs/product-page.md). This note is historical.
+
 Redesign of `/products/:slug`, built on a structural and visual read of four partner-brand product pages. DND is the primary reference.
 
 ## What each reference does

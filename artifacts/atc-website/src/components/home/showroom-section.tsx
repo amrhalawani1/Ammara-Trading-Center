@@ -9,7 +9,10 @@ import { mapsHref } from "@/lib/maps";
 import { cn } from "@/lib/utils";
 import { Reveal, Section, SolidLink } from "./primitives";
 
-const SHOWROOM_IMAGES = ["/images/showroom-wide.webp", "/images/showroom-detail.webp"] as const;
+const SHOWROOM_IMAGES = [
+  { src: "/images/showroom-lounge.webp", alt: "The flagship floor: lounge seating with kitchens installed beyond" },
+  { src: "/images/showroom-handles.webp", alt: "Door handles displayed board by board on the showroom wall" },
+] as const;
 
 function ShowroomRow({ index, active, stacked, onActivate }: { index: number; active: boolean; stacked: boolean; onActivate: () => void }) {
   const showroom = company.showrooms[index]!;
@@ -69,7 +72,7 @@ function ShowroomRow({ index, active, stacked, onActivate }: { index: number; ac
               onClick={(event) => event.stopPropagation()}
               className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary transition-colors hover:text-foreground"
             >
-              Directions <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+              Get directions <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
             </a>
           </div>
         </div>
@@ -94,7 +97,7 @@ export function ShowroomSection() {
     <Section className="pb-20 md:pb-24">
       <Reveal className="max-w-3xl">
         <h2 className="font-display text-5xl font-medium leading-[0.92] tracking-[-0.05em] md:text-7xl">Open the drawer. Feel the close.</h2>
-        <p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">Two working showrooms in Amman where every system on the floor can be operated. No appointment needed; a consultant is always on hand.</p>
+        <p className="mt-6 max-w-lg text-lg leading-8 text-muted-foreground">Two showrooms in Amman where every system on display can be used. Walk in during opening hours, or book a visit and a consultant will have your systems ready.</p>
       </Reveal>
 
       <div className="mt-14 grid gap-10 lg:mt-20 lg:grid-cols-12 lg:gap-8">
@@ -102,14 +105,14 @@ export function ShowroomSection() {
           <div className="relative aspect-[4/3] overflow-hidden bg-card lg:aspect-auto lg:h-full lg:min-h-[560px]">
             <AnimatePresence mode="sync" initial={false}>
               <motion.div
-                key={image}
+                key={image.src}
                 initial={reduce ? { opacity: 1 } : { opacity: 0, scale: 1.06 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute inset-0"
               >
-                <MediaImage src={image} alt={`${name} showroom`} width={1600} height={1200} className="h-full w-full object-cover" />
+                <MediaImage src={image.src} alt={image.alt} width={1600} height={1200} className="h-full w-full object-cover" />
               </motion.div>
             </AnimatePresence>
             <motion.span key={name} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="absolute left-5 top-5 bg-background/90 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur-sm">
@@ -125,7 +128,7 @@ export function ShowroomSection() {
             ))}
           </ul>
           <div className="mt-10">
-            <SolidLink href="/showroom">Plan a visit</SolidLink>
+            <SolidLink href="/showroom">Book a visit</SolidLink>
           </div>
         </div>
       </div>

@@ -8,6 +8,8 @@ const FINISH_TONES: Array<[RegExp, string]> = [
   [/bronze/i, "#8A6A4E"],
   [/brass|gold/i, "#C3A46B"],
   [/copper|rose/i, "#B77A5B"],
+  [/pink/i, "#E4C4C0"],
+  [/mint|green/i, "#B7C9B4"],
   [/moka|brown|walnut/i, "#5B4437"],
   [/titanium|gunmetal/i, "#7E7A76"],
   [/nickel|chrome|silver|stainless|steel|aluminium|aluminum|zinc|inox|orion/i, "#B9B6B2"],

@@ -21,3 +21,4 @@ export * from "./brands";
 export * from "./catalog-meta";
 export * from "./inquiries";
 export * from "./products";
+export * from "./trade";

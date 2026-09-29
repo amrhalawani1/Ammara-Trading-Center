@@ -54,7 +54,7 @@ export function ProductHero({ name, brandName, brandSlug, type, designer, badge,
                   // alongside, so the panel stays quiet rather than repeating it.
                   <span className="flex flex-col items-center gap-4 text-center">
                     <span className="h-14 w-14 rounded-full border border-foreground/15" aria-hidden />
-                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/70">Image on request</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground/70">Photo on request</span>
                   </span>
                 )}
               </motion.div>

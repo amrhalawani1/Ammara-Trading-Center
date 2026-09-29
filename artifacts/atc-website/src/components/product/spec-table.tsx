@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Copy } from "lucide-react";
+import { referenceLine, type ProductReference } from "@/lib/whatsapp";
+import { cn } from "@/lib/utils";
 import type { Spec } from "./product-facts";
 
 interface SpecTableProps {
   productName: string;
   brandName: string;
-  reference?: string | null;
+  reference?: ProductReference | null;
   specs: (Spec & { group?: string | null })[];
 }
 
@@ -15,7 +17,12 @@ const GROUP_ORDER = ["Dimensions", "Performance", "Material", "Electrical", "Ins
 /** "General" and "Other" both display as General, so they must collapse into one group. */
 const groupKey = (group: string | null | undefined) => (!group || group === "General" ? "Other" : group);
 
-/** Häfele-style dense technical table. "Copy specification" lifts the whole sheet to the clipboard for a fabricator's order notes. */
+/** A short measurement reads as a figure. A sentence stays body type. */
+function isFigure(value: string) {
+  return value.length <= 48 && value.split(/\s+/).length <= 8;
+}
+
+/** A graphite cut-sheet. The figure leads, the label sits under it, and groups run down the side. */
 export function SpecTable({ productName, brandName, reference, specs }: SpecTableProps) {
   const [copied, setCopied] = useState(false);
 
@@ -26,7 +33,7 @@ export function SpecTable({ productName, brandName, reference, specs }: SpecTabl
   }, [copied]);
 
   const copy = async () => {
-    const sheet = [`${productName} - ${brandName}`, reference ? `Ref: ${reference}` : null, ...specs.map((spec) => `${spec.label}: ${spec.value}`)]
+    const sheet = [`${productName} - ${brandName}`, reference ? referenceLine(reference) : null, ...specs.map((spec) => `${spec.label}: ${spec.value}`)]
       .filter(Boolean)
       .join("\n");
     try {
@@ -38,40 +45,44 @@ export function SpecTable({ productName, brandName, reference, specs }: SpecTabl
   };
 
   if (specs.length === 0) {
-    return <p className="text-sm leading-7 text-muted-foreground">Technical details for this system are shared on request.</p>;
+    return <p className="text-sm leading-7 text-muted-foreground">Technical data for this product is available on request. Ask on WhatsApp and a consultant will send the manufacturer's current sheet.</p>;
   }
+
+  const grouped = specs.some((spec) => spec.group);
+  const groups = grouped
+    ? GROUP_ORDER.concat([...new Set(specs.map((spec) => groupKey(spec.group)))].filter((g) => !GROUP_ORDER.includes(g)))
+        .map((group) => ({ group, rows: specs.filter((spec) => groupKey(spec.group) === group) }))
+        .filter((g) => g.rows.length > 0)
+    : [{ group: null as string | null, rows: specs }];
 
   return (
     <div>
-      {(() => {
-        const grouped = specs.some((spec) => spec.group);
-        const groups = grouped
-          ? GROUP_ORDER.concat([...new Set(specs.map((spec) => groupKey(spec.group)))].filter((g) => !GROUP_ORDER.includes(g)))
-              .map((group) => ({ group, rows: specs.filter((spec) => groupKey(spec.group) === group) }))
-              .filter((g) => g.rows.length > 0)
-          : [{ group: null as string | null, rows: specs }];
-        return groups.map(({ group, rows }) => (
-          <div key={group ?? "all"} className={group ? "mb-8 last:mb-0" : undefined}>
-            {group && <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">{group === "Other" ? "General" : group}</p>}
-            <table className="w-full border-t border-border text-sm">
-              <tbody>
-                {rows.map((spec) => (
-                  <tr key={spec.label} className="border-b border-border">
-                    <th scope="row" className="w-2/5 py-3.5 pr-4 text-left align-top font-normal text-muted-foreground">
-                      {spec.label}
-                    </th>
-                    <td className="py-3.5 text-foreground tabular-nums">{spec.value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <div className={grouped ? "divide-y divide-foreground/12 border-y border-foreground/12" : undefined}>
+        {groups.map(({ group, rows }) => (
+          <div key={group ?? "all"} className={group ? "grid gap-6 py-8 lg:grid-cols-[12rem_1fr] lg:items-start lg:gap-12 lg:py-10" : undefined}>
+            {group && (
+              <h3 className="flex items-center gap-3 font-display text-lg font-medium tracking-[-0.03em]">
+                <span className="h-px w-6 shrink-0 bg-primary" aria-hidden />
+                {group === "Other" ? "General" : group}
+              </h3>
+            )}
+            <dl className="grid gap-x-10 gap-y-7 sm:grid-cols-2 xl:grid-cols-3">
+              {rows.map((spec) => (
+                <div key={spec.label} className="flex flex-col-reverse gap-2">
+                  <dt className="text-xs text-muted-foreground">{spec.label}</dt>
+                  <dd className={cn("text-balance text-foreground tabular-nums", isFigure(spec.value) ? "font-display text-[1.65rem] font-medium leading-tight tracking-[-0.03em]" : "text-base font-medium leading-6")}>
+                    {spec.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
-        ));
-      })()}
+        ))}
+      </div>
       <button
         type="button"
         onClick={copy}
-        className="mt-5 inline-flex items-center gap-2 text-xs font-semibold text-foreground transition hover:text-primary active:translate-y-px"
+        className="mt-8 inline-flex h-11 items-center gap-2 border border-foreground/25 px-4 text-sm font-medium text-foreground transition hover:border-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary active:translate-y-px"
         data-testid="button-copy-spec"
       >
         <AnimatePresence mode="wait" initial={false}>

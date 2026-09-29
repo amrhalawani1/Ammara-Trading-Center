@@ -5,7 +5,7 @@ import pinoHttp from "pino-http";
 import { clerkMiddleware } from "@clerk/express";
 import { publishableKeyFromHost } from "@clerk/shared/keys";
 import { logger } from "./lib/logger";
-import { corsOrigins, getEnv } from "./lib/env";
+import { clerkIsConfigured, corsOrigins, getEnv } from "./lib/env";
 import {
   CLERK_PROXY_PATH,
   clerkProxyMiddleware,
@@ -82,13 +82,11 @@ export function createApp(options: AppOptions = {}): Express {
   );
   app.use(express.json({ limit: "1mb" }));
   app.use(express.urlencoded({ extended: true, limit: "1mb" }));
-  if (!options.disableClerkMiddleware) {
-    // Scoped to /api/content, not applied globally: it's the only sub-route that
-    // reads req.auth (via requireStaffAuth). Registered here, unconditionally,
-    // clerkMiddleware throws on *every* request — including public reads like
-    // GET /api/catalog — whenever CLERK_SECRET_KEY isn't configured.
+  if (!options.disableClerkMiddleware && clerkIsConfigured(env)) {
+    // Applied to all /api routes so inquiries can optionally stamp a session.
+    // Skipped when Clerk keys are unset so public catalogue reads keep working.
     app.use(
-      "/api/content",
+      "/api",
       clerkMiddleware((req) => ({
         publishableKey: publishableKeyFromHost(
           getClerkProxyHost(req) ?? "",

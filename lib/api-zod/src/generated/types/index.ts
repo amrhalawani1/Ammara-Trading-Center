@@ -6,11 +6,19 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './accountInquiry';
+export * from './accountInquiryKind';
+export * from './accountShortlist';
+export * from './accountShortlistItem';
+export * from './accountShortlistState';
+export * from './accountShortlistStateVersion';
 export * from './brand';
 export * from './brandDetail';
 export * from './brandInput';
 export * from './brandUpdate';
 export * from './catalogResponse';
+export * from './contentInquiry';
+export * from './contentInquiryKind';
 export * from './contentStatus';
 export * from './healthStatus';
 export * from './importBrand';
@@ -20,6 +28,10 @@ export * from './importResult';
 export * from './inquiryInput';
 export * from './inquiryInputKind';
 export * from './inquiryResult';
+export * from './inquiryStatus';
+export * from './listContentInquiriesKind';
+export * from './listContentInquiriesParams';
+export * from './patchInquiryStatusInput';
 export * from './product';
 export * from './productDetails';
 export * from './productDetailsDownloadsItem';
@@ -34,5 +46,10 @@ export * from './productEditorialChaptersItem';
 export * from './productEditorialDesigner';
 export * from './productInput';
 export * from './productUpdate';
+export * from './putAccountShortlistsInput';
+export * from './savedItemKind';
 export * from './shortlistItemInput';
 export * from './spec';
+export * from './tradeProfile';
+export * from './tradeProfileInput';
+export * from './tradeRole';

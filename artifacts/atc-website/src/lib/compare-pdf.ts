@@ -138,7 +138,7 @@ export async function downloadComparisonPdf(products: Product[], rows: Compariso
       const drawHeight = photo.height * scale;
       doc.addImage(photo.data, "JPEG", x + pad + (boxWidth - drawWidth) / 2, y + pad + (boxHeight - drawHeight) / 2, drawWidth, drawHeight);
     } else {
-      doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(...MUTED).text("Image on request", x + inner / 2, y + photoHeight / 2, { align: "center" });
+      doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(...MUTED).text("Photo on request", x + inner / 2, y + photoHeight / 2, { align: "center" });
     }
     let textY = y + photoHeight + 6;
     doc.setFont("helvetica", "bold").setFontSize(nameFont).setTextColor(...INK);
@@ -185,7 +185,7 @@ export async function downloadComparisonPdf(products: Product[], rows: Compariso
       const showroom = company.showrooms[0];
       doc.setFont("helvetica", "normal").setFontSize(7.5).setTextColor(...MUTED);
       doc.text(`${company.name}, ${showroom ? `${showroom.addressLines.join(", ")}, ${showroom.phone}, ` : ""}${company.email}`, margin, footerY);
-      doc.text("Details as published by each brand. Availability and project terms are confirmed by ATC.", margin, footerY + 4);
+      doc.text("Details as published by each brand. A consultant at Amara Trading Center confirms availability and terms.", margin, footerY + 4);
       doc.text(`Page ${data.pageNumber}`, pageWidth - margin, footerY, { align: "right" });
     },
   });

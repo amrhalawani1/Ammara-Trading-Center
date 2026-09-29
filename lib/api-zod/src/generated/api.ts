@@ -302,7 +302,7 @@ export const GetPublicProductResponse = zod.object({
 
 
 /**
- * @summary Submit a general or shortlist inquiry
+ * @summary Submit a general, shortlist or newsletter inquiry
  */
 export const createInquiryBodyNameMin = 2;
 
@@ -333,7 +333,7 @@ export const createInquiryBodyItemsMax = 200;
 
 
 export const CreateInquiryBody = zod.object({
-  "kind": zod.enum(['general', 'shortlist']),
+  "kind": zod.enum(['general', 'shortlist', 'newsletter']),
   "name": zod.string().min(createInquiryBodyNameMin),
   "email": zod.string().min(createInquiryBodyEmailMin),
   "phone": zod.string().nullish(),
@@ -355,6 +355,209 @@ export const CreateInquiryBody = zod.object({
 export const CreateInquiryResponse = zod.object({
   "accepted": zod.boolean(),
   "reference": zod.string()
+})
+
+
+/**
+ * @summary The signed-in trade visitor's profile
+ */
+export const GetAccountProfileResponse = zod.object({
+  "clerkUserId": zod.string(),
+  "email": zod.string(),
+  "name": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "role": zod.union([zod.enum(['specifier', 'procurement', 'fabricator', 'other']),zod.null()]).optional()
+})
+
+
+/**
+ * @summary Create or update the trade profile and claim guest inquiries by email
+ */
+export const putAccountProfileBodyEmailMin = 3;
+
+export const putAccountProfileBodyNameMax = 120;
+
+export const putAccountProfileBodyCompanyMax = 120;
+
+
+
+export const PutAccountProfileBody = zod.object({
+  "email": zod.string().min(putAccountProfileBodyEmailMin),
+  "name": zod.string().max(putAccountProfileBodyNameMax).nullish(),
+  "company": zod.string().max(putAccountProfileBodyCompanyMax).nullish(),
+  "role": zod.union([zod.enum(['specifier', 'procurement', 'fabricator', 'other']),zod.null()]).optional()
+})
+
+export const PutAccountProfileResponse = zod.object({
+  "clerkUserId": zod.string(),
+  "email": zod.string(),
+  "name": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "role": zod.union([zod.enum(['specifier', 'procurement', 'fabricator', 'other']),zod.null()]).optional()
+})
+
+
+/**
+ * @summary The account's saved shortlists
+ */
+export const getAccountShortlistsResponseListsItemItemsItemQuantityMax = 9999;
+export const getAccountShortlistsResponseListsItemItemsItemQuantityMultipleOf = 1;
+
+
+
+export const GetAccountShortlistsResponse = zod.object({
+  "version": zod.literal(1),
+  "lists": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "createdAt": zod.string(),
+  "items": zod.array(zod.object({
+  "key": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "brandName": zod.string(),
+  "reference": zod.string(),
+  "variant": zod.string().nullish(),
+  "image": zod.string().nullish(),
+  "quantity": zod.number().min(1).max(getAccountShortlistsResponseListsItemItemsItemQuantityMax).multipleOf(getAccountShortlistsResponseListsItemItemsItemQuantityMultipleOf),
+  "addedAt": zod.string(),
+  "kind": zod.enum(['product', 'brand']).optional()
+}))
+})),
+  "activeListId": zod.string()
+})
+
+
+/**
+ * @summary Replace or merge device shortlists into the account
+ */
+export const putAccountShortlistsBodyStateListsItemItemsItemQuantityMax = 9999;
+export const putAccountShortlistsBodyStateListsItemItemsItemQuantityMultipleOf = 1;
+
+
+
+export const PutAccountShortlistsBody = zod.object({
+  "state": zod.object({
+  "version": zod.literal(1),
+  "lists": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "createdAt": zod.string(),
+  "items": zod.array(zod.object({
+  "key": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "brandName": zod.string(),
+  "reference": zod.string(),
+  "variant": zod.string().nullish(),
+  "image": zod.string().nullish(),
+  "quantity": zod.number().min(1).max(putAccountShortlistsBodyStateListsItemItemsItemQuantityMax).multipleOf(putAccountShortlistsBodyStateListsItemItemsItemQuantityMultipleOf),
+  "addedAt": zod.string(),
+  "kind": zod.enum(['product', 'brand']).optional()
+}))
+})),
+  "activeListId": zod.string()
+}),
+  "merge": zod.boolean().optional()
+})
+
+export const putAccountShortlistsResponseListsItemItemsItemQuantityMax = 9999;
+export const putAccountShortlistsResponseListsItemItemsItemQuantityMultipleOf = 1;
+
+
+
+export const PutAccountShortlistsResponse = zod.object({
+  "version": zod.literal(1),
+  "lists": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "createdAt": zod.string(),
+  "items": zod.array(zod.object({
+  "key": zod.string(),
+  "slug": zod.string(),
+  "name": zod.string(),
+  "brandName": zod.string(),
+  "reference": zod.string(),
+  "variant": zod.string().nullish(),
+  "image": zod.string().nullish(),
+  "quantity": zod.number().min(1).max(putAccountShortlistsResponseListsItemItemsItemQuantityMax).multipleOf(putAccountShortlistsResponseListsItemItemsItemQuantityMultipleOf),
+  "addedAt": zod.string(),
+  "kind": zod.enum(['product', 'brand']).optional()
+}))
+})),
+  "activeListId": zod.string()
+})
+
+
+/**
+ * @summary Trade inquiries submitted by or claimed for this account
+ */
+export const GetAccountInquiriesResponseItem = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['general', 'shortlist', 'newsletter']),
+  "reference": zod.string().nullish(),
+  "status": zod.enum(['submitted', 'in_progress', 'responded']),
+  "listName": zod.string().nullish(),
+  "message": zod.string(),
+  "createdAt": zod.string(),
+  "statusUpdatedAt": zod.string().nullish()
+})
+export const GetAccountInquiriesResponse = zod.array(GetAccountInquiriesResponseItem)
+
+
+/**
+ * @summary List inquiries for the staff inbox
+ */
+export const ListContentInquiriesQueryParams = zod.object({
+  "status": zod.enum(['submitted', 'in_progress', 'responded']).optional(),
+  "kind": zod.enum(['general', 'shortlist', 'newsletter']).optional()
+})
+
+export const ListContentInquiriesResponseItem = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['general', 'shortlist', 'newsletter']),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "reference": zod.string().nullish(),
+  "status": zod.enum(['submitted', 'in_progress', 'responded']),
+  "listName": zod.string().nullish(),
+  "timeline": zod.string().nullish(),
+  "message": zod.string(),
+  "clerkUserId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "statusUpdatedAt": zod.string().nullish()
+})
+export const ListContentInquiriesResponse = zod.array(ListContentInquiriesResponseItem)
+
+
+/**
+ * @summary Update an inquiry's status
+ */
+export const PatchContentInquiryParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PatchContentInquiryBody = zod.object({
+  "status": zod.enum(['submitted', 'in_progress', 'responded'])
+})
+
+export const PatchContentInquiryResponse = zod.object({
+  "id": zod.number(),
+  "kind": zod.enum(['general', 'shortlist', 'newsletter']),
+  "name": zod.string(),
+  "email": zod.string(),
+  "phone": zod.string().nullish(),
+  "company": zod.string().nullish(),
+  "reference": zod.string().nullish(),
+  "status": zod.enum(['submitted', 'in_progress', 'responded']),
+  "listName": zod.string().nullish(),
+  "timeline": zod.string().nullish(),
+  "message": zod.string(),
+  "clerkUserId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "statusUpdatedAt": zod.string().nullish()
 })
 
 

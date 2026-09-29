@@ -276,6 +276,7 @@ export type InquiryInputKind = typeof InquiryInputKind[keyof typeof InquiryInput
 export const InquiryInputKind = {
   general: 'general',
   shortlist: 'shortlist',
+  newsletter: 'newsletter',
 } as const;
 
 export interface ShortlistItemInput {
@@ -346,4 +347,175 @@ export interface InquiryResult {
   accepted: boolean;
   reference: string;
 }
+
+export type InquiryStatus = typeof InquiryStatus[keyof typeof InquiryStatus];
+
+
+export const InquiryStatus = {
+  submitted: 'submitted',
+  in_progress: 'in_progress',
+  responded: 'responded',
+} as const;
+
+export type TradeRole = typeof TradeRole[keyof typeof TradeRole];
+
+
+export const TradeRole = {
+  specifier: 'specifier',
+  procurement: 'procurement',
+  fabricator: 'fabricator',
+  other: 'other',
+} as const;
+
+export type SavedItemKind = typeof SavedItemKind[keyof typeof SavedItemKind];
+
+
+export const SavedItemKind = {
+  product: 'product',
+  brand: 'brand',
+} as const;
+
+export interface TradeProfile {
+  clerkUserId: string;
+  email: string;
+  /** @nullable */
+  name?: string | null;
+  /** @nullable */
+  company?: string | null;
+  role?: TradeRole | null;
+}
+
+export interface TradeProfileInput {
+  /** @minLength 3 */
+  email: string;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  name?: string | null;
+  /**
+     * @maxLength 120
+     * @nullable
+     */
+  company?: string | null;
+  role?: TradeRole | null;
+}
+
+export interface AccountShortlistItem {
+  key: string;
+  slug: string;
+  name: string;
+  brandName: string;
+  reference: string;
+  /** @nullable */
+  variant?: string | null;
+  /** @nullable */
+  image?: string | null;
+  /**
+     * @minimum 1
+     * @maximum 9999
+     */
+  quantity: number;
+  addedAt: string;
+  kind?: SavedItemKind;
+}
+
+export interface AccountShortlist {
+  id: string;
+  name: string;
+  createdAt: string;
+  items: AccountShortlistItem[];
+}
+
+export type AccountShortlistStateVersion = typeof AccountShortlistStateVersion[keyof typeof AccountShortlistStateVersion];
+
+
+export const AccountShortlistStateVersion = {
+  NUMBER_1: 1,
+} as const;
+
+export interface AccountShortlistState {
+  version: AccountShortlistStateVersion;
+  lists: AccountShortlist[];
+  activeListId: string;
+}
+
+export interface PutAccountShortlistsInput {
+  state: AccountShortlistState;
+  merge?: boolean;
+}
+
+export type AccountInquiryKind = typeof AccountInquiryKind[keyof typeof AccountInquiryKind];
+
+
+export const AccountInquiryKind = {
+  general: 'general',
+  shortlist: 'shortlist',
+  newsletter: 'newsletter',
+} as const;
+
+export interface AccountInquiry {
+  id: number;
+  kind: AccountInquiryKind;
+  /** @nullable */
+  reference?: string | null;
+  status: InquiryStatus;
+  /** @nullable */
+  listName?: string | null;
+  message: string;
+  createdAt: string;
+  /** @nullable */
+  statusUpdatedAt?: string | null;
+}
+
+export type ContentInquiryKind = typeof ContentInquiryKind[keyof typeof ContentInquiryKind];
+
+
+export const ContentInquiryKind = {
+  general: 'general',
+  shortlist: 'shortlist',
+  newsletter: 'newsletter',
+} as const;
+
+export interface ContentInquiry {
+  id: number;
+  kind: ContentInquiryKind;
+  name: string;
+  email: string;
+  /** @nullable */
+  phone?: string | null;
+  /** @nullable */
+  company?: string | null;
+  /** @nullable */
+  reference?: string | null;
+  status: InquiryStatus;
+  /** @nullable */
+  listName?: string | null;
+  /** @nullable */
+  timeline?: string | null;
+  message: string;
+  /** @nullable */
+  clerkUserId?: string | null;
+  createdAt: string;
+  /** @nullable */
+  statusUpdatedAt?: string | null;
+}
+
+export interface PatchInquiryStatusInput {
+  status: InquiryStatus;
+}
+
+export type ListContentInquiriesParams = {
+status?: InquiryStatus;
+kind?: ListContentInquiriesKind;
+};
+
+export type ListContentInquiriesKind = typeof ListContentInquiriesKind[keyof typeof ListContentInquiriesKind];
+
+
+export const ListContentInquiriesKind = {
+  general: 'general',
+  shortlist: 'shortlist',
+  newsletter: 'newsletter',
+} as const;
 

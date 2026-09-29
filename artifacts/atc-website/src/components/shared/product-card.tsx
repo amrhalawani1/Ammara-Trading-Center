@@ -41,7 +41,7 @@ export function ProductCard({
   return (
     <Link
       href={`/products/${product.slug}`}
-      className={cn("group block bg-background border border-border transition-colors hover:border-primary/40", className)}
+      className={cn("group flex h-full w-full flex-col bg-background border border-border transition-colors hover:border-primary/40", className)}
       data-testid={`card-product-${product.slug}`}
     >
       <div
@@ -64,10 +64,10 @@ export function ProductCard({
           </div>
         ) : null}
         <div className="absolute bottom-0 left-0 flex w-full justify-end bg-gradient-to-t from-background to-transparent p-4 opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="text-xs font-bold uppercase tracking-wider text-primary">View Spec &rarr;</span>
+          <span className="text-xs font-bold uppercase tracking-wider text-primary">View details</span>
         </div>
       </div>
-      <div className={showDescription ? "p-5" : "p-4"}>
+      <div className={cn("flex flex-1 flex-col", showDescription ? "p-5" : "p-4")}>
         <span
           className={cn(
             "block font-bold uppercase tracking-widest text-muted-foreground",
@@ -79,7 +79,7 @@ export function ProductCard({
         <h3
           className={cn(
             "font-display text-lg leading-tight transition-colors group-hover:text-primary",
-            !showDescription && "line-clamp-2",
+            !showDescription && "line-clamp-2 min-h-[2lh]",
           )}
         >
           {product.name}

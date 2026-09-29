@@ -18,22 +18,22 @@ export const PILLARS: Pillar[] = [
     index: "01",
     title: "We represent",
     body: "European manufacturers of door, window and furniture hardware, each chosen because their fittings are still working after twenty years in a kitchen.",
-    image: "/images/showroom-detail.webp",
-    alt: "Hardware displayed in the ATC showroom",
+    image: "/images/showroom-reception.webp",
+    alt: "The reception desk and the wall of partner brands",
   },
   {
     index: "02",
     title: "We stock",
     body: "Deep inventory held in Amman, so a fabricator's programme does not wait on a container. Item numbers are confirmed against the manufacturer's current documentation.",
-    image: "/images/trade-planning.webp",
-    alt: "Planning a project at the ATC trade desk",
+    image: "/images/showroom-blum.webp",
+    alt: "Blum kitchen systems installed on the showroom floor",
   },
   {
     index: "03",
     title: "We advise",
     body: "Consultants who have installed what they sell. Bring a drawing, a photo or a competitor's item code and leave with the right specification.",
-    image: "/images/trade-workshop.webp",
-    alt: "Reviewing a technical drawing in the workshop",
+    image: "/images/showroom-seating.webp",
+    alt: "Seating beside the cabinetry, where a visit is talked through",
   },
 ];
 
@@ -60,60 +60,7 @@ export const ARCHITECT_SERVICES = [
   { title: "Site consultancy", body: "A consultant at the mock-up, before the joinery is cut." },
 ];
 
-export interface ProjectReference {
-  sector: string;
-  title: string;
-  location: string;
-  scope: string;
-  systems: string[];
-  image: string;
-  /** True until a real project has been cleared for publication. */
-  placeholder: boolean;
-}
-
-/**
- * PLACEHOLDER content. Case studies are still being compiled and
- * cleared, so nothing here describes a real installation. Replace every entry with a cleared
- * project before launch, and remove the `placeholder` flag; the section shows a notice until then.
- */
-export const PROJECTS: ProjectReference[] = [
-  {
-    sector: "Hospitality",
-    title: "Boutique hotel refurbishment",
-    location: "Amman",
-    scope: "Guest room and back-of-house doors",
-    systems: ["Door levers", "Concealed hinges", "Locking systems"],
-    image: "/images/showroom-wide.webp",
-    placeholder: true,
-  },
-  {
-    sector: "Residential",
-    title: "Private villa kitchen",
-    location: "Dabouq",
-    scope: "Fitted kitchen and pantry",
-    systems: ["Drawer systems", "Lift systems", "Kitchen storage"],
-    image: "/images/hero-kitchen.webp",
-    placeholder: true,
-  },
-  {
-    sector: "Commercial",
-    title: "Headquarters fit-out",
-    location: "Abdali",
-    scope: "Meeting rooms and executive floor",
-    systems: ["Sliding door systems", "Entrance pull handles"],
-    image: "/images/trade-planning.webp",
-    placeholder: true,
-  },
-  {
-    sector: "Joinery",
-    title: "Wardrobe programme",
-    location: "Sahab",
-    scope: "Fabricator supply, 340 units",
-    systems: ["Sliding & folding doors", "Wire storage"],
-    image: "/images/brand-sliding.webp",
-    placeholder: true,
-  },
-];
+// Project references live in lib/projects.ts, shared by the homepage section and /projects.
 
 export interface JournalEntry {
   category: string;

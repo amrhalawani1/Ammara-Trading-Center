@@ -51,7 +51,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Hinges & Drawer Systems",
     description:
       "Since 1888, they have been setting the global standard for furniture fittings. Known for engineering precision and extreme durability testing, their hinge systems and drawer runners are the hidden force behind the world's finest cabinetry.",
-    coverImage: "/images/brand-hinge.webp",
+    coverImage: "/images/brand-hettich.webp",
     isFeatured: true,
     status: "published",
   },
@@ -62,7 +62,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Opening Systems",
     description:
       "Pioneers of the concealed hinge and advanced opening systems. Combining Italian design flair with rigorous engineering to create seamless movement solutions.",
-    coverImage: "/images/brand-sliding.webp",
+    coverImage: "/images/brand-salice.webp",
     isFeatured: true,
     status: "published",
   },
@@ -73,7 +73,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Kitchen Storage & Ergonomics",
     description:
       "Intelligent kitchen storage solutions and ergonomic lifters. Transforming inner cabinet space into highly functional, easily accessible storage.",
-    coverImage: "/images/product-handle.webp",
+    coverImage: "/images/brand-kessebohmer.webp",
     isFeatured: false,
     status: "published",
   },
@@ -84,7 +84,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Wardrobe & Wire Storage",
     description:
       "Premium wire storage accessories for wardrobes and kitchens. Characterized by elegant Italian wirework, smooth motion, and impeccable plating.",
-    coverImage: "/images/brand-hinge.webp",
+    coverImage: "/images/brand-vibo.webp",
     isFeatured: false,
     status: "published",
   },
@@ -95,7 +95,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Hinges & Drawer Systems",
     description:
       "The Austrian benchmark for cabinet movement. Blum's hinge and drawer platforms are engineered around decades of motion research, delivering fittings that feel weightless even under heavy daily use.",
-    coverImage: "/images/showroom-detail.webp",
+    coverImage: "/images/brand-blum.webp",
     isFeatured: true,
     status: "published",
   },
@@ -106,7 +106,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Sinks, Taps & Cooking",
     description:
       "A family manufacturer from Pordenone working in stainless steel since 1968. Barazza makes sinks, taps, hobs and built-in appliances with the thickness and finish of professional kitchen equipment, sized for the home.",
-    coverImage: "/images/hero-kitchen.webp",
+    coverImage: "/images/brand-barazza.webp",
     isFeatured: true,
     status: "published",
   },
@@ -117,7 +117,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Drawer Runners & Slides",
     description:
       "Precision-engineered drawer and hinge technology from the Austrian Alps. Grass systems are built for architects who specify to the millimetre and expect that tolerance to hold for twenty years.",
-    coverImage: "/images/trade-workshop.webp",
+    coverImage: "/images/brand-grass.webp",
     isFeatured: false,
     status: "published",
   },
@@ -128,7 +128,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Handles & Decorative Hardware",
     description:
       "One of the world's broadest furniture and architectural hardware ranges, from handles to locking systems to integrated lighting. Häfele is the catalogue a specifier reaches for when the detail has to be exactly right.",
-    coverImage: "/images/product-handle.webp",
+    coverImage: "/images/brand-hafele.webp",
     isFeatured: true,
     status: "published",
   },
@@ -139,7 +139,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Handles & Decorative Hardware",
     description:
       "An Italian design house working with architects and product designers to turn the door handle into a considered object in its own right. Every DND handle is a small study in proportion, grip, and finish.",
-    coverImage: "/images/dnd-palm.webp",
+    coverImage: "/images/brand-dnd.webp",
     isFeatured: true,
     status: "published",
   },
@@ -150,7 +150,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Sliding Door Systems",
     description:
       "Swiss-engineered sliding and folding door hardware for interiors that need to move silently and disappear completely when not in use. A specialist brand for architects working with pocket doors and room dividers.",
-    coverImage: "/images/showroom-wide.webp",
+    coverImage: "/images/brand-hawa.webp",
     isFeatured: false,
     status: "published",
   },
@@ -161,7 +161,7 @@ export const initialBrands: SeedBrand[] = [
     category: "Hinges & Opening Systems",
     description:
       "An Italian specialist in lift, flap, and bi-fold opening mechanisms for wall cabinets and high-level storage. FGV systems bring elegant, counterbalanced motion to doors that would otherwise be awkward to reach.",
-    coverImage: "/images/brand-sliding.webp",
+    coverImage: "/images/brand-fgv.webp",
     isFeatured: false,
     status: "published",
   },
@@ -172,7 +172,7 @@ export const initialBrands: SeedBrand[] = [
     category: "LED Lighting & Electronics",
     description:
       "Spanish innovators in furniture fittings and integrated LED lighting. Emuca brings low-voltage, sensor-driven light into cabinetry, wardrobes, and worktops without visible wiring.",
-    coverImage: "/images/trade-planning.webp",
+    coverImage: "/images/brand-emuca.webp",
     isFeatured: true,
     status: "comingSoon",
   },

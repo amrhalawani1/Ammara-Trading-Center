@@ -6,15 +6,23 @@ export function AuthUnavailablePage({ title }: { title: string }) {
         <BrandLogo size="md" priority />
       </a>
       <div className="max-w-lg border border-border bg-card p-8 text-center">
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          Local development
-        </p>
+        {import.meta.env.DEV && (
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+            Local development
+          </p>
+        )}
         <h1 className="mb-3 font-display text-3xl">{title}</h1>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          Clerk is not configured on this machine. Public pages work without it.
-          To enable staff sign-in, set a real{" "}
-          <code className="font-mono text-xs">VITE_CLERK_PUBLISHABLE_KEY</code>.
-        </p>
+        {import.meta.env.DEV ? (
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Clerk is not configured on this machine. Public pages work without it.
+            To enable staff sign-in and trade accounts, set a real{" "}
+            <code className="font-mono text-xs">VITE_CLERK_PUBLISHABLE_KEY</code>.
+          </p>
+        ) : (
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Sign-in is unavailable right now. You can still save shortlists and send enquiries.
+          </p>
+        )}
       </div>
     </div>
   );

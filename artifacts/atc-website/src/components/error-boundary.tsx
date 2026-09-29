@@ -42,12 +42,9 @@ function DefaultFallback({ error, resetError }: ErrorFallbackProps) {
         <BrandLogo size="md" priority />
       </a>
       <div className="w-full max-w-lg border border-border bg-card p-8 text-center">
-        <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-          Interrupted
-        </p>
-        <h1 className="font-display text-3xl text-foreground">Something went wrong</h1>
+        <h1 className="font-display text-3xl text-foreground">This section did not load</h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          This part of the site hit an error. The rest of the site is still available.
+          Try again. If it happens again, the rest of the site still works, or ask on WhatsApp.
         </p>
         {import.meta.env.DEV ? (
           <pre className="mt-4 overflow-x-auto border border-border bg-muted p-3 text-left text-xs text-foreground">

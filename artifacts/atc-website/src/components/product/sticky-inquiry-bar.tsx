@@ -1,44 +1,58 @@
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { MessageCircle } from "lucide-react";
+import { useEffect } from "react";
+import { Check, MessageCircle } from "lucide-react";
+import { track } from "@/lib/analytics";
 
 interface StickyInquiryBarProps {
-  visible: boolean;
   productName: string;
   finish?: string | null;
   href: string;
+  quoted: boolean;
+  onQuote: () => void;
 }
 
-/** Mobile-only: WhatsApp stays one thumb away once the hero CTA has scrolled off (Fadi, on site, on a phone). */
-export function StickyInquiryBar({ visible, productName, finish, href }: StickyInquiryBarProps) {
-  const reduceMotion = useReducedMotion();
+/** Phone only. WhatsApp and Add to quote stay in thumb reach and do not cover the page end. */
+export function StickyInquiryBar({ productName, finish, href, quoted, onQuote }: StickyInquiryBarProps) {
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 1023px)");
+    const apply = () => document.documentElement.style.setProperty("--sticky-quote-bar", media.matches ? "5.5rem" : "0px");
+    apply();
+    media.addEventListener("change", apply);
+    return () => {
+      media.removeEventListener("change", apply);
+      document.documentElement.style.removeProperty("--sticky-quote-bar");
+    };
+  }, []);
+
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          initial={reduceMotion ? { opacity: 0 } : { y: 72, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={reduceMotion ? { opacity: 0 } : { y: 72, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 260, damping: 30 }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden"
-          style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    <div
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <p className="truncate px-3 pt-2 text-xs text-muted-foreground">
+        <span className="text-foreground">{productName}</span>
+        {finish ? ` · ${finish}` : ""}
+      </p>
+      <div className="grid grid-cols-2 gap-2 px-3 py-2">
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() => track("whatsapp_click", { item_id: productName })}
+          className="inline-flex min-h-11 items-center justify-center gap-2 border border-border px-3 text-sm font-medium text-foreground"
+          data-testid="button-sticky-whatsapp"
         >
-          <div className="flex items-center gap-4 px-4 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">{productName}</p>
-              {finish && <p className="truncate text-xs text-muted-foreground">{finish}</p>}
-            </div>
-            <a
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex h-11 shrink-0 items-center gap-2 bg-primary px-5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition active:scale-[0.98]"
-              data-testid="button-sticky-whatsapp"
-            >
-              <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> WhatsApp
-            </a>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> WhatsApp
+        </a>
+        <button
+          type="button"
+          onClick={onQuote}
+          className="inline-flex min-h-11 items-center justify-center gap-2 bg-primary px-3 text-sm font-medium text-primary-foreground"
+          data-testid="button-sticky-quote"
+        >
+          {quoted ? <Check className="h-4 w-4" strokeWidth={2} /> : null}
+          {quoted ? "Added" : "Add to quote"}
+        </button>
+      </div>
+    </div>
   );
 }

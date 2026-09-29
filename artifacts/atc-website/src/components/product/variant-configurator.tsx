@@ -19,7 +19,7 @@ const KIND_HEADING: Record<ConfiguratorVariant["kind"], string> = {
   finish: "Finishes",
   size: "Sizes",
   model: "Models",
-  colour: "Light colours",
+  colour: "Light colour",
 };
 
 const COLLAPSED = 8;
@@ -43,7 +43,7 @@ interface VariantConfiguratorProps {
 
 
 const fieldClass =
-  "h-11 w-full border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-foreground";
+  "h-11 w-full border border-border bg-background px-3 text-sm text-foreground outline-none transition focus:border-primary";
 
 /**
  * DND's finishes block: the render on the left, and on the right the name
@@ -90,8 +90,8 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
   const showGroups = new Set(variants.map((v) => v.attributes?.group ?? "")).size > 1;
   const message = useMemo(() => {
     const lines = [
-      `Hello ATC, I would like to configure the ${productName} by ${brandName}.`,
-      articleNumber ? `Item no.: ${articleNumber}` : `Ref: ${reference}`,
+      `Hello ATC, I would like to enquire about the ${productName} by ${brandName}.`,
+      articleNumber ? `Item no. ${articleNumber}` : `ATC ref. ${reference}`,
       variant ? `${KIND_HEADING[variant.kind].replace(/s$/, "")}: ${variant.code} - ${variant.label}` : null,
       quantity.trim() ? `Quantity: ${quantity.trim()}` : null,
       `Project: ${projectType}`,
@@ -110,8 +110,9 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
           <ProductGallery images={images} alt={`${productName}${variant ? `, ${variant.label}` : ""}`} activeIndex={activeImage} onChange={onImageChange} />
         </div>
 
-        <div className="lg:col-span-4 lg:col-start-9">
-          <h2 className="font-display text-4xl font-light lowercase leading-[0.95] tracking-[-0.03em] md:text-5xl">{productName}</h2>
+        <div className="lg:sticky lg:top-32 lg:col-span-4 lg:col-start-9 lg:max-h-[calc(100dvh-8.5rem)] lg:self-start lg:overflow-y-auto">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">{brandName}</p>
+          <h1 className="mt-2 font-display text-4xl font-medium leading-[0.95] tracking-[-0.03em] md:text-5xl">{productName}</h1>
           {designer && <p className="mt-3 text-sm text-muted-foreground">{designer}</p>}
           {designLine && (
             <p className="mt-6 font-mono text-[11px] tracking-[0.18em] text-muted-foreground">
@@ -200,7 +201,7 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
             )}
             data-testid="button-configure"
           >
-            {open ? "Close" : `Configure ${productName}`}
+            {open ? "Close" : `Enquire about ${productName}`}
           </button>
           {shortlist}
         </div>
@@ -242,13 +243,13 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="cfg-project" className="text-xs text-muted-foreground">Project</label>
+                  <label htmlFor="cfg-project" className="text-xs text-muted-foreground">Project type</label>
                   <select id="cfg-project" value={projectType} onChange={(event) => setProjectType(event.target.value as (typeof PROJECT_TYPES)[number])} className={fieldClass}>
                     {PROJECT_TYPES.map((type) => <option key={type}>{type}</option>)}
                   </select>
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label htmlFor="cfg-timing" className="text-xs text-muted-foreground">When do you expect the supply?</label>
+                  <label htmlFor="cfg-timing" className="text-xs text-muted-foreground">When do you need it?</label>
                   <select id="cfg-timing" value={timing} onChange={(event) => setTiming(event.target.value as (typeof TIMINGS)[number])} className={fieldClass}>
                     {TIMINGS.map((item) => <option key={item}>{item}</option>)}
                   </select>
@@ -270,7 +271,7 @@ export function VariantConfigurator(props: VariantConfiguratorProps) {
                 >
                   <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Send on WhatsApp
                 </button>
-                <p className="mt-3 text-xs leading-5 text-muted-foreground">Opens WhatsApp with this text ready to send. Our trade team replies with availability and project terms.</p>
+                <p className="mt-3 text-xs leading-5 text-muted-foreground">Opens WhatsApp with this message ready to send. A consultant replies with availability for your project.</p>
               </div>
             </form>
           </motion.div>

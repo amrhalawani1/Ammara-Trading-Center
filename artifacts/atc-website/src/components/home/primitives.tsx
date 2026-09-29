@@ -8,7 +8,7 @@ export const SPRING = { type: "spring", stiffness: 100, damping: 20 } as const;
 
 export function Kicker({ children, light = false, className }: { children: ReactNode; light?: boolean; className?: string }) {
   return (
-    <div className={cn("flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.25em]", light ? "text-foreground/60" : "text-primary", className)}>
+    <div className={cn("flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.25em]", light ? "text-foreground" : "text-primary", className)}>
       <span className="h-px w-8 bg-primary" aria-hidden />
       {children}
     </div>

@@ -12,16 +12,3 @@ export function useOpenStatus(hours: string): OpenStatus | null {
   return status;
 }
 
-const formatAmman = () =>
-  new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Amman", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date());
-
-/** The current wall-clock time in Amman as "14:32", refreshed every fifteen seconds. */
-export function useAmmanTime(): string {
-  const [time, setTime] = useState(formatAmman);
-  useEffect(() => {
-    setTime(formatAmman());
-    const timer = window.setInterval(() => setTime(formatAmman()), 15_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return time;
-}

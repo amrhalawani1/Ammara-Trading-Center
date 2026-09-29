@@ -3,11 +3,13 @@
   "configurations": [
     {
       "name": "atc-website",
-      "runtimeExecutable": "pnpm",
+      "runtimeExecutable": "sh",
       "runtimeArgs": [
-        "dev"
+        "-c",
+        "WEB_PORT=$PORT pnpm run dev:web"
       ],
-      "port": 5173
+      "port": 5173,
+      "autoPort": true
     },
     {
       "name": "atc-website-alt-api",

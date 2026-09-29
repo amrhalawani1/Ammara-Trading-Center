@@ -1,6 +1,7 @@
 import { MainLayout } from "@/components/layout/main-layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BrandsTab } from "./brands-tab";
+import { InquiriesTab } from "./inquiries-tab";
 import { ProductsTab } from "./products-tab";
 import { ImportTab } from "./import-tab";
 
@@ -14,7 +15,7 @@ export default function ContentWorkspace() {
           </span>
           <h1 className="text-3xl md:text-4xl font-display mb-2">Content Workspace</h1>
           <p className="text-muted-foreground font-light max-w-2xl">
-            Manage catalogue content, brands, systems, and bulk imports.
+            Manage catalogue content, brands, systems, inquiries, and bulk imports.
           </p>
         </div>
       </div>
@@ -35,6 +36,12 @@ export default function ContentWorkspace() {
               Systems
             </TabsTrigger>
             <TabsTrigger 
+              value="inquiries"
+              className="rounded-none h-full px-6 text-xs font-bold uppercase tracking-widest data-[state=active]:bg-accent data-[state=active]:text-foreground"
+            >
+              Inquiries
+            </TabsTrigger>
+            <TabsTrigger 
               value="import"
               className="rounded-none h-full px-6 text-xs font-bold uppercase tracking-widest data-[state=active]:bg-accent data-[state=active]:text-foreground"
             >
@@ -47,6 +54,9 @@ export default function ContentWorkspace() {
           </TabsContent>
           <TabsContent value="products">
             <ProductsTab />
+          </TabsContent>
+          <TabsContent value="inquiries">
+            <InquiriesTab />
           </TabsContent>
           <TabsContent value="import">
             <ImportTab />

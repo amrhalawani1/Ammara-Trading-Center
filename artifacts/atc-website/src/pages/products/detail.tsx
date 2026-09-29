@@ -1,439 +1,735 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useInView } from "framer-motion";
-import { ArrowUpRight, Check, FileText, MessageCircle, Share2 } from "lucide-react";
-import { Link, useParams } from "wouter";
+import { ArrowUpRight, Award, Check, ChevronDown, Copy, FileText, MessageCircle, Sparkles } from "lucide-react";
+import { Link, useLocation, useParams, useSearch } from "wouter";
+import type { Product } from "@workspace/api-client-react";
 import { useGetPublicCatalog, useGetPublicProduct } from "@workspace/api-client-react";
 import { MainLayout } from "@/components/layout/main-layout";
 import { MediaImage } from "@/components/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import NotFound from "@/pages/not-found";
-import { ProductHero } from "@/components/product/product-hero";
-import { EditorialChapters } from "@/components/product/editorial-chapters";
-import { VariantConfigurator, type ConfiguratorVariant } from "@/components/product/variant-configurator";
 import { AddToShortlist } from "@/components/product/add-to-shortlist";
-import { FeatureList } from "@/components/product/feature-list";
-import { TechnicalDrawings } from "@/components/product/technical-drawings";
-import { VariantTable } from "@/components/product/variant-table";
-import { mediaByRole, primaryImage, productType, variantImage } from "@/lib/product-media";
-import { finishCode } from "@/lib/finishes";
-import { solutionByName } from "@/lib/solutions";
-import { NumberedGallery } from "@/components/product/numbered-gallery";
 import { DesignerBlock } from "@/components/product/designer-block";
+import { EditorialChapters } from "@/components/product/editorial-chapters";
+import { FeatureList } from "@/components/product/feature-list";
 import { ProductAnchorNav, type AnchorItem } from "@/components/product/product-anchor-nav";
 import { ProductFacts } from "@/components/product/product-facts";
-import { SpecTable } from "@/components/product/spec-table";
+import { ProductGallery } from "@/components/product/product-gallery";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { RelatedProducts } from "@/components/product/related-products";
+import { SpecTable } from "@/components/product/spec-table";
 import { StickyInquiryBar } from "@/components/product/sticky-inquiry-bar";
-import { productInquiryMessage, whatsappUrl } from "@/lib/whatsapp";
-import { company } from "@/lib/content";
+import { ShowroomMap } from "@/components/showroom/showroom-map";
+import { useShortlists } from "@/hooks/use-shortlists";
+import { useToast } from "@/hooks/use-toast";
+import { track } from "@/lib/analytics";
+import { designerOf } from "@/lib/catalog-filters";
+import { designerPath, sameDesigner } from "@/lib/designers";
+import { assetUrl } from "@/lib/env";
+import { FinishCodes, type FinishChoice } from "@/components/product/finish-selector";
+import { noteGuestSave } from "@/lib/guest-save";
+import { primaryImage, productType, variantImage } from "@/lib/product-media";
+import { SHOWROOMS } from "@/lib/showrooms";
+import { solutionByName } from "@/lib/solutions";
+import { productInquiryMessage, whatsappUrl, type ProductReference } from "@/lib/whatsapp";
+import type { ConfiguratorVariant } from "@/components/product/variant-configurator";
 
-/** First sentence is the statement fallback when no editorial statement is set; the rest is the paragraph. */
-function splitStatement(description: string): { statement: string; body: string } {
-  const match = description.match(/^(.+?[.!?])(\s+|$)([\s\S]*)$/);
-  if (!match) return { statement: description, body: "" };
-  return { statement: match[1]!, body: match[3]!.trim() };
-}
+const RECENT_KEY = "atc-recent-products";
+const KIND_LABEL: Record<ConfiguratorVariant["kind"], string> = {
+  finish: "Finish",
+  size: "Size",
+  model: "Model",
+  colour: "Colour",
+};
 
-const KIND_LABEL: Record<ConfiguratorVariant["kind"], string> = { finish: "Finishes", size: "Sizes", model: "Models", colour: "Light colours" };
-
-/** Match source "related" names (e.g. "anik (Handles for windows)") to products in our catalogue. */
 function normaliseName(value: string) {
   return value.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]+/g, " ").trim();
 }
 
-const DOCUMENTS = [
-  { label: "Technical drawing", note: "2D, PDF" },
-  { label: "Product data sheet", note: "PDF" },
-  { label: "CAD / BIM files", note: "DWG, STEP" },
-] as const;
+function rememberProduct(slug: string) {
+  try {
+    const current = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as unknown;
+    const slugs = Array.isArray(current) ? current.filter((item): item is string => typeof item === "string") : [];
+    localStorage.setItem(RECENT_KEY, JSON.stringify([slug, ...slugs.filter((item) => item !== slug)].slice(0, 8)));
+  } catch {
+    /* private mode */
+  }
+}
 
-const STATUS_BADGE: Record<string, string | undefined> = { comingSoon: "Coming soon" };
+function recentSlugs(except: string): string[] {
+  try {
+    const current = JSON.parse(localStorage.getItem(RECENT_KEY) ?? "[]") as unknown;
+    const slugs = Array.isArray(current) ? current.filter((item): item is string => typeof item === "string") : [];
+    return slugs.filter((item) => item !== except).slice(0, 6);
+  } catch {
+    return [];
+  }
+}
 
-/** Mounts with the hero (after loading), so the observer always has an element to watch. */
-function HeroWatcher({ onChange, children }: { onChange: (inView: boolean) => void; children: ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { margin: "-64px 0px 0px 0px" });
-  useEffect(() => onChange(inView), [inView, onChange]);
-  return <div ref={ref}>{children}</div>;
+/** Centimetres, when the value actually states a length. */
+function parseCm(value: string): number | null {
+  const mm = value.match(/(\d+(?:\.\d+)?)\s*mm\b/i);
+  if (mm) return Number(mm[1]) / 10;
+  const cm = value.match(/(\d+(?:\.\d+)?)\s*cm\b/i);
+  if (cm) return Number(cm[1]);
+  return null;
+}
+
+function collectionKey(product: Pick<Product, "details" | "family">) {
+  return (product.details?.collection ?? product.family ?? "").trim().toLowerCase();
+}
+
+function Fold({ id, title, children, dark = false }: { id: string; title: string; children: ReactNode; dark?: boolean }) {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 1024px)");
+    const keepOpen = () => {
+      if (media.matches && detailsRef.current) detailsRef.current.open = true;
+    };
+    keepOpen();
+    media.addEventListener("change", keepOpen);
+    return () => media.removeEventListener("change", keepOpen);
+  }, []);
+  return (
+    <section id={id} className={`scroll-mt-28 border-t border-border lg:scroll-mt-32${dark ? " dark bg-background text-foreground" : ""}`}>
+      <details
+        ref={detailsRef}
+        open
+        className="group"
+        onToggle={(event) => {
+          const el = event.currentTarget;
+          if (window.matchMedia("(min-width: 1024px)").matches && !el.open) el.open = true;
+        }}
+      >
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 text-sm font-medium lg:hidden [&::-webkit-details-marker]:hidden">
+          {title}
+          <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180" aria-hidden />
+        </summary>
+        <div className="container mx-auto px-4 pb-12 pt-2 lg:py-16">{children}</div>
+      </details>
+    </section>
+  );
 }
 
 export default function ProductDetail() {
   const params = useParams();
   const slug = params.slug || "";
+  const search = useSearch();
+  const [location, setLocation] = useLocation();
+  const { toast } = useToast();
+  const { activeListId, addItem } = useShortlists();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState(0);
-  const [shared, setShared] = useState(false);
-  const [heroInView, setHeroInView] = useState(true);
-  const onHeroInView = useCallback((inView: boolean) => setHeroInView(inView), []);
+  const [copied, setCopied] = useState(false);
+  const [quoted, setQuoted] = useState(false);
+  const [cabinetCm, setCabinetCm] = useState("");
+  const [drawingOpen, setDrawingOpen] = useState(false);
 
   const { data: product, isLoading: isProductLoading, error: productError } = useGetPublicProduct(slug);
   const { data: catalog, isLoading: isCatalogLoading } = useGetPublicCatalog();
   const brand = catalog?.brands.find((item) => item.slug === product?.brandSlug);
 
   const galleryImages = useMemo(() => {
-    const media = (product?.details?.media ?? []).filter((m) => m.role !== "technical").map((m) => m.src);
+    const media = (product?.details?.media ?? []).map((item) => item.src);
     const legacy = [product?.image, ...(product?.images ?? [])];
     return Array.from(new Set([...media, ...legacy].filter((image): image is string => Boolean(image))));
   }, [product?.details?.media, product?.image, product?.images]);
 
-  const related = useMemo(() => {
-    if (!catalog || !product) return [];
-    const others = catalog.products.filter((item) => item.slug !== product.slug);
-    const named = new Set((product.details?.related ?? []).map(normaliseName));
-    const listed = others.filter((item) => named.has(normaliseName(item.name)));
-    const family = others.filter((item) => !listed.includes(item) && item.brandSlug === product.brandSlug && (item.details?.collection ?? item.family) === (product.details?.collection ?? product.family));
-    const brandMates = others.filter((item) => !listed.includes(item) && !family.includes(item) && item.brandSlug === product.brandSlug);
-    const sameCategory = others.filter((item) => item.brandSlug !== product.brandSlug && item.category === product.category);
-    const picked = [...listed, ...family, ...sameCategory, ...brandMates].slice(0, 6);
-    const title = listed.length + family.length > 0
-      ? "Products in the same family"
-      : sameCategory.length > 0 && picked[0] && picked[0].category === product.category
-        ? `More in ${product.category.toLowerCase()}`
-        : `More from ${product.brandName}`;
-    return Object.assign(picked, { title });
-  }, [catalog, product]) as (NonNullable<typeof catalog>["products"] & { title?: string });
+  const variants: ConfiguratorVariant[] = useMemo(() => {
+    if (!product) return [];
+    if (product.details?.variants?.length) return product.details.variants;
+    return (product.finishes ?? []).map((name) => ({
+      code: name,
+      label: name,
+      kind: "finish" as const,
+      articleNumber: null,
+      attributes: {},
+      image: null,
+    }));
+  }, [product]);
 
   useEffect(() => {
     setActiveImage(0);
-    setSelectedVariant(0);
-    setShared(false);
+    setCabinetCm("");
+    setQuoted(false);
+    setDrawingOpen(false);
   }, [slug]);
 
   useEffect(() => {
-    if (!shared) return;
-    const timer = window.setTimeout(() => setShared(false), 2200);
+    if (!product) return;
+    const code = new URLSearchParams(search).get("v");
+    const index = code ? variants.findIndex((item) => item.code === code) : 0;
+    const next = index >= 0 ? index : 0;
+    setSelectedVariant(next);
+    const image = variantImage(product, variants[next]);
+    const at = image ? galleryImages.indexOf(image) : -1;
+    if (at >= 0) setActiveImage(at);
+  }, [product, search, variants, galleryImages]);
+
+  useEffect(() => {
+    if (!slug) return;
+    rememberProduct(slug);
+    track("view_item", { item_id: slug });
+  }, [slug]);
+
+  useEffect(() => {
+    if (!product || !brand) return;
+    const previous = document.title;
+    document.title = `${product.name} · ${brand.name} · Amara Trading Center`;
+    const link = document.createElement("link");
+    link.rel = "canonical";
+    link.href = `${window.location.origin}${assetUrl(`/products/${product.slug}`)}`;
+    document.head.appendChild(link);
+    return () => {
+      document.title = previous;
+      link.remove();
+    };
+  }, [product, brand]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = window.setTimeout(() => setCopied(false), 1800);
     return () => window.clearTimeout(timer);
-  }, [shared]);
+  }, [copied]);
+
+  useEffect(() => {
+    if (!quoted) return;
+    const timer = window.setTimeout(() => setQuoted(false), 1800);
+    return () => window.clearTimeout(timer);
+  }, [quoted]);
+
+  const selectVariant = useCallback(
+    (index: number) => {
+      const code = variants[index]?.code;
+      const params = new URLSearchParams(search);
+      if (code) params.set("v", code);
+      else params.delete("v");
+      const qs = params.toString();
+      const path = location.split("?")[0] ?? location;
+      setLocation(qs ? `${path}?${qs}` : path, { replace: true });
+      if (code) track("select_variant", { item_id: slug, item_variant: code });
+    },
+    [variants, search, location, setLocation, slug],
+  );
+
+  const viewed = useMemo(() => {
+    if (!catalog || !product) return [];
+    return recentSlugs(product.slug)
+      .map((item) => catalog.products.find((candidate) => candidate.slug === item))
+      .filter((item): item is Product => Boolean(item));
+  }, [catalog, product]);
 
   if (isProductLoading || isCatalogLoading) {
     return (
       <MainLayout>
-        <section className="container mx-auto grid gap-8 px-4 pb-10 pt-6 lg:min-h-[74dvh] lg:grid-cols-12 lg:gap-10">
-          <div className="flex flex-col justify-end gap-5 lg:col-span-5">
-            <Skeleton className="h-20 w-5/6 rounded-none" />
-            <Skeleton className="h-3 w-48 rounded-none" />
+        <section className="container mx-auto grid gap-8 px-4 pb-10 pt-6 lg:grid-cols-2">
+          <Skeleton className="aspect-square w-full rounded-none" />
+          <div className="flex flex-col gap-4 pt-6">
+            <Skeleton className="h-4 w-24 rounded-none" />
+            <Skeleton className="h-12 w-4/5 rounded-none" />
+            <Skeleton className="h-4 w-40 rounded-none" />
+            <Skeleton className="mt-6 h-11 w-full rounded-none" />
           </div>
-          <Skeleton className="aspect-[4/3] w-full rounded-none lg:col-span-7 lg:aspect-auto lg:min-h-[60dvh]" />
         </section>
       </MainLayout>
     );
   }
 
-  if (productError || !product || !brand) {
-    return <NotFound />;
-  }
+  if (productError || !product || !brand) return <NotFound />;
 
   const editorial = product.editorial ?? null;
   const details = product.details ?? null;
-  const variants: ConfiguratorVariant[] = details?.variants?.length
-    ? details.variants
-    : (product.finishes ?? []).map((name) => ({ code: finishCode(name), label: name, kind: "finish" as const, articleNumber: null, attributes: {}, image: null }));
   const variant = variants[selectedVariant] ?? null;
-  const activeFinish = variant?.label ?? null;
-  const variantKind = variant?.kind ?? variants[0]?.kind ?? "finish";
-  const technicalImages = mediaByRole(product, "technical").map((m) => m.src);
-  const ambientImage = mediaByRole(product, "ambient")[0]?.src ?? null;
-  const features = details?.features ?? [];
-  const applications = details?.applications ?? [];
-  const heroImage = variantImage(product, variant ?? undefined) ?? galleryImages[activeImage] ?? galleryImages[0] ?? null;
-  const documents = details?.downloads?.length ? details.downloads.map((d) => ({ label: d.label, note: d.fileType })) : DOCUMENTS;
+  const catalogueVariant = Boolean(details?.variants?.length);
+  const modelCode = variant?.articleNumber || product.sku || (catalogueVariant ? variant?.code : null) || null;
+  const productReference: ProductReference | null = modelCode
+    ? { value: modelCode, kind: modelCode === product.sku && !variant?.articleNumber ? "atc" : "item" }
+    : null;
   const specs = product.specs ?? [];
-  const designerName = editorial?.designer?.name ?? specs.find((spec) => /designer/i.test(spec.label))?.value ?? null;
-  const heroType = productType(product);
-  // "Type" is a design line for brands that describe a mechanism there (a tap's "Single-lever
-  // mixer"), but not when it just repeats the type already shown above the product name.
-  const designLine =
-    specs.find((spec) => /^(rose type|design|profile|type)$/i.test(spec.label) && spec.value !== heroType)?.value ?? null;
-  const fallback = splitStatement(product.description);
-  const shortSentence = fallback.statement.length <= 90 ? fallback.statement : null;
-  const statement = editorial?.statement ?? shortSentence ?? solutionByName(product.category)?.line ?? fallback.statement;
-  const body = editorial?.statement || !shortSentence ? product.description : fallback.body || product.description;
-  const reference = variant?.articleNumber ?? product.sku ?? `ATC-${brand.slug.slice(0, 3).toUpperCase()}-${String(product.id).padStart(4, "0")}`;
   const technicalSpecs = [
     ...specs,
-    ...(product.material ? [{ label: "Material", value: product.material }] : []),
-    ...(product.dimensions ? [{ label: "Dimensions", value: product.dimensions }] : []),
+    ...(product.material ? [{ label: "Material", value: product.material, group: "Material" as string | null }] : []),
+    ...(product.dimensions ? [{ label: "Dimensions", value: product.dimensions, group: "Dimensions" as string | null }] : []),
   ].filter((spec, index, all) => all.findIndex((other) => other.label === spec.label) === index);
-  const detailGallery = editorial?.gallery?.length ? editorial.gallery : galleryImages;
-
-  const inquiryHref = whatsappUrl(productInquiryMessage({ name: product.name, brandName: brand.name, reference, finish: activeFinish }));
+  const installSpecs = technicalSpecs.filter((spec) => spec.group === "Installation" || /cut-?\s*out|base cabinet|door thickness|drilling/i.test(spec.label));
+  const fitSpec = installSpecs.find((spec) => parseCm(spec.value) != null) ?? installSpecs.find((spec) => /cut-?\s*out|width|base|thickness|drilling|cabinet/i.test(spec.label)) ?? null;
+  const fitCm = fitSpec ? parseCm(fitSpec.value) : null;
+  const features = details?.features ?? [];
+  const documents = details?.downloads?.length
+    ? details.downloads.map((item) => ({ label: item.label, note: item.fileType }))
+    : [
+        { label: "Technical drawing", note: "2D, PDF" },
+        { label: "Product data sheet", note: "PDF" },
+        { label: "CAD / BIM files", note: "DWG, STEP" },
+      ];
+  const badges = details?.badges ?? [];
+  const showNew = badges.some((badge) => /new/i.test(badge));
+  const showAward = badges.some((badge) => /award|winner|premio/i.test(badge));
+  const onDisplay = badges.some((badge) => /showroom|on display/i.test(badge));
+  const solution = solutionByName(product.category);
+  const identity = [product.dimensions, product.material, productType(product)].filter((item): item is string => Boolean(item));
+  const designerName = designerOf(product);
+  const designerBio = editorial?.designer && designerName && sameDesigner(editorial.designer.name, designerName) ? editorial.designer.bio : "";
+  const pageUrl = `${window.location.origin}${assetUrl(`/products/${product.slug}`)}${variant ? `?v=${encodeURIComponent(variant.code)}` : ""}`;
+  const canonical = `${window.location.origin}${assetUrl(`/products/${product.slug}`)}`;
+  const inquiryHref = whatsappUrl(
+    productInquiryMessage({
+      name: product.name,
+      brandName: brand.name,
+      reference: productReference,
+      finish: variant?.kind === "finish" || variant?.kind === "colour" ? variant.label : null,
+      variantCode: variant?.code ?? null,
+      pageUrl,
+    }),
+  );
   const documentsHref = (doc: string) =>
-    whatsappUrl(`${productInquiryMessage({ name: product.name, brandName: brand.name, reference }, "documents")}\nDocument: ${doc}`);
+    whatsappUrl(
+      `${productInquiryMessage({ name: product.name, brandName: brand.name, reference: productReference, variantCode: variant?.code ?? null, pageUrl }, "documents")}\nDocument: ${doc}`,
+    );
 
-  const selectVariant = (index: number) => {
-    setSelectedVariant(index);
-    const image = variantImage(product, variants[index]);
-    const at = image ? galleryImages.indexOf(image) : -1;
-    if (at >= 0) setActiveImage(at);
+  const quoteItem = {
+    key: variant ? `${product.slug}::${variant.code}` : product.slug,
+    slug: product.slug,
+    name: product.name,
+    brandName: brand.name,
+    reference: modelCode ?? product.name,
+    variant: variant ? `${variant.code} - ${variant.label}` : null,
+    image: variant?.image ?? primaryImage(product),
   };
 
-  const share = async () => {
-    const url = window.location.href;
+  const siblings = (catalog?.products ?? []).filter(
+    (item) => item.slug !== product.slug && item.brandSlug === product.brandSlug && collectionKey(item) !== "" && collectionKey(item) === collectionKey(product),
+  );
+  const siblingSlugs = new Set(siblings.map((item) => item.slug));
+  const others = (catalog?.products ?? []).filter((item) => item.slug !== product.slug);
+  const named = new Set((details?.related ?? []).map(normaliseName));
+  const completes = others.filter((item) => named.has(normaliseName(item.name)) && !siblingSlugs.has(item.slug)).slice(0, 6);
+  const sameCategory = others.filter((item) => !siblingSlugs.has(item.slug) && !completes.includes(item) && item.category === product.category).slice(0, 6);
+  const look = completes.length > 0 ? completes : sameCategory;
+
+  const cabinet = Number(cabinetCm);
+  const fitResult = fitCm != null && cabinetCm.trim() !== "" && Number.isFinite(cabinet)
+    ? cabinet + 0.05 >= fitCm
+      ? "fits"
+      : "tight"
+    : null;
+
+  const copyCode = async () => {
+    if (!modelCode) return;
     try {
-      if (navigator.share) {
-        await navigator.share({ title: `${product.name} - ${brand.name}`, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        setShared(true);
-      }
+      await navigator.clipboard.writeText(modelCode);
+      setCopied(true);
+      toast({ title: "Code copied" });
     } catch {
-      /* dismissed */
+      toast({ title: "Could not copy the code" });
     }
   };
 
+  const addQuote = () => {
+    addItem(activeListId, quoteItem);
+    noteGuestSave();
+    track("add_to_quote", { item_id: product.slug, item_variant: variant?.code });
+    setQuoted(true);
+  };
+
+  const checkFit = () => {
+    if (fitResult) track("fit_check", { item_id: product.slug, result: fitResult });
+  };
+
+  const groups = variants.reduce<{ kind: ConfiguratorVariant["kind"]; items: { variant: ConfiguratorVariant; index: number }[] }[]>((acc, item, index) => {
+    const last = acc[acc.length - 1];
+    if (last && last.kind === item.kind) last.items.push({ variant: item, index });
+    else acc.push({ kind: item.kind, items: [{ variant: item, index }] });
+    return acc;
+  }, []);
+
   const anchors: AnchorItem[] = [
     { id: "overview", label: "Overview" },
-    ...(features.length > 0 || applications.length > 0 ? [{ id: "features", label: "Features" }] : []),
-    { id: "finishes", label: variants.length > 0 ? KIND_LABEL[variantKind] : "Configure" },
-    { id: "technical", label: "Technical data" },
-    { id: "documents", label: "Documents" },
-    ...(related.length > 0 ? [{ id: "related", label: "Related" }] : []),
+    { id: "specifications", label: "Specifications" },
+    { id: "drawing", label: "Drawing" },
+    ...(installSpecs.length > 0 || product.installationNotes ? [{ id: "installation", label: "Installation" }] : []),
+    { id: "downloads", label: "Downloads" },
   ];
 
-  const lifestyleImage = ambientImage ?? (brand.coverImage && !galleryImages.includes(brand.coverImage) ? brand.coverImage : "/images/showroom-detail.webp");
-  const sectionClass = "scroll-mt-32 md:scroll-mt-36";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        name: product.name,
+        sku: modelCode ?? undefined,
+        description: product.description,
+        image: galleryImages.map((src) => (src.startsWith("http") ? src : `${window.location.origin}${assetUrl(src)}`)),
+        brand: { "@type": "Brand", name: brand.name },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${window.location.origin}${assetUrl("/")}` },
+          { "@type": "ListItem", position: 2, name: product.category, item: `${window.location.origin}${assetUrl(solution ? `/catalog?solution=${solution.slug}` : "/catalog")}` },
+          { "@type": "ListItem", position: 3, name: product.name, item: canonical },
+        ],
+      },
+    ],
+  };
+
+  const flagship = SHOWROOMS[0]!;
 
   return (
     <MainLayout>
-      <div className="pb-24 lg:pb-0">
-        <HeroWatcher onChange={onHeroInView}>
-          <ProductHero
-            name={product.name}
-            brandName={brand.name}
-            brandSlug={brand.slug}
-            type={heroType}
-            designer={designerName}
-            badge={STATUS_BADGE[product.status] ?? ((details?.badges ?? []).some((b) => /new/i.test(b)) ? "New" : undefined)}
-            image={heroImage}
-            finish={activeFinish}
-          />
-        </HeroWatcher>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <div className="pb-28 lg:pb-0">
+        <nav aria-label="Breadcrumb" className="border-b border-border">
+          <ol className="container mx-auto flex gap-2 overflow-x-auto whitespace-nowrap px-4 py-3 text-xs text-muted-foreground">
+            <li><Link href="/" className="hover:text-foreground">Home</Link></li>
+            <li aria-hidden>/</li>
+            <li>
+              <Link href={solution ? `/catalog?solution=${solution.slug}` : "/catalog"} className="hover:text-foreground">{product.category}</Link>
+            </li>
+            <li aria-hidden>/</li>
+            <li className="text-foreground" aria-current="page">{product.name}</li>
+          </ol>
+        </nav>
 
-        <div className="border-y border-border">
-          <nav aria-label="Breadcrumb" className="container mx-auto flex gap-2 overflow-x-auto whitespace-nowrap px-4 py-3 text-xs lowercase text-muted-foreground">
-            <Link href="/catalog" className="transition-colors hover:text-foreground" data-testid="link-bc-catalog">products</Link>
-            <span aria-hidden>/</span>
-            <Link href={`/brands/${brand.slug}`} className="transition-colors hover:text-foreground" data-testid={`link-bc-brand-${brand.slug}`}>{brand.name}</Link>
-            <span aria-hidden>/</span>
-            <span className="text-foreground" aria-current="page" data-testid="text-bc-current">{product.name}</span>
-          </nav>
-        </div>
+        <section className="container mx-auto grid gap-8 px-4 py-6 lg:grid-cols-12 lg:gap-12 lg:py-10">
+          <div className="lg:col-span-7">
+            <ProductGallery
+              images={galleryImages}
+              alt={`${product.name}${variant ? `, ${variant.label}` : ""}`}
+              activeIndex={activeImage}
+              onChange={setActiveImage}
+              badge={showNew ? "New" : undefined}
+            />
+          </div>
 
-        <ProductAnchorNav items={anchors} />
+          <div className="lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100dvh-7rem)] lg:self-start lg:overflow-y-auto">
+            <div className="flex items-start justify-between gap-4">
+              <Link href={`/brands/${brand.slug}`} className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary hover:text-foreground">
+                {brand.name}
+              </Link>
+              <span className="flex items-center gap-2">
+                {showAward && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground">
+                    <Award className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden /> Award
+                  </span>
+                )}
+                {onDisplay && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-foreground">
+                    <Sparkles className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden /> On display
+                  </span>
+                )}
+              </span>
+            </div>
 
-        {/* Overview: statement, story chapters, key facts */}
-        <section id="overview" className={sectionClass}>
-          <div className="container mx-auto px-4 py-16 md:py-28">
-            <EditorialChapters statement={statement} body={body} awards={editorial?.awards ?? []} chapters={editorial?.chapters ?? []} />
-            <div className="mt-16 md:mt-28">
-              <ProductFacts specs={specs} />
+            <h1 className="mt-3 font-display text-4xl font-medium leading-[0.95] tracking-[-0.03em] md:text-5xl">{product.name}</h1>
+            {modelCode && (
+              <p className="mt-4 flex items-center gap-2">
+                <span className="font-mono text-sm tracking-[0.12em] text-foreground" data-testid="text-reference">{modelCode}</span>
+                <button
+                  type="button"
+                  onClick={copyCode}
+                  className="inline-flex min-h-11 min-w-11 items-center justify-center text-muted-foreground hover:text-foreground"
+                  aria-label={copied ? "Code copied" : "Copy model code"}
+                  data-testid="button-copy-code"
+                >
+                  {copied ? <Check className="h-4 w-4 text-primary" strokeWidth={2} /> : <Copy className="h-4 w-4" strokeWidth={1.5} />}
+                </button>
+              </p>
+            )}
+            {identity.length > 0 && <p className="mt-2 text-sm text-muted-foreground">{identity.join(" · ")}</p>}
+            {designerName && (
+              <p className="mt-3 text-sm text-muted-foreground">
+                Designed by{" "}
+                <Link href={designerPath(brand.slug, designerName)} className="text-foreground underline-offset-4 hover:text-primary hover:underline" data-testid="link-designer">
+                  {designerName}
+                </Link>
+              </p>
+            )}
+
+            <p className="mt-6 font-display text-3xl font-light tracking-[-0.02em]" data-testid="text-price">Price on request</p>
+            {onDisplay && <p className="mt-2 text-sm text-foreground">On display in the showroom</p>}
+
+            {groups.map((group) => {
+              const swatch = group.kind === "finish" || group.kind === "colour";
+              const choice = ({ variant, index }: (typeof group.items)[number]): FinishChoice => ({ code: variant.code, label: variant.label, index });
+              const parents = group.items.filter((item) => item.variant.attributes?.group !== "Inserts");
+              const inserts = group.items.filter((item) => item.variant.attributes?.group === "Inserts");
+              const current = group.items.find((item) => item.index === selectedVariant);
+              const parentCode = current?.variant.code.split(/[+-]/)[0];
+              const parentSelected = parents.some((item) => item.index === selectedVariant)
+                ? selectedVariant
+                : (parents.find((item) => item.variant.code === parentCode)?.index ?? -1);
+              const visibleInserts = parentCode ? inserts.filter((item) => item.variant.code.startsWith(`${parentCode}+`) || item.variant.code.startsWith(`${parentCode}-`)) : [];
+              return (
+                <fieldset key={group.kind} className={swatch ? "mt-10" : "mt-6"}>
+                  <legend className={swatch ? "sr-only" : "text-xs font-medium text-muted-foreground"}>{KIND_LABEL[group.kind]}</legend>
+                  {swatch ? (
+                    <>
+                      <FinishCodes items={(parents.length > 0 ? parents : group.items).map(choice)} selected={selectedVariant} marked={parents.length > 0 ? parentSelected : selectedVariant} onSelect={selectVariant} label={KIND_LABEL[group.kind]} />
+                      {visibleInserts.length > 0 && <FinishCodes items={visibleInserts.map(choice)} selected={selectedVariant} onSelect={selectVariant} label="Insert" className="mt-5" />}
+                    </>
+                  ) : (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {group.items.map(({ variant: item, index }) => {
+                        const active = index === selectedVariant;
+                        return (
+                          <label
+                            key={`${item.code}-${index}`}
+                            className={`inline-flex min-h-11 cursor-pointer items-center gap-2 border px-3 text-sm has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring ${active ? "border-foreground" : "border-border"}`}
+                          >
+                            <input type="radio" name="product-variant" className="sr-only" checked={active} onChange={() => selectVariant(index)} />
+                            <span>{item.label}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </fieldset>
+              );
+            })}
+
+            {(fitSpec || product.installationNotes) && (
+              <a href="#installation" className="mt-6 flex min-h-11 items-center justify-between gap-4 border border-border px-4 py-3 text-sm hover:border-foreground">
+                <span>
+                  <span className="block text-xs text-muted-foreground">Will it fit?</span>
+                  <span className="mt-1 block text-foreground">{fitSpec ? `${fitSpec.label} ${fitSpec.value}` : "Installation notes"}</span>
+                </span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+              </a>
+            )}
+
+            <div className="mt-6">
+              <AddToShortlist
+                item={quoteItem}
+                trailing={
+                  <a
+                    href={inquiryHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => track("whatsapp_click", { item_id: product.slug })}
+                    className="inline-flex h-11 w-full items-center justify-center gap-2 border border-border px-3 text-sm font-medium text-foreground hover:border-foreground"
+                    data-testid="button-whatsapp"
+                  >
+                    <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> WhatsApp us
+                  </a>
+                }
+              />
             </div>
           </div>
         </section>
 
-        {/* Features and applications (Barazza icons, Blum benefits and applications) */}
-        {(features.length > 0 || applications.length > 0) && (
-          <section id="features" className={`${sectionClass} border-t border-border`}>
-            <div className="container mx-auto grid gap-10 px-4 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
-              <div className="lg:col-span-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">Features</p>
-                <h2 className="mt-5 font-display text-4xl font-light leading-[1.02] tracking-[-0.025em] md:text-5xl">What it does well.</h2>
-                {applications.length > 0 && (
-                  <div className="mt-8">
-                    <p className="text-xs text-muted-foreground">Where it is used</p>
-                    <ul className="mt-3 flex flex-wrap gap-2" data-testid="list-applications">
-                      {applications.map((item) => (
-                        <li key={item} className="border border-border px-3 py-1.5 text-xs text-foreground">{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-              <div className="lg:col-span-8">
-                {features.length > 0 ? (
-                  <FeatureList features={features} />
-                ) : ambientImage ? (
-                  <div className="aspect-[16/10] overflow-hidden bg-accent">
-                    <MediaImage src={ambientImage} alt={`${product.name} in use`} width={1400} height={875} sizes="(min-width: 1024px) 60vw, 100vw" className="h-full w-full object-cover" />
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </section>
+        {technicalSpecs.length > 0 && (
+          <div className="container mx-auto px-4">
+            <ProductFacts specs={technicalSpecs} />
+          </div>
         )}
 
-        {/* Variants + configure (DND finishes, Häfele items, Barazza codes) */}
-        <section id="finishes" className={`${sectionClass} border-t border-border`}>
-          <div className="container mx-auto px-4 py-16 md:py-24">
-            <VariantConfigurator
-              productName={product.name}
-              brandName={brand.name}
-              reference={reference}
-              designer={designerName}
-              designLine={designLine}
-              variants={variants}
-              selected={selectedVariant}
-              onSelect={selectVariant}
-              images={galleryImages}
-              activeImage={activeImage}
-              onImageChange={setActiveImage}
-              documentsHref={documentsHref("Catalogue sheet")}
-              shortlist={
-                <AddToShortlist
-                  item={{
-                    key: variant ? `${product.slug}::${variant.code}` : product.slug,
-                    slug: product.slug,
-                    name: product.name,
-                    brandName: brand.name,
-                    reference,
-                    variant: variant ? `${variant.code} - ${variant.label}` : null,
-                    image: variant?.image ?? primaryImage(product),
-                  }}
+        <div className="mt-8 hidden lg:block">
+          <ProductAnchorNav items={anchors} />
+        </div>
+
+        <Fold id="overview" title="Overview">
+          {features.length > 0 ? (
+            <FeatureList features={features.slice(0, 3)} />
+          ) : (
+            <EditorialChapters statement={editorial?.statement ?? product.description} body={editorial?.statement ? product.description : undefined} awards={editorial?.awards ?? []} chapters={(editorial?.chapters ?? []).slice(0, 2)} />
+          )}
+          {brand.summary && <p className="mt-10 max-w-2xl text-sm leading-7 text-muted-foreground">{brand.summary}</p>}
+          {(editorial?.awards?.length ?? 0) > 0 && features.length > 0 && (
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {editorial!.awards!.map((award) => (
+                <li key={award} className="border border-border px-3 py-1.5 text-xs">{award}</li>
+              ))}
+            </ul>
+          )}
+          {designerName && (
+            <div className="mt-12">
+              <DesignerBlock name={designerName} bio={designerBio} href={designerPath(brand.slug, designerName)} />
+            </div>
+          )}
+        </Fold>
+
+        <Fold id="specifications" title="Specifications" dark>
+          <SpecTable productName={product.name} brandName={brand.name} reference={productReference} specs={technicalSpecs} />
+        </Fold>
+
+        <section id="drawing" className="scroll-mt-28 border-t border-border lg:scroll-mt-32" data-testid="product-blueprint">
+          <div className="container mx-auto grid items-start gap-10 px-4 py-12 lg:grid-cols-12 lg:gap-16 lg:py-20">
+            <div className="lg:sticky lg:top-36 lg:col-span-4">
+              <h2 className="font-display text-3xl font-light tracking-[-0.02em] md:text-4xl">Technical drawing</h2>
+              <p className="mt-4 max-w-sm text-sm leading-7 text-muted-foreground">
+                Placeholder sheet, shown until this product&apos;s own drawing is on file. Dimensions in millimetres.
+              </p>
+            </div>
+            <figure className="lg:col-span-8">
+              <button
+                type="button"
+                onClick={() => setDrawingOpen(true)}
+                className="block w-full max-w-[15rem] cursor-zoom-in outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View ${product.name} technical drawing full screen`}
+                data-testid="button-drawing"
+              >
+                <MediaImage
+                  src="/images/blueprint-placeholder.jpg"
+                  alt={`${product.name} technical drawing`}
+                  width={766}
+                  height={1024}
+                  sizes="320px"
+                  className="h-auto w-full object-contain"
                 />
-              }
+              </button>
+            </figure>
+            <PhotoLightbox
+              photos={[{ src: "/images/blueprint-placeholder.jpg", alt: `${product.name} technical drawing` }]}
+              index={drawingOpen ? 0 : null}
+              onChange={() => {}}
+              onClose={() => setDrawingOpen(false)}
+              label={`${product.name} technical drawing`}
             />
           </div>
         </section>
 
-        {detailGallery.length > 1 && (
+        {(installSpecs.length > 0 || product.installationNotes) && (
+          <Fold id="installation" title="Installation">
+            {installSpecs.length > 0 && (
+              <dl className="grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+                {installSpecs.map((spec) => (
+                  <div key={spec.label} className="flex flex-col-reverse gap-2 border-t border-foreground pt-4">
+                    <dt className="text-xs text-muted-foreground">{spec.label}</dt>
+                    <dd className="font-display text-2xl font-medium leading-tight tracking-[-0.03em] text-foreground">{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {product.installationNotes && <p className="mt-6 max-w-xl text-sm leading-7 text-muted-foreground">{product.installationNotes}</p>}
+            {fitCm != null && fitSpec && (
+              <form
+                className="mt-8 max-w-sm"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  checkFit();
+                }}
+              >
+                <label htmlFor="cabinet-width" className="text-sm text-foreground">Your cabinet width, in cm</label>
+                <div className="mt-2 flex gap-2">
+                  <input
+                    id="cabinet-width"
+                    inputMode="decimal"
+                    value={cabinetCm}
+                    onChange={(event) => setCabinetCm(event.target.value)}
+                    className="h-11 w-full border border-border bg-background px-3 text-sm outline-none focus:border-primary"
+                  />
+                  <button type="submit" className="h-11 shrink-0 border border-foreground px-4 text-sm">Check</button>
+                </div>
+                {fitResult === "fits" && <p className="mt-3 text-sm text-foreground" role="status">This {fitSpec.label.toLowerCase()} fits a {cabinetCm} cm cabinet.</p>}
+                {fitResult === "tight" && <p className="mt-3 text-sm text-foreground" role="status">A {cabinetCm} cm cabinet is under the {fitSpec.value} {fitSpec.label.toLowerCase()}. Ask us before you cut.</p>}
+              </form>
+            )}
+            {(details?.videos ?? 0) > 0 && <p className="mt-6 text-sm text-muted-foreground">An installation video is available. Ask on WhatsApp and we will send the current one.</p>}
+          </Fold>
+        )}
+
+        <Fold id="downloads" title="Downloads">
+          <ul className="divide-y divide-border border-y border-border">
+            {documents.map((doc) => (
+              <li key={doc.label}>
+                <a
+                  href={documentsHref(doc.label)}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => track("whatsapp_click", { item_id: product.slug, document: doc.label })}
+                  className="group flex min-h-11 items-center gap-4 py-4 hover:text-primary"
+                  data-testid={`link-document-${doc.label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center text-foreground transition-colors group-hover:text-primary" aria-hidden>
+                    <FileText className="h-4 w-4" strokeWidth={1.75} />
+                  </span>
+                  <span className="flex-1">
+                    <span className="block text-sm font-medium">{doc.label}</span>
+                    <span className="block text-xs text-muted-foreground">{doc.note} · Request</span>
+                  </span>
+                  <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} />
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 max-w-xl text-xs leading-6 text-muted-foreground">Files are sent by a consultant, so you receive the manufacturer’s current revision. A file with a public URL will download directly.</p>
+        </Fold>
+
+        {siblings.length > 0 && (
           <section className="border-t border-border">
-            <div className="container mx-auto px-4 py-16 md:py-24">
-              <NumberedGallery images={detailGallery} alt={product.name} />
+            <div className="container mx-auto px-4 py-12 lg:py-16">
+              <h2 className="font-display text-3xl font-light tracking-[-0.02em]">Same collection</h2>
+              <div className="mt-6 overflow-x-auto">
+                <table className="w-full min-w-[36rem] border-t border-border text-sm">
+                  <thead>
+                    <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                      <th scope="col" className="py-3 pr-4 font-medium">Model</th>
+                      <th scope="col" className="py-3 pr-4 font-medium">Code</th>
+                      <th scope="col" className="py-3 pr-4 font-medium">Key spec</th>
+                      <th scope="col" className="py-3 font-medium">Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {siblings.map((item) => {
+                      const code = item.sku || item.details?.variants?.find((entry) => entry.articleNumber)?.articleNumber || item.details?.variants?.[0]?.code || "—";
+                      const spec = item.dimensions || item.specs.find((entry) => /width|size|cut|dimension/i.test(entry.label))?.value || "—";
+                      return (
+                        <tr key={item.slug} className="border-b border-border">
+                          <td className="py-3 pr-4"><Link href={`/products/${item.slug}`} className="hover:text-primary">{item.name}</Link></td>
+                          <td className="py-3 pr-4 font-mono text-xs tracking-[0.08em]">{code}</td>
+                          <td className="py-3 pr-4">{spec}</td>
+                          <td className="py-3">On request</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
         )}
 
-        {editorial?.designer && (
+        {look.length > 0 && (
           <section className="border-t border-border">
-            <div className="container mx-auto px-4 py-16 md:py-24">
-              <DesignerBlock name={editorial.designer.name} bio={editorial.designer.bio} url={editorial.designer.url} />
+            <div className="container mx-auto px-4 py-12 lg:py-16">
+              <RelatedProducts title="Completes the look" products={look} />
             </div>
           </section>
         )}
 
-        {/* Technical data (Häfele) */}
-        <section id="technical" className={`${sectionClass} border-t border-border bg-accent`}>
-          <div className="container mx-auto grid gap-10 px-4 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">Technical data</p>
-              <h2 className="mt-5 font-display text-4xl font-light leading-[1.02] tracking-[-0.025em] md:text-5xl">The numbers that matter on site.</h2>
-              <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">
-                Copy the sheet straight into your order notes. Anything not listed, our technical team confirms against the manufacturer's current documentation.
-              </p>
-              <p className="mt-6 text-xs text-muted-foreground">
-                Reference <span className="ml-2 font-mono tracking-[0.14em] text-foreground" data-testid="text-reference">{reference}</span>
-              </p>
-            </div>
-            <div className="lg:col-span-7 lg:col-start-6">
-              <SpecTable productName={product.name} brandName={brand.name} reference={reference} specs={technicalSpecs} />
-              {product.installationNotes && <p className="mt-8 border-l border-primary pl-5 text-sm leading-7 text-muted-foreground">{product.installationNotes}</p>}
-            </div>
-            {variants.some((v) => v.articleNumber) && variants.length > 1 && (
-              <div className="lg:col-span-12">
-                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Item numbers</p>
-                <VariantTable variants={variants} selected={selectedVariant} onSelect={selectVariant} />
-              </div>
-            )}
-            {technicalImages.length > 0 && (
-              <div className="lg:col-span-7 lg:col-start-6">
-                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Drawings</p>
-                <TechnicalDrawings images={technicalImages} productName={product.name} />
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Showroom band */}
-        <section className="bg-primary text-primary-foreground">
-          <div className="container mx-auto grid items-center gap-10 px-4 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-7">
-              <div className="aspect-[4/3] overflow-hidden">
-                <MediaImage src={lifestyleImage} alt={`${brand.name} systems on display`} width={1200} height={900} sizes="(min-width: 1024px) 58vw, 100vw" className="h-full w-full object-cover grayscale-[25%]" />
-              </div>
-            </div>
-            <div className="lg:col-span-4 lg:col-start-9">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">In the showroom</p>
-              <h2 className="mt-5 font-display text-4xl font-light leading-[1.02] tracking-[-0.025em] md:text-5xl">See it working.</h2>
-              <p className="mt-5 text-sm leading-7 text-primary-foreground/70">
-                Open the drawer. Feel the close. {brand.name} systems are on the floor at {company.showrooms[0].name} and {company.showrooms[1].name}, with a consultant who has installed them.
-              </p>
-              <Link href="/showroom" className="mt-8 inline-flex h-12 items-center gap-2 border border-primary-foreground/30 px-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition hover:bg-primary-foreground hover:text-primground active:scale-[0.98]" data-testid="button-showroom">
-                Plan a showroom visit <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} />
+        <section className="border-t border-border">
+          <div className="container mx-auto grid gap-8 px-4 py-12 lg:grid-cols-12 lg:py-16">
+            <div className="lg:col-span-5">
+              <h2 className="font-display text-3xl font-light tracking-[-0.02em]">See it in person</h2>
+              <ul className="mt-6 space-y-4 text-sm">
+                {SHOWROOMS.map((room) => (
+                  <li key={room.slug}>
+                    <Link href={`/showroom/${room.slug}`} className="font-medium hover:text-primary">{room.name}</Link>
+                    <p className="text-muted-foreground">{room.hours}</p>
+                    <p className="text-muted-foreground">{room.addressLines.join(", ")}</p>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/showroom" className="mt-6 inline-flex h-11 items-center gap-2 bg-primary px-5 text-sm font-medium text-primary-foreground">
+                Book a visit <ArrowUpRight className="h-4 w-4" strokeWidth={1.5} />
               </Link>
             </div>
-          </div>
-        </section>
-
-        {/* Documents */}
-        <section id="documents" className={`${sectionClass} border-t border-border`}>
-          <div className="container mx-auto grid gap-10 px-4 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-4">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary">Documents</p>
-              <h2 className="mt-5 font-display text-4xl font-light leading-[1.02] tracking-[-0.025em] md:text-5xl">Drawings and data sheets.</h2>
-              <p className="mt-5 max-w-sm text-sm leading-7 text-muted-foreground">Sent by our technical team so you always receive the manufacturer's current revision, not a cached copy.</p>
+            <div className="aspect-[4/3] lg:col-span-7">
+              <ShowroomMap name={flagship.name} addressLines={flagship.addressLines} label={flagship.name} className="h-full min-h-64" />
             </div>
-            <ul className="divide-y divide-border border-y border-border lg:col-span-7 lg:col-start-6">
-              {documents.map((doc) => (
-                <li key={doc.label}>
-                  <a href={documentsHref(doc.label)} target="_blank" rel="noreferrer" className="group flex items-center gap-5 py-5 transition hover:bg-accent md:px-3" data-testid={`link-document-${doc.label.toLowerCase().replace(/[^a-z]+/g, "-")}`}>
-                    <FileText className="h-5 w-5 shrink-0 text-muted-foreground group-hover:text-primary" strokeWidth={1.5} />
-                    <span className="flex-1">
-                      <span className="block text-sm font-medium text-foreground">{doc.label}</span>
-                      <span className="block text-xs text-muted-foreground">{doc.note}</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground group-hover:text-primary">
-                      Request <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.5} />
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
         </section>
 
-        {related.length > 0 && (
-          <section id="related" className={`${sectionClass} border-t border-border`}>
-            <div className="container mx-auto px-4 py-16 md:py-24">
-              <RelatedProducts title={related.title ?? "Related products"} products={related} />
+        {viewed.length > 0 && (
+          <section className="border-t border-border">
+            <div className="container mx-auto px-4 py-12 lg:py-16">
+              <RelatedProducts title="Recently viewed" products={viewed} />
             </div>
           </section>
         )}
-
-        {/* DND: "Do you want more information?" */}
-        <section className="border-t border-border">
-          <div className="container mx-auto grid gap-8 px-4 py-16 md:py-24 lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-6">
-              <h2 className="font-display text-4xl font-light leading-[1.02] tracking-[-0.03em] md:text-6xl">Do you want more information?</h2>
-            </div>
-            <div className="flex flex-col items-start gap-6 lg:col-span-5 lg:col-start-8 lg:pt-3">
-              <a href={inquiryHref} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center gap-2.5 bg-primary px-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98]" data-testid="button-whatsapp-footer">
-                <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Contact us on WhatsApp
-              </a>
-              <ul className="flex flex-wrap gap-x-8 gap-y-3 text-xs">
-                <li>
-                  <a href={documentsHref("Product data sheet")} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-foreground transition hover:text-primary">
-                    Request the data sheet <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  </a>
-                </li>
-                <li>
-                  <a href="#technical" className="inline-flex items-center gap-1.5 text-foreground transition hover:text-primary">
-                    Technical data <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-                  </a>
-                </li>
-                <li>
-                  <button type="button" onClick={share} className="inline-flex items-center gap-1.5 text-foreground transition hover:text-primary" data-testid="button-share">
-                    {shared ? <Check className="h-3.5 w-3.5 text-primary" strokeWidth={2} /> : <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />}
-                    {shared ? "Link copied" : "Share"}
-                  </button>
-                </li>
-              </ul>
-              <p className="text-xs text-muted-foreground">{company.whatsapp.display} · {company.email}</p>
-            </div>
-          </div>
-        </section>
       </div>
 
-      <StickyInquiryBar visible={!heroInView} productName={product.name} finish={activeFinish} href={inquiryHref} />
+      <StickyInquiryBar productName={product.name} finish={variant?.label} href={inquiryHref} quoted={quoted} onQuote={addQuote} />
     </MainLayout>
   );
 }

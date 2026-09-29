@@ -14,10 +14,10 @@ interface Detail {
 }
 
 const DETAILS: Detail[] = [
-  { title: "Finishes matched across handle, hinge and lock", body: "One tone through the whole door schedule, checked against physical samples in daylight.", image: "/images/showroom-detail.webp", alt: "Matched hardware finishes on display" },
-  { title: "Item numbers checked against the current sheet", body: "Never a cached copy. What we quote is what the manufacturer ships today.", image: "/images/trade-workshop.webp", alt: "A specification checked against the manufacturer's drawing" },
-  { title: "Stock held in Amman, not promised from a port", body: "Deep inventory on the ground, so a programme does not wait on a container.", image: "/images/trade-planning.webp", alt: "Stock planning at the trade desk" },
-  { title: "A consultant who has installed the system", body: "At the mock-up before the joinery is cut, and back on site years later.", image: "/images/hero-kitchen.webp", alt: "An installed kitchen with concealed hardware" },
+  { title: "Finishes matched across handle, hinge and lock", body: "One tone through the whole door schedule, checked against physical samples in daylight.", image: "/images/showroom-handles.webp", alt: "Door handles in a range of finishes on one wall" },
+  { title: "Item numbers checked against the current sheet", body: "Always the current sheet. What we quote is what the manufacturer ships today.", image: "/images/showroom-dnd.webp", alt: "Handles labelled on display boards" },
+  { title: "Stock held in Amman, not promised from a port", body: "Stock on the ground, so a project does not wait on a container.", image: "/images/showroom-blum.webp", alt: "Kitchen systems built and stocked on the showroom floor" },
+  { title: "A consultant who has installed the system", body: "At the mock-up before the joinery is cut, and back on site years later.", image: "/images/kitchen-corner.webp", alt: "Corner drawers installed and pulled out for use" },
 ];
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -179,9 +179,8 @@ function ServiceRow({ index, title, body, open, stacked, onOpen }: { index: numb
         onPointerEnter={() => !stacked && onOpen()}
         onFocus={onOpen}
         aria-expanded={open}
-        className="grid w-full grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-4 py-6 text-left outline-none focus-visible:bg-background md:py-7"
+        className="block w-full py-6 pl-5 text-left outline-none focus-visible:bg-background md:py-7 md:pl-6"
       >
-        <span className={cn("font-mono text-xs tracking-[0.12em] transition-colors", open ? "text-primary" : "text-muted-foreground")}>{String(index + 1).padStart(2, "0")}</span>
         <span className={cn("font-display text-2xl font-medium leading-[1.02] tracking-[-0.03em] transition-colors md:text-3xl", open ? "text-foreground" : "text-foreground/60")}>{title}</span>
       </button>
       <AnimatePresence initial={false}>
@@ -194,9 +193,8 @@ function ServiceRow({ index, title, body, open, stacked, onOpen }: { index: numb
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <div className="grid grid-cols-[3rem_minmax(0,1fr)] gap-4 pb-7">
-              <span aria-hidden />
-              <div>
+            <div className="pb-7">
+              <div className="pl-5 md:pl-6">
                 <p className="max-w-md text-base leading-7 text-muted-foreground">{body}</p>
                 {stacked && (
                   <div className="mt-5 aspect-[16/10] overflow-hidden bg-background">
@@ -236,13 +234,13 @@ function ForArchitects() {
     <Section tone="panel">
       <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
         <Reveal className="lg:col-span-7">
-          <h2 className="max-w-[16ch] font-display text-[clamp(2.5rem,4.6vw,4.5rem)] font-medium leading-[0.94] tracking-[-0.04em]">For architects and the practices that specify.</h2>
+          <h2 className="max-w-[16ch] font-display text-[clamp(2.5rem,4.6vw,4.5rem)] font-medium leading-[0.94] tracking-[-0.04em]">For architects, fabricators and procurement teams.</h2>
         </Reveal>
         <Reveal className="lg:col-span-4 lg:col-start-9">
           <p className="max-w-sm text-base leading-7 text-muted-foreground">
-            Send a door schedule or a joinery package. We return item numbers, finishes and drawings, and we sit at the mock-up with you.
+            Send a door schedule, a joinery package or a project brief. We return item nos., finishes and drawings, sit at the mock-up with you, and quote against the full schedule.
           </p>
-          <SolidLink href="/contact" className="mt-7">Send a schedule</SolidLink>
+          <SolidLink href="/contact" className="mt-7">Send a trade enquiry</SolidLink>
         </Reveal>
       </div>
 
@@ -265,9 +263,12 @@ function ForArchitects() {
         </Reveal>
 
         {!stacked && (
-          <Reveal className="lg:col-span-5 lg:col-start-8">
-            <figure className="sticky top-28">
-              <div className="relative aspect-[4/5] overflow-hidden bg-background">
+          <div
+            className="sticky z-10 self-start lg:col-span-5 lg:col-start-8"
+            style={{ top: "calc(var(--nav-offset, 76px) + 1rem)" }}
+          >
+            <figure>
+              <div className="relative aspect-[4/5] max-h-[calc(100dvh-8rem)] overflow-hidden bg-background">
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={image.src}
@@ -277,7 +278,7 @@ function ForArchitects() {
                     transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
                     className="absolute inset-0"
                   >
-                    <MediaImage src={image.src} alt={image.alt} width={900} height={1125} sizes="(min-width: 1024px) 40vw, 100vw" className="h-full w-full object-cover" />
+                    <MediaImage src={image.src} alt={image.alt} width={900} height={1125} sizes="(min-width: 1024px) 40vw, 100vw" className="h-full w-full object-cover object-top" />
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -286,7 +287,7 @@ function ForArchitects() {
                 <span className="tabular-nums"><span className="text-foreground">{String(active + 1).padStart(2, "0")}</span> / {String(ARCHITECT_SERVICES.length).padStart(2, "0")}</span>
               </figcaption>
             </figure>
-          </Reveal>
+          </div>
         )}
       </div>
     </Section>

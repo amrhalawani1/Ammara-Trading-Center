@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight, FileText, MessageCircle, Search, X } from "lucide-react";
+import { ArrowUpRight, Download, FileText, MessageCircle, Search, X } from "lucide-react";
 import { Link } from "wouter";
 import { useGetPublicCatalog, type Product } from "@workspace/api-client-react";
 import { EditorialLink, Reveal, RevealGroup, Section, SPRING } from "@/components/home/primitives";
@@ -11,9 +11,10 @@ import { apiErrorMessage } from "@/lib/api-error";
 import { JOURNAL } from "@/lib/home-content";
 import { productType } from "@/lib/product-media";
 import { cn } from "@/lib/utils";
-import { productInquiryMessage, whatsappUrl } from "@/lib/whatsapp";
+import { documentDownloadUrl } from "@/lib/document-files";
+import { whatsappUrl } from "@/lib/whatsapp";
 
-const GUIDE_IMAGES = ["/images/resources-docs.webp", "/images/brand-hinge.webp", "/images/dnd-ellipse.webp", "/images/brand-sliding.webp"] as const;
+const GUIDE_IMAGES = ["/images/kitchen-corner.webp", "/images/showroom-hinges.webp", "/images/showroom-handles.webp", "/images/kitchen-pullout.webp"] as const;
 
 interface DocumentRow {
   product: Product;
@@ -81,11 +82,14 @@ export default function Resources() {
               Documents and guides.
             </motion.h1>
             <motion.p initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.1 }} className="mt-8 max-w-lg text-lg leading-8 text-muted-foreground">
-              Manufacturer data sheets for every item in the catalogue, sent on request, and the guides our consultants are writing.
+              Data sheets, drawings and CAD files for every product on the site, sent on request by a consultant.
             </motion.p>
+            <motion.div initial={reduce ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }} className="mt-8">
+              <EditorialLink href="/catalogues">Manufacturer catalogues and brochures</EditorialLink>
+            </motion.div>
           </div>
           <motion.div initial={reduce ? false : { opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }} className="relative aspect-[4/5] overflow-hidden bg-card sm:aspect-[5/4] lg:col-span-5">
-            <MediaImage src="/images/resources-docs.webp" alt="Manufacturer documentation and drawings on the trade desk" width={1200} height={1500} lazy={false} fetchPriority="high" sizes="(min-width: 1024px) 40vw, 100vw" className="absolute inset-0 h-full w-full object-cover" />
+            <MediaImage src="/images/showroom-certificate.webp" alt="A framed Häfele certificate in the showroom corridor" width={1200} height={1500} lazy={false} fetchPriority="high" sizes="(min-width: 1024px) 40vw, 100vw" className="absolute inset-0 h-full w-full object-cover object-[20%_center]" />
           </motion.div>
         </div>
       </section>
@@ -112,7 +116,7 @@ export default function Resources() {
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Product, brand or document"
                 autoComplete="off"
-                className="h-12 w-full border border-border bg-background pl-11 pr-11 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground [&::-webkit-search-cancel-button]:hidden"
+                className="h-12 w-full border border-border bg-background pl-11 pr-11 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary [&::-webkit-search-cancel-button]:hidden"
                 data-testid="input-document-search"
               />
               {query && (
@@ -147,7 +151,7 @@ export default function Resources() {
             {isLoading ? (
               <ul className="border-t border-border">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <li key={i} className="grid gap-4 border-b border-border py-5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_8rem]">
+                    <li key={i} className="grid gap-4 border-b border-border py-5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_9.5rem]">
                     <Skeleton className="h-5 w-2/3 rounded-none" />
                     <Skeleton className="h-5 w-1/2 rounded-none" />
                     <Skeleton className="h-5 w-20 rounded-none md:justify-self-end" />
@@ -163,11 +167,11 @@ export default function Resources() {
               <div className="grid gap-8 border border-border px-6 py-14 md:grid-cols-12 md:px-10">
                 <div className="md:col-span-7">
                   <p className="font-display text-3xl font-medium leading-[0.98] tracking-[-0.03em] md:text-4xl">Not indexed yet.</p>
-                  <p className="mt-4 max-w-md text-sm leading-7 text-muted-foreground">The index covers the catalogue online. For anything else in a manufacturer's range, send the item number and we will find the sheet.</p>
+                  <p className="mt-4 max-w-md text-sm leading-7 text-muted-foreground">This index covers the products on the site. For anything else in a brand's range, send the item no. and we will find the sheet.</p>
                 </div>
                 <div className="flex flex-col items-start gap-4 md:col-span-5 md:justify-end">
                   <a href={whatsappUrl(`Hello ATC, could you send the technical documents for "${query.trim()}"?`)} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center gap-2.5 bg-primary px-6 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground transition hover:bg-foreground hover:text-background active:scale-[0.98]">
-                    <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Request on WhatsApp
+                    <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Ask on WhatsApp
                   </a>
                   <button type="button" onClick={() => { setQuery(""); setBrand(null); }} className="text-xs text-foreground underline-offset-4 hover:underline">
                     Clear search
@@ -185,13 +189,15 @@ export default function Resources() {
                     </div>
                     <ul>
                       <AnimatePresence initial={false}>
-                        {group.rows.map((row) => (
+                        {group.rows.map((row) => {
+                          const file = documentDownloadUrl(row.product.details?.sourceUrl);
+                          return (
                           <motion.li
                             key={row.product.slug}
                             layout={!reduce}
                             variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: SPRING } }}
                             exit={reduce ? undefined : { opacity: 0 }}
-                            className="group grid gap-3 border-b border-border py-5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_8rem] md:items-center md:gap-6"
+                            className="group grid gap-3 border-b border-border py-5 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_9.5rem] md:items-center md:gap-6"
                             data-testid={`doc-row-${row.product.slug}`}
                           >
                             <Link href={`/products/${row.product.slug}`} className="min-w-0">
@@ -207,17 +213,22 @@ export default function Resources() {
                                 </li>
                               ))}
                             </ul>
-                            <a
-                              href={whatsappUrl(productInquiryMessage({ name: row.product.name, brandName: row.product.brandName, reference: row.product.sku }, "documents"))}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex h-9 w-fit items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary transition-colors hover:text-foreground md:justify-self-end"
-                              data-testid={`link-request-${row.product.slug}`}
-                            >
-                              Request <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={2} />
-                            </a>
+                            {file && (
+                              <a
+                                href={file}
+                                download
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex h-9 w-fit items-center gap-1.5 bg-foreground px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-background transition-colors hover:bg-primary md:justify-self-end"
+                                data-testid={`link-download-${row.product.slug}`}
+                              >
+                                <Download className="h-3.5 w-3.5" strokeWidth={2} />
+                                Download
+                              </a>
+                            )}
                           </motion.li>
-                        ))}
+                          );
+                        })}
                       </AnimatePresence>
                     </ul>
                   </RevealGroup>
@@ -269,7 +280,7 @@ export default function Resources() {
           </Reveal>
         </div>
         <Reveal className="mt-12" delay={0.15}>
-          <EditorialLink href="/catalog" light>Find the item number in the catalogue</EditorialLink>
+          <EditorialLink href="/catalog" light>Find the item no. in Products</EditorialLink>
         </Reveal>
       </Section>
     </MainLayout>

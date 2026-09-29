@@ -1,70 +1,95 @@
+import { ArrowUpRight, Instagram } from "lucide-react";
 import { Link } from "wouter";
 import { BrandLogo } from "@/components/brand-logo";
 import { company } from "@/lib/content";
+import { cn } from "@/lib/utils";
+
+const DIRECTORY = [
+  {
+    label: "Visit",
+    links: [
+      { href: "/catalog", label: "Products" },
+      { href: "/brands", label: "Brands" },
+      { href: "/showroom", label: "Showrooms" },
+      { href: "/projects", label: "Projects" },
+    ],
+  },
+  {
+    label: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/resources", label: "Resources" },
+      { href: "/catalogues", label: "Manufacturer catalogues" },
+      { href: "/lists", label: "Quote" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+] as const;
+
+const focusRing = "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
 
 export function Footer() {
   return (
-    <footer className="dark bg-background text-foreground py-16 mt-auto">
-      <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="space-y-4 md:col-span-1">
-          <div className="mb-8">
+    <footer className="dark mt-auto border-t border-white/10 bg-background text-foreground">
+      <div className="mx-auto max-w-[1440px] px-6 md:px-12">
+        <div className="grid gap-10 py-12 md:py-16 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-5">
             <BrandLogo size="md" />
-          </div>
-          <p className="text-sm text-foreground/60 max-w-xs leading-relaxed">
-            Premium distributor of kitchen systems, furniture fittings, and hardware serving Jordan since {company.established}.
-          </p>
-        </div>
-
-        <div>
-          <h4 className="font-display text-lg mb-4 text-primary">Showrooms</h4>
-          <address className="not-italic text-sm text-foreground/60 space-y-3">
-            {company.showrooms.map((showroom) => (
-              <p key={showroom.name}>
-                <strong className="text-foreground block font-medium mb-1">{showroom.name}</strong>
-                {showroom.addressLines.map((line) => (
-                  <span key={line}>
-                    {line}
-                    <br />
-                  </span>
-                ))}
-              </p>
-            ))}
-          </address>
-        </div>
-
-        <div>
-          <h4 className="font-display text-lg mb-4 text-primary">Quick Links</h4>
-          <ul className="space-y-2 text-sm text-foreground/60">
-            <li><Link href="/brands" className="hover:text-foreground transition-colors">Our Brands</Link></li>
-            <li><Link href="/resources" className="hover:text-foreground transition-colors">Resources</Link></li>
-            <li><Link href="/lists" className="hover:text-foreground transition-colors">Project shortlists</Link></li>
-            <li><Link href="/about" className="hover:text-foreground transition-colors">Our Story</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 className="font-display text-lg mb-4 text-primary">Contact</h4>
-          <ul className="space-y-2 text-sm text-foreground/60">
-            <li>{company.showrooms[0].phone}</li>
-            <li>
-              <a href={`mailto:${company.email}`} className="hover:text-foreground transition-colors">
+            <p className="mt-8 max-w-[36ch] text-sm leading-6 text-foreground/70">
+              Exclusive agent in Jordan for European kitchen systems, furniture fittings and door hardware. In Amman since {company.established}.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4">
+              <a
+                href={company.instagram.href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`Amara Trading Center on Instagram, ${company.instagram.handle}`}
+                data-testid="link-footer-instagram"
+                className={cn("group inline-flex items-center gap-3 text-sm text-foreground transition-colors hover:text-primary", focusRing)}
+              >
+                <span className="flex h-10 w-10 items-center justify-center border border-white/20 transition-colors group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Instagram className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                </span>
+                {company.instagram.handle}
+              </a>
+              <a href={`mailto:${company.email}`} className={cn("text-sm text-foreground/80 transition-colors hover:text-primary", focusRing)}>
                 {company.email}
               </a>
-            </li>
-            {company.contactUnconfirmed ? (
-              <li className="pt-1 text-[10px] uppercase tracking-widest text-foreground/40">Unconfirmed — verify before print</li>
-            ) : null}
-            <li className="pt-2">
-              <Link href="/contact" className="inline-flex items-center text-primary hover:text-primary/80 transition-colors uppercase tracking-wider text-xs font-bold">
-                Send an Inquiry &rarr;
-              </Link>
-            </li>
-          </ul>
+            </div>
+            <Link
+              href="/contact"
+              className={cn("group mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary", focusRing)}
+            >
+              Send an enquiry
+              <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" strokeWidth={1.75} />
+            </Link>
+          </div>
+
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:gap-10 lg:col-span-6 lg:col-start-7 lg:content-start">
+            {DIRECTORY.map((group) => (
+              <div key={group.label}>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground/45">{group.label}</p>
+                <ul className="mt-4 grid gap-2.5">
+                  {group.links.map((item) => (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={cn("text-sm text-foreground/80 transition-colors hover:text-primary", focusRing)}
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
         </div>
-      </div>
-      <div className="container mx-auto px-4 mt-16 pt-8 border-t border-foreground/10 text-xs text-foreground/40 flex flex-col md:flex-row justify-between items-center gap-4">
-        <p>&copy; {new Date().getFullYear()} {company.name}. All rights reserved.</p>
-        <p>A quiet authority in hardware.</p>
+
+        <div className="flex flex-col gap-2 border-t border-white/10 py-6 pb-[calc(1.5rem+var(--sticky-quote-bar,0px))] text-xs leading-5 text-foreground/45 sm:flex-row sm:items-baseline sm:justify-between">
+          <p>&copy; {new Date().getFullYear()} {company.name}</p>
+          <p>Al-Bayader and Al-Wehdat, Amman. Sat–Thu.</p>
+        </div>
       </div>
     </footer>
   );

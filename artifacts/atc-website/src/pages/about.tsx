@@ -6,7 +6,7 @@ import { BRAND_LOGOS, BrandMark } from "@/components/home/partner-brands";
 import { EditorialLink, Reveal, RevealGroup, Section, SolidLink, SPRING } from "@/components/home/primitives";
 import { MainLayout } from "@/components/layout/main-layout";
 import { MediaImage } from "@/components/media-image";
-import { CHAPTERS, REFERENCES, STORY_HERO, type Chapter } from "@/lib/about-content";
+import { CERTIFICATIONS, CHAPTERS, REFERENCES, STORY_HERO, type Chapter } from "@/lib/about-content";
 import { company } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -23,9 +23,9 @@ export default function About() {
     .sort((a, b) => (BRAND_ORDER.indexOf(a.slug) + 1 || 99) - (BRAND_ORDER.indexOf(b.slug) + 1 || 99));
 
   const stats: Stat[] = [
-    { value: new Date().getFullYear() - company.established, label: `Years in Amman, since ${company.established}` },
+    { value: company.established, label: "Founded in Amman" },
     { value: 3, label: "Generations of the Amara family" },
-    { value: brands.length || 11, label: "European manufacturers represented in Jordan" },
+    { value: company.partnerBrands, suffix: "+", label: "European brands, represented exclusively in Jordan" },
     { value: company.showrooms.length, label: "Showrooms, Al-Bayader and Al-Wehdat" },
   ];
 
@@ -38,17 +38,18 @@ export default function About() {
     <MainLayout immersiveHeader>
       <Prologue />
       <Story visuals={visuals} />
+      <Certifications />
 
       {/* Epilogue: the story in numbers, then the one thing to do about it. */}
       <CredibilityStrip stats={stats} />
       <Section className="py-20 md:py-28">
         <div className="grid gap-8 md:grid-cols-12 md:items-end">
           <Reveal className="md:col-span-8">
-            <p className="max-w-3xl font-display text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-6xl">Use it before you specify it.</p>
-            <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground">Both showrooms are open Saturday to Thursday. No appointment; a consultant is on the floor.</p>
+            <p className="max-w-3xl font-display text-4xl font-medium leading-[0.95] tracking-[-0.04em] md:text-6xl">Try it before you choose it.</p>
+            <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground">Both showrooms are open Saturday to Thursday. Walk in, or book a visit.</p>
           </Reveal>
           <Reveal className="md:col-span-4 md:justify-self-end" delay={0.1}>
-            <SolidLink href="/showroom">Plan a visit</SolidLink>
+            <SolidLink href="/showroom">Book a showroom visit</SolidLink>
           </Reveal>
         </div>
       </Section>
@@ -56,34 +57,32 @@ export default function About() {
   );
 }
 
-/** Opening: the title of the story over a photograph that eases away as the reader begins. */
+/** Opening: the title of the story over a full-bleed photograph that drifts as the reader begins. */
 function Prologue() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 1], reduce ? [1, 1] : [1, 1.12]);
-  const fade = useTransform(scrollYProgress, [0, 0.7], [1, reduce ? 1 : 0]);
+  const y = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "18%"]);
+  const fade = useTransform(scrollYProgress, [0, 0.6], [1, reduce ? 1 : 0]);
   const enter = (delay: number) => (reduce ? {} : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.9, ease: EASE, delay } });
 
   return (
-    <section ref={ref} className="dark relative grid min-h-[100dvh] overflow-hidden bg-background text-foreground lg:grid-cols-12" data-testid="section-about-prologue">
-      <motion.div style={{ opacity: fade }} className="relative z-10 flex flex-col justify-end px-6 pb-16 pt-32 md:px-12 md:pb-24 lg:col-span-7 lg:pt-40">
-        <motion.p {...enter(0)} className="text-xs font-medium text-foreground/60">
+    <section ref={ref} className="dark relative flex min-h-[88dvh] flex-col justify-end overflow-hidden bg-background text-foreground" data-testid="section-about-prologue">
+      <motion.div style={{ y }} className="absolute inset-0 will-change-transform">
+        <MediaImage src="/images/building-facade.webp" alt="The Amara Trading Center building, with the name set into the stone facade" width={1920} height={1080} lazy={false} fetchPriority="high" sizes="100vw" className="h-[118%] w-full object-cover object-[68%_center]" />
+      </motion.div>
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/20" aria-hidden />
+      <motion.div style={{ opacity: fade }} className="relative mx-auto w-full max-w-[1440px] px-6 pb-16 pt-44 md:px-12 md:pb-24">
+        <motion.p {...enter(0)} className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
           {STORY_HERO.kicker}
         </motion.p>
-        <motion.h1 {...enter(0.1)} className="mt-6 max-w-[18ch] font-display text-[clamp(2.75rem,5vw,5.5rem)] font-medium leading-[0.92] tracking-[-0.05em]">
+        <motion.h1 {...enter(0.1)} className="mt-5 max-w-[16ch] font-display text-[clamp(2.75rem,6vw,6.25rem)] font-medium leading-[0.9] tracking-[-0.05em]">
           {STORY_HERO.headline}
         </motion.h1>
-        <motion.p {...enter(0.2)} className="mt-8 max-w-md text-lg leading-8 text-foreground/70">
+        <motion.p {...enter(0.25)} className="mt-8 max-w-md text-lg leading-8 text-foreground/75">
           {STORY_HERO.intro}
         </motion.p>
       </motion.div>
-      <div className="relative min-h-[46dvh] lg:col-span-5 lg:min-h-0">
-        <motion.div style={{ scale }} className="absolute inset-0 origin-center will-change-transform">
-          <MediaImage src="/images/trade-planning.webp" alt="An ATC consultant and an architect reviewing a specification" width={1400} height={1750} lazy={false} fetchPriority="high" sizes="(min-width: 1024px) 42vw, 100vw" className="h-full w-full object-cover" />
-        </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent lg:bg-gradient-to-r lg:from-background lg:via-background/20 lg:to-transparent" aria-hidden />
-      </div>
     </section>
   );
 }
@@ -199,6 +198,87 @@ function BrandMarks({ brands }: { brands: Array<{ slug: string; name: string }> 
         <EditorialLink href="/brands">All brands</EditorialLink>
       </Reveal>
     </div>
+  );
+}
+
+/**
+ * Certifications on record: the standards behind the stock and the programmes ATC runs. Only
+ * published entries render; placeholders wait in the data until ATC confirms them.
+ */
+function Certifications() {
+  const published = CERTIFICATIONS.filter((item) => item.published);
+  if (published.length === 0) return null;
+  const atc = published.filter((item) => item.holder === "ATC").length;
+  const partners = published.length - atc;
+
+  return (
+    <Section dark id="certifications">
+      <Reveal className="grid gap-8 lg:grid-cols-12 lg:items-end">
+        <div className="lg:col-span-7">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">Certifications</p>
+          <h2 className="mt-4 max-w-[16ch] font-display text-5xl font-medium leading-[0.92] tracking-[-0.05em] md:text-7xl">On record.</h2>
+        </div>
+        <p className="max-w-sm text-base leading-7 text-muted-foreground lg:col-span-4 lg:col-start-9">
+          The standards the factories are held to and the programmes ATC runs itself. Nothing is listed here that cannot be produced on paper at the counter.
+        </p>
+      </Reveal>
+
+      <Reveal className="mt-12 md:mt-16">
+        <figure>
+          <div className="relative aspect-[16/9] overflow-hidden md:aspect-[2.4/1]">
+            <MediaImage
+              src="/images/showroom-certificate.webp"
+              alt="A framed Häfele certificate naming Amara Trading Center in Amman as an authorised distributor"
+              width={1600}
+              height={900}
+              sizes="(min-width: 1440px) 1200px, 100vw"
+              className="absolute inset-0 h-full w-full object-cover object-[22%_center]"
+            />
+          </div>
+          <figcaption className="mt-3 text-xs text-foreground/55">Häfele authorisation, Naples, 1 April 2016. It hangs in the showroom corridor.</figcaption>
+        </figure>
+      </Reveal>
+
+      <RevealGroup as="ul" className="mt-12 grid border-l border-t border-white/10 md:mt-16 md:grid-cols-2" aria-label="Certifications on record">
+        {published.map((item) => (
+          <motion.li
+            key={`${item.holder}-${item.mark}-${item.title}`}
+            variants={{ hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: SPRING } }}
+            className="flex min-h-[260px] flex-col justify-between border-b border-r border-white/10 p-6 md:p-8"
+            data-testid={`certification-${item.mark.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <p className="font-display text-3xl font-medium leading-none tracking-[-0.04em] md:text-4xl">{item.mark}</p>
+              <p className={cn("shrink-0 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.16em]", item.holder === "ATC" ? "bg-primary text-primary-foreground" : "border border-white/20 text-foreground/70")}>
+                {item.holder === "ATC" ? "Held by ATC" : "Partner factories"}
+              </p>
+            </div>
+            <div className="mt-8">
+              <h3 className="text-base font-medium leading-6">{item.title}</h3>
+              <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">{item.scope}</p>
+              {(item.issuer || item.year || item.document) && (
+                <p className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/60">
+                  {item.issuer && <span>{item.issuer}</span>}
+                  {item.year && <span className="font-mono tabular-nums">{item.year}</span>}
+                  {item.document && (
+                    <a href={item.document} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-4 hover:text-foreground">
+                      View certificate
+                    </a>
+                  )}
+                </p>
+              )}
+            </div>
+          </motion.li>
+        ))}
+      </RevealGroup>
+
+      <Reveal className="mt-8 flex flex-wrap items-baseline justify-between gap-4 text-xs text-foreground/50">
+        <p>
+          {partners} held by the manufacturers ATC represents, {atc} held by ATC.
+        </p>
+        <p>Certificates are available on request at either showroom.</p>
+      </Reveal>
+    </Section>
   );
 }
 

@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
 import { MediaImage } from "@/components/media-image";
+import { PhotoLightbox } from "@/components/shared/photo-lightbox";
 import { cn } from "@/lib/utils";
 
 interface ProductGalleryProps {
@@ -30,22 +30,6 @@ export function ProductGallery({ images, alt, activeIndex, onChange, badge, clas
   const previous = useCallback(() => onChange((activeIndex - 1 + count) % count), [activeIndex, count, onChange]);
   const next = useCallback(() => onChange((activeIndex + 1) % count), [activeIndex, count, onChange]);
 
-  useEffect(() => {
-    if (!lightbox) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setLightbox(false);
-      if (event.key === "ArrowLeft" && count > 1) previous();
-      if (event.key === "ArrowRight" && count > 1) next();
-    };
-    document.addEventListener("keydown", onKey);
-    const { overflow } = document.body.style;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = overflow;
-    };
-  }, [lightbox, count, previous, next]);
-
   const fade = reduceMotion
     ? { initial: { opacity: 1 }, animate: { opacity: 1 }, exit: { opacity: 1 } }
     : { initial: { opacity: 0, scale: 0.985 }, animate: { opacity: 1, scale: 1 }, exit: { opacity: 0, scale: 1.01 } };
@@ -61,6 +45,13 @@ export function ProductGallery({ images, alt, activeIndex, onChange, badge, clas
             className="absolute inset-0 flex items-center justify-center p-8 md:p-14"
           >
             {current ? (
+              <button
+                type="button"
+                onClick={() => setLightbox(true)}
+                className="h-full w-full cursor-zoom-in outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View ${alt} full screen`}
+                data-testid="button-stage-image"
+              >
               <MediaImage
                 src={current}
                 alt={alt}
@@ -72,6 +63,7 @@ export function ProductGallery({ images, alt, activeIndex, onChange, badge, clas
                 sizes="(min-width: 1024px) 58vw, 100vw"
                 className="h-full w-full object-contain mix-blend-multiply"
               />
+              </button>
             ) : (
               <span className="font-display text-3xl font-light text-muted-foreground/60">{alt}</span>
             )}
@@ -145,56 +137,14 @@ export function ProductGallery({ images, alt, activeIndex, onChange, badge, clas
         </ul>
       )}
 
-      {createPortal(
-      <AnimatePresence>
-        {lightbox && current && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[60] flex items-center justify-center bg-background/95 p-4 md:p-12"
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${alt}, enlarged`}
-            onClick={() => setLightbox(false)}
-          >
-            <motion.div
-              initial={reduceMotion ? undefined : { scale: 0.96, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={reduceMotion ? undefined : { scale: 0.98, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 260, damping: 28 }}
-              className="relative flex h-full w-full max-w-6xl items-center justify-center bg-background"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <MediaImage src={current} alt={alt} width={1600} height={1200} lazy={false} sizes="90vw" className="max-h-full max-w-full object-contain p-6 md:p-12" />
-              <button
-                type="button"
-                onClick={() => setLightbox(false)}
-                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center border border-border bg-background text-foreground transition hover:bg-accent"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" strokeWidth={1.5} />
-              </button>
-              {count > 1 && (
-                <>
-                  <button type="button" onClick={previous} className="absolute left-2 top-1/2 -translate-y-1/2 p-3 text-foreground/60 hover:text-foreground" aria-label="Previous image">
-                    <ChevronLeft className="h-8 w-8" strokeWidth={1.25} />
-                  </button>
-                  <button type="button" onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 p-3 text-foreground/60 hover:text-foreground" aria-label="Next image">
-                    <ChevronRight className="h-8 w-8" strokeWidth={1.25} />
-                  </button>
-                </>
-              )}
-              <span className="absolute bottom-4 left-5 font-mono text-xs tabular-nums tracking-[0.2em] text-muted-foreground">
-                {pad(activeIndex + 1)} / {pad(count)}
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>,
-      document.body,
-      )}
+      <PhotoLightbox
+        photos={images.map((src) => ({ src, alt }))}
+        index={lightbox && current ? activeIndex : null}
+        onChange={onChange}
+        onClose={() => setLightbox(false)}
+        label={alt}
+        surface="light"
+      />
     </div>
   );
 }

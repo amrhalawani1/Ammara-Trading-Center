@@ -42,6 +42,11 @@ export function getEnv(): ServerEnv {
   return cached;
 }
 
+export function clerkIsConfigured(env: ServerEnv = getEnv()): boolean {
+  const key = env.CLERK_PUBLISHABLE_KEY ?? "";
+  return Boolean(env.CLERK_SECRET_KEY && (key.startsWith("pk_test_") || key.startsWith("pk_live_")));
+}
+
 export function corsOrigins(env: ServerEnv = getEnv()): string[] {
   const fromEnv = (env.CORS_ORIGIN ?? "")
     .split(",")

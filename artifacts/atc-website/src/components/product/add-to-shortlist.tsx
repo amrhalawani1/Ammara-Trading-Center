@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
-import { Bookmark, Check } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Check } from "lucide-react";
 import { btn } from "@/components/lists/ui";
 import { useShortlists } from "@/hooks/use-shortlists";
+import { track } from "@/lib/analytics";
+import { noteGuestSave } from "@/lib/guest-save";
 import type { NewItem } from "@/lib/shortlists";
 
 const ADDED_MS = 1800;
@@ -9,9 +11,9 @@ const ADDED_MS = 1800;
 /**
  * Saves the product, in the finish or size currently chosen, to one of the visitor's project
  * shortlists. The dropdown remembers the last list used; adding the same item again raises its
- * quantity rather than adding a second line. The button reads "Added" for a moment afterwards.
+ * quantity rather than adding a second line. The button reads "Saved" for a moment afterwards.
  */
-export function AddToShortlist({ item }: { item: NewItem }) {
+export function AddToShortlist({ item, trailing }: { item: NewItem; trailing?: ReactNode }) {
   const { lists, activeListId, setActiveList, addItem } = useShortlists();
   const [added, setAdded] = useState(false);
 
@@ -23,17 +25,19 @@ export function AddToShortlist({ item }: { item: NewItem }) {
 
   const add = () => {
     addItem(activeListId, item);
+    noteGuestSave();
+    track("add_to_quote", { item_id: item.slug, item_variant: item.variant ?? undefined });
     setAdded(true);
   };
 
   return (
-    <div className="mt-4 flex gap-2" data-testid="add-to-shortlist">
-      <label className="sr-only" htmlFor="shortlist-target">Choose project shortlist</label>
+    <div className="space-y-2" data-testid="add-to-shortlist">
+      <label className="sr-only" htmlFor="shortlist-target">Quote list</label>
       <select
         id="shortlist-target"
         value={activeListId}
         onChange={(event) => setActiveList(event.target.value)}
-        className="h-11 min-w-0 flex-1 border border-border bg-card px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="h-11 w-full border border-border bg-card px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         data-testid="select-shortlist"
       >
         {lists.map((list) => (
@@ -42,10 +46,13 @@ export function AddToShortlist({ item }: { item: NewItem }) {
           </option>
         ))}
       </select>
-      <button type="button" onClick={add} className={btn("outline", "shrink-0")} aria-live="polite" data-testid="button-add-to-shortlist">
-        {added ? <Check /> : <Bookmark />}
-        {added ? "Added" : "Add to shortlist"}
-      </button>
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" onClick={add} className={btn("primary", "w-full")} aria-live="polite" data-testid="button-add-to-shortlist">
+          {added ? <Check /> : null}
+          {added ? "Added" : "Add to quote"}
+        </button>
+        {trailing}
+      </div>
     </div>
   );
 }

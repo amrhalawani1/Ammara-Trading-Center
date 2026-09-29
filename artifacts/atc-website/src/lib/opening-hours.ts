@@ -1,5 +1,5 @@
 /**
- * Reads the human hours strings in company.showrooms ("Sat - Thu, 9AM - 6PM") and answers
+ * Reads the human hours strings in company.showrooms ("Sat–Thu, 9 am–6 pm") and answers
  * whether a showroom is open right now in Amman. Unparseable strings return null so the UI
  * simply shows the string.
  */
@@ -20,7 +20,7 @@ function parseTime(value: string): number | null {
 }
 
 export function parseHours(hours: string): Schedule | null {
-  const m = /^([A-Za-z]{3})\s*-\s*([A-Za-z]{3}),\s*(.+?)\s*-\s*(.+)$/.exec(hours.trim());
+  const m = /^([A-Za-z]{3})\s*[-–]\s*([A-Za-z]{3}),\s*(.+?)\s*[-–]\s*(.+)$/.exec(hours.trim());
   if (!m) return null;
   const from = DAYS.indexOf(m[1]!.toLowerCase());
   const to = DAYS.indexOf(m[2]!.toLowerCase());
@@ -37,13 +37,13 @@ export function parseHours(hours: string): Schedule | null {
 
 export interface OpenStatus {
   open: boolean;
-  /** "Open until 6PM" or "Closed, opens Sat 9AM". */
+  /** "Open until 6 pm" or "Closed, opens Sat 9 am". */
   label: string;
 }
 
 const formatTime = (minutes: number) => {
   const h = Math.floor(minutes / 60);
-  const suffix = h >= 12 ? "PM" : "AM";
+  const suffix = h >= 12 ? " pm" : " am";
   const hour = h % 12 === 0 ? 12 : h % 12;
   const mins = minutes % 60;
   return `${hour}${mins ? `:${String(mins).padStart(2, "0")}` : ""}${suffix}`;

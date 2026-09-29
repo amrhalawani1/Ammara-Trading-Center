@@ -1,5 +1,7 @@
 # ATC Phase 1 IA & Content Requirements
 
+> **Partly superseded.** Product, catalogue, and brand behaviour — including price, downloads, and the quote list — are defined in [specs/product-page.md](specs/product-page.md). Where this file disagrees, that spec wins. A public price or “Price on request” is allowed. A file with a real URL downloads directly. A cart is allowed only when `sellOnline` is true. Checkout and payment stay out of scope. Quote and WhatsApp stay the primary actions.
+
 This is the content reference for the first informative website release. The
 site is a showroom and inquiry experience, not an e-commerce catalogue.
 
@@ -37,8 +39,8 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
 
 ## Project shortlists (`/lists`)
 
-- Device-local lists of product references, one per project. Created and renamed on the page; the default list is "New project shortlist".
-- Product pages carry "Choose project shortlist" and "Add to shortlist"; the same finish or size added twice raises the quantity instead of adding a line.
+- Device-local lists of product references, one per project. Created and renamed on the page; the default list is "New project shortlist". An optional trade account syncs those lists across devices; Save never requires login.
+- Product pages carry "Add to quote". The same finish or size added twice raises the quantity instead of adding a line. See the product page spec for the quote list.
 - Each list can be sent as an enquiry to ATC (project details form, reference `ATC-YYMMDD-XXXX`), on WhatsApp, or by email. Empty lists cannot be sent.
 
 ## About Us
@@ -57,7 +59,8 @@ site is a showroom and inquiry experience, not an e-commerce catalogue.
 
 ## Content boundaries
 
-- Never add checkout, cart, payment, online purchasing, or account flows.
+- Never add checkout or payment. A cart control is allowed only when `sellOnline` is true, as defined in the product page spec.
+- Optional trade accounts are allowed. They must never be required for inquiry, Save, or showroom booking.
 - Never invent client names, project references, certifications, or product
   availability.
 - Use the website palette and typography system: cream, dark brown, restrained

@@ -3,20 +3,26 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, Copy } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { TradePrefill } from "@/components/account/trade-prefill";
 import { useCreateInquiry } from "@workspace/api-client-react";
+import { Link } from "wouter";
 import { btn, field } from "@/components/lists/ui";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { apiErrorMessage } from "@/lib/api-error";
+import { publicEnv } from "@/lib/env";
+import { FORM_MESSAGES } from "@/lib/form-messages";
+import { TIMINGS } from "@/lib/inquiry-options";
 import { enquiryMessage } from "@/lib/shortlist-message";
-import { referenceCount, type Shortlist } from "@/lib/shortlists";
+import { productCount, type Shortlist } from "@/lib/shortlists";
+import { recordLocalInquiry } from "@/lib/trade-inquiries";
 import { cn } from "@/lib/utils";
 
 const schema = z.object({
-  name: z.string().trim().min(2, "Your name, at least two characters."),
+  name: z.string().trim().min(2, FORM_MESSAGES.name),
   company: z.string().trim().max(120).optional(),
-  email: z.string().trim().email("An email address we can reply to."),
-  phone: z.string().trim().min(6, "A phone number we can call."),
+  email: z.string().trim().email(FORM_MESSAGES.email),
+  phone: z.string().trim().min(6, FORM_MESSAGES.phone),
   projectType: z.string().trim().max(80).optional(),
   timeline: z.string().trim().max(80).optional(),
   notes: z.string().trim().max(4000).optional(),
@@ -26,16 +32,34 @@ type Values = z.infer<typeof schema>;
 const label = "text-sm font-medium leading-none";
 
 /**
- * Project details for a shortlist enquiry. On success the dialog shows the reference ATC issued,
+ * Project details for a shortlist enquiry. On success the dialog shows the enquiry ref. ATC issued,
  * which the visitor quotes when they call or write.
  */
 export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; open: boolean; onOpenChange: (open: boolean) => void }) {
+  return (
+    <TradePrefill>
+      {(prefill) => <EnquiryDialogForm key={`${prefill.email}-${open}`} list={list} open={open} onOpenChange={onOpenChange} prefill={prefill} />}
+    </TradePrefill>
+  );
+}
+
+function EnquiryDialogForm({
+  list,
+  open,
+  onOpenChange,
+  prefill,
+}: {
+  list: Shortlist;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  prefill: { name: string; email: string; company: string };
+}) {
   const inquiry = useCreateInquiry();
   const [reference, setReference] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
-    defaultValues: { name: "", company: "", email: "", phone: "", projectType: "", timeline: "", notes: "" },
+    defaultValues: { name: prefill.name, company: prefill.company, email: prefill.email, phone: "", projectType: "", timeline: "", notes: "" },
   });
 
   useEffect(() => {
@@ -62,7 +86,20 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
           items: list.items.map(({ slug, name, brandName, reference: ref, variant, quantity }) => ({ slug, name, brandName, reference: ref || null, variant, quantity })),
         },
       },
-      { onSuccess: (result) => setReference(result.reference) },
+      {
+        onSuccess: (result) => {
+          if (!publicEnv.clerkIsConfigured) {
+            recordLocalInquiry({
+              email: values.email,
+              reference: result.reference,
+              kind: "shortlist",
+              listName: list.name,
+              message: enquiryMessage(list, values.notes ?? ""),
+            });
+          }
+          setReference(result.reference);
+        },
+      },
     );
   };
 
@@ -82,8 +119,8 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
         {reference ? (
           <div className="grid gap-4" data-testid="enquiry-success">
             <DialogHeader>
-              <DialogTitle className="font-display text-2xl font-medium tracking-[-0.02em]">Sent to ATC.</DialogTitle>
-              <DialogDescription>Quote this reference when you call or write. Our specification team replies with availability and project terms.</DialogDescription>
+              <DialogTitle className="font-display text-2xl font-medium tracking-[-0.02em]">Enquiry sent.</DialogTitle>
+              <DialogDescription>Quote this enquiry ref. when you call or write. A consultant will reply with availability for your project.</DialogDescription>
             </DialogHeader>
             <div className="flex items-center justify-between gap-4 border border-border bg-card px-5 py-4">
               <span className="font-mono text-xl tracking-[0.12em] text-foreground" data-testid="text-enquiry-reference">{reference}</span>
@@ -92,7 +129,10 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
                 {copied ? "Copied" : "Copy"}
               </button>
             </div>
-            <div className="flex sm:justify-end">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+              <Link href="/account/inquiries" className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary" data-testid="link-enquiry-account">
+                View in your account
+              </Link>
               <button type="button" onClick={() => onOpenChange(false)} className={btn("outline")} data-testid="button-enquiry-close">
                 Close
               </button>
@@ -104,7 +144,7 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
               <DialogHeader>
                 <DialogTitle className="font-display text-2xl font-medium tracking-[-0.02em]">Send “{list.name}” to ATC.</DialogTitle>
                 <DialogDescription>
-                  {referenceCount(list.items.length)} with quantities will reach our specification team together with your project details.
+                  {productCount(list.items.length)} and quantities go to a consultant with your project details.
                 </DialogDescription>
               </DialogHeader>
 
@@ -146,8 +186,13 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
                 )} />
                 <FormField control={form.control} name="timeline" render={({ field: f }) => (
                   <FormItem className="grid gap-2">
-                    <label htmlFor="enq-timeline" className={label}>Timeline</label>
-                    <FormControl><input id="enq-timeline" {...f} placeholder="For example, within six weeks" className={field} data-testid="input-enquiry-timeline" /></FormControl>
+                    <label htmlFor="enq-timeline" className={label}>When do you need it?</label>
+                    <FormControl>
+                      <select id="enq-timeline" {...f} className={field} data-testid="input-enquiry-timeline">
+                        <option value="">Choose one</option>
+                        {TIMINGS.map((item) => <option key={item} value={item}>{item}</option>)}
+                      </select>
+                    </FormControl>
                     <FormMessage className="mt-0" />
                   </FormItem>
                 )} />
@@ -162,13 +207,13 @@ export function EnquiryDialog({ list, open, onOpenChange }: { list: Shortlist; o
 
               {inquiry.isError && (
                 <p className="text-sm text-primary" role="alert" data-testid="text-enquiry-error">
-                  {apiErrorMessage(inquiry.error, "The enquiry could not be sent. Try again, or send the list on WhatsApp.")}
+                  {apiErrorMessage(inquiry.error, "Enquiry not sent. Try again, or send the shortlist on WhatsApp.")}
                 </p>
               )}
 
               <div className="flex flex-col-reverse sm:flex-row sm:justify-end">
                 <button type="submit" disabled={inquiry.isPending || list.items.length === 0} className={btn("primary")} data-testid="button-enquiry-submit">
-                  {inquiry.isPending ? "Sending" : "Send enquiry"}
+                  {inquiry.isPending ? "Sending…" : "Send enquiry"}
                 </button>
               </div>
             </form>

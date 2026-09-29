@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "wouter";
 import { MediaImage } from "@/components/media-image";
@@ -17,45 +17,28 @@ interface SolutionsExplorerProps {
 const countLabel = (count: number, isLoading: boolean) => (isLoading ? "" : count > 0 ? `${count} ${count === 1 ? "product" : "products"}` : "On request");
 
 /**
- * Solutions as a pinned takeover: the section holds the viewport while scrolling walks through
- * the eleven solution areas, each taking the whole stage with its photograph. Phones and reduced
- * motion get a horizontal snap gallery instead of the pin.
+ * Solutions as one screen: hovering a category swaps the photograph and the copy.
+ * Scrolling moves on to the next section. Phones and reduced motion get a horizontal snap gallery.
  */
 export function SolutionsExplorer({ counts, isLoading }: SolutionsExplorerProps) {
-  const pinned = useMediaQuery("(min-width: 1024px)");
+  const wide = useMediaQuery("(min-width: 1024px)");
   const reduce = useReducedMotion();
   return (
     <div className="dark bg-background text-foreground">
-      {pinned && !reduce ? <PinnedSolutions counts={counts} isLoading={isLoading} /> : <SolutionGallery counts={counts} isLoading={isLoading} />}
+      {wide && !reduce ? <HoverSolutions counts={counts} isLoading={isLoading} /> : <SolutionGallery counts={counts} isLoading={isLoading} />}
     </div>
   );
 }
 
-function PinnedSolutions({ counts, isLoading }: SolutionsExplorerProps) {
-  const ref = useRef<HTMLDivElement>(null);
+function HoverSolutions({ counts, isLoading }: SolutionsExplorerProps) {
   const [active, setActive] = useState(0);
-  const total = SOLUTIONS.length;
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  useMotionValueEvent(scrollYProgress, "change", (value) => {
-    const next = Math.min(total - 1, Math.max(0, Math.floor(value * total)));
-    if (next !== active) setActive(next);
-  });
-
-  const jumpTo = (index: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const travel = el.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + (travel * (index + 0.5)) / total, behavior: "smooth" });
-  };
 
   const solution = SOLUTIONS[active]!;
   const visual = SOLUTION_IMAGES[solution.slug] ?? SOLUTION_IMAGES["kitchen-storage"]!;
   const count = counts.get(solution.name) ?? 0;
 
   return (
-    <div ref={ref} style={{ height: `${total * 60}vh` }} className="relative">
-      <div className="sticky top-0 h-[100dvh] overflow-hidden bg-background">
+    <div className="relative h-[100dvh] overflow-hidden bg-background">
         <AnimatePresence mode="sync" initial={false}>
           <motion.div key={solution.slug} initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }} className="absolute inset-0">
             <MediaImage src={visual.image} alt={visual.alt} width={1920} height={1080} className="h-full w-full object-cover opacity-60" />
@@ -64,7 +47,7 @@ function PinnedSolutions({ counts, isLoading }: SolutionsExplorerProps) {
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/10" />
 
         <div className="relative mx-auto grid h-full max-w-[1440px] grid-cols-12 items-center gap-8 px-12">
-          <ol className="col-span-5 max-h-[80dvh] overflow-hidden" aria-label="Solutions">
+          <ol className="col-span-5" aria-label="Solutions">
             {SOLUTIONS.map((item, index) => {
               const isActive = index === active;
               const cnt = counts.get(item.name) ?? 0;
@@ -72,7 +55,8 @@ function PinnedSolutions({ counts, isLoading }: SolutionsExplorerProps) {
                 <li key={item.slug}>
                   <button
                     type="button"
-                    onClick={() => jumpTo(index)}
+                    onMouseEnter={() => setActive(index)}
+                    onFocus={() => setActive(index)}
                     aria-current={isActive ? "true" : undefined}
                     className={cn("flex w-full items-baseline justify-between gap-6 py-1.5 text-left font-display font-medium tracking-[-0.03em] transition-[color,font-size] duration-300", isActive ? "text-2xl text-foreground xl:text-3xl" : "text-lg text-foreground/35 hover:text-foreground/70")}
                     data-testid={`button-home-solution-${item.slug}`}
@@ -97,12 +81,7 @@ function PinnedSolutions({ counts, isLoading }: SolutionsExplorerProps) {
             </AnimatePresence>
           </div>
         </div>
-
-        <div className="absolute bottom-0 left-0 h-1 w-full bg-foreground/10" aria-hidden>
-          <motion.div style={{ scaleX: scrollYProgress }} className="h-full w-full origin-left bg-primary" />
-        </div>
       </div>
-    </div>
   );
 }
 

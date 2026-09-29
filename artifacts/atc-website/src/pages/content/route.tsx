@@ -1,37 +1,26 @@
-import { ClerkProvider, useAuth, useClerk, useUser } from "@clerk/react";
-import { publishableKeyFromHost } from "@clerk/react/internal";
+import { useState } from "react";
+import { useAuth, useClerk, useUser } from "@clerk/react";
 import { useQuery } from "@tanstack/react-query";
-import { Redirect, useLocation } from "wouter";
+import { Redirect } from "wouter";
 import { AuthUnavailablePage } from "@/components/auth-unavailable";
-import { basePath, clerkAppearance, stripBase } from "@/lib/clerk";
+import { ConfirmDialog } from "@/components/confirm-dialog";
+import { basePath } from "@/lib/clerk";
 import { publicEnv } from "@/lib/env";
 import ContentWorkspace from "@/pages/content/index";
 
 export default function ContentRoute() {
-  const [, setLocation] = useLocation();
-
   if (!publicEnv.clerkIsConfigured) {
     return <AuthUnavailablePage title="Staff workspace" />;
   }
 
-  return (
-    <ClerkProvider
-      publishableKey={publishableKeyFromHost(window.location.hostname, publicEnv.clerkPublishableKey)}
-      proxyUrl={publicEnv.clerkProxyUrl}
-      appearance={clerkAppearance}
-      signInUrl={`${basePath}/sign-in`}
-      routerPush={(to) => setLocation(stripBase(to))}
-      routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
-    >
-      <StaffContentRoute />
-    </ClerkProvider>
-  );
+  return <StaffContentRoute />;
 }
 
 function StaffContentRoute() {
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const { signOut } = useClerk();
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
 
   // Fail-closed: any network/response error resolves to "denied" rather than
   // surfacing a Query error state, matching the access gate's prior behavior.
@@ -75,10 +64,20 @@ function StaffContentRoute() {
           <button
             type="button"
             className="text-xs font-bold uppercase tracking-widest text-primary hover:text-foreground"
-            onClick={() => signOut({ redirectUrl: basePath || "/" })}
+            onClick={() => setConfirmSignOut(true)}
           >
             Sign out
           </button>
+          <ConfirmDialog
+            open={confirmSignOut}
+            onOpenChange={setConfirmSignOut}
+            title="Sign out?"
+            description="This ends the session on this device."
+            confirmLabel="Sign out"
+            onConfirm={() => signOut({ redirectUrl: basePath || "/" })}
+            testId="dialog-sign-out"
+            confirmTestId="button-confirm-sign-out"
+          />
         </div>
       </div>
     );

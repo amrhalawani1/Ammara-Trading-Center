@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import type { Product } from "@workspace/api-client-react";
 import { MediaImage } from "@/components/media-image";
 import { FinishSwatches } from "@/components/catalog/finish-swatches";
+import { ShortlistPicker } from "@/components/catalog/shortlist-picker";
 import { designerOf } from "@/lib/catalog-filters";
 import { isNew, primaryImage, productType, variantSummary } from "@/lib/product-media";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,7 @@ interface CatalogRowProps {
   onToggleCompare: (slug: string) => void;
 }
 
-export const ROW_GRID = "grid grid-cols-[3rem_minmax(0,1fr)_2.5rem] items-center gap-4 md:grid-cols-[3.5rem_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_6.5rem]";
+export const ROW_GRID = "grid grid-cols-[3rem_minmax(0,1fr)_5.5rem] items-center gap-4 md:grid-cols-[3.5rem_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,0.9fr)_minmax(0,0.8fr)_12rem]";
 
 /** Index view: one product per line, the way a specifier reads a price list. */
 export const CatalogRow = memo(function CatalogRow({ product, index = 0, compared, compareFull, onToggleCompare }: CatalogRowProps) {
@@ -61,22 +62,37 @@ export const CatalogRow = memo(function CatalogRow({ product, index = 0, compare
         <span aria-hidden />
       </Link>
 
-      <button
-        type="button"
-        onClick={() => onToggleCompare(product.slug)}
-        disabled={disabled}
-        aria-pressed={compared}
-        aria-label={compared ? `Remove ${product.name} from comparison` : `Add ${product.name} to comparison`}
-        title={disabled ? "You can compare up to 4 products" : compared ? "Comparing" : "Compare"}
-        className={cn(
-          "absolute right-2 top-1/2 inline-flex h-9 -translate-y-1/2 items-center justify-center gap-1.5 px-2 text-xs font-medium transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 md:px-3",
-          compared ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-foreground hover:text-background",
-        )}
-        data-testid={`button-compare-${product.slug}`}
-      >
-        {compared ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />}
-        <span className="hidden md:inline">{compared ? "Comparing" : "Compare"}</span>
-      </button>
+      <div className="absolute right-2 top-1/2 z-20 flex -translate-y-1/2 items-center">
+        <ShortlistPicker
+          item={{
+            key: product.slug,
+            slug: product.slug,
+            name: product.name,
+            brandName: product.brandName,
+            reference: product.sku?.trim() || product.slug,
+            variant: null,
+            image: primary,
+          }}
+          variant="inline"
+          testId={`button-shortlist-${product.slug}`}
+        />
+        <button
+          type="button"
+          onClick={() => onToggleCompare(product.slug)}
+          disabled={disabled}
+          aria-pressed={compared}
+          aria-label={compared ? `Remove ${product.name} from comparison` : `Add ${product.name} to comparison`}
+          title={disabled ? "You can compare up to 4 products" : compared ? "Comparing" : "Compare"}
+          className={cn(
+            "inline-flex h-9 items-center justify-center gap-1.5 px-2 text-xs font-medium transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 md:px-3",
+            compared ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-foreground hover:text-background",
+          )}
+          data-testid={`button-compare-${product.slug}`}
+        >
+          {compared ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} /> : <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />}
+          <span className="hidden md:inline">{compared ? "Comparing" : "Compare"}</span>
+        </button>
+      </div>
     </motion.li>
   );
 });

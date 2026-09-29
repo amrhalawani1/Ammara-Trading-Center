@@ -24,16 +24,20 @@ export function iconForSpec(label: string): LucideIcon {
   return ICONS.find(([pattern]) => pattern.test(label))?.[1] ?? Info;
 }
 
-/** Key facts as one thin-ruled row: no boxes, DND's restraint with Häfele's usefulness. */
+/** Key facts as one thin-ruled row. On a phone the row scrolls sideways; from `lg` it sits in columns. */
 export function ProductFacts({ specs }: { specs: Spec[] }) {
-  const facts = specs.filter((spec) => !/designer/i.test(spec.label)).slice(0, 4);
+  const facts = specs.filter((spec) => !/designer/i.test(spec.label)).slice(0, 6);
   if (facts.length === 0) return null;
   return (
-    <dl className="grid grid-cols-2 border-y border-border md:grid-cols-4 md:divide-x md:divide-border" data-testid="product-facts">
+    <dl
+      className="flex snap-x snap-mandatory overflow-x-auto border-y border-border [scrollbar-width:none] lg:grid lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+      style={{ gridTemplateColumns: `repeat(${facts.length}, minmax(0, 1fr))` }}
+      data-testid="product-facts"
+    >
       {facts.map((fact) => {
         const Icon = iconForSpec(fact.label);
         return (
-          <div key={fact.label} className="py-6 md:px-6 md:first:pl-0 md:last:pr-0">
+          <div key={fact.label} className="min-w-[46%] shrink-0 snap-start border-r border-border px-4 py-5 last:border-r-0 lg:min-w-0 lg:px-6 lg:first:pl-0 lg:last:border-r-0 lg:last:pr-0">
             <dt className="flex items-center gap-2 text-xs text-muted-foreground">
               <Icon className="h-3.5 w-3.5" strokeWidth={1.5} aria-hidden /> {fact.label}
             </dt>

@@ -26,6 +26,11 @@ export const inquiriesTable = pgTable("catalog_inquiries", {
   listName: text("list_name"),
   timeline: text("timeline"),
   items: jsonb("items").$type<ShortlistInquiryItem[]>(),
+  /** Present when the visitor was signed in, or claimed later by matching email. */
+  clerkUserId: text("clerk_user_id"),
+  /** Workflow for the staff inbox and the trade account history. */
+  status: text("status").notNull().default("submitted"),
+  statusUpdatedAt: timestamp("status_updated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

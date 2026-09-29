@@ -18,4 +18,4 @@ export const btn = (variant: keyof typeof variants, className?: string) => cn(ba
 
 /** Text inputs in the shortlist forms. */
 export const field =
-  "flex h-11 w-full border border-border bg-card px-3 py-2 text-base text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm";
+  "flex h-12 w-full border border-border bg-muted/70 px-3.5 py-2 text-base text-foreground outline-none transition-[border-color,background-color,box-shadow] placeholder:text-muted-foreground hover:border-foreground/25 focus:border-primary focus:bg-background focus-visible:ring-2 focus-visible:ring-foreground/10";

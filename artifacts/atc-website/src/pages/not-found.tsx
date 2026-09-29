@@ -6,14 +6,18 @@ export default function NotFound() {
   return (
     <MainLayout>
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center min-h-[60vh]">
-        <h1 className="text-6xl font-display text-primary mb-4 tracking-wider">404</h1>
-        <h2 className="text-2xl font-display mb-4">Page not found</h2>
+        <h1 className="text-3xl font-display mb-4">Page not found</h1>
         <p className="text-muted-foreground max-w-md mx-auto mb-8">
-          The page you are looking for does not exist or has been moved.
+          This page has moved or no longer exists. Search for a product, or start from the homepage.
         </p>
-        <Button asChild variant="outline">
-          <Link href="/">Return to Home</Link>
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button asChild>
+            <Link href="/catalog" data-testid="link-not-found-search">Search products</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link href="/" data-testid="link-not-found-home">Go to homepage</Link>
+          </Button>
+        </div>
       </div>
     </MainLayout>
   );

@@ -169,7 +169,25 @@ before(async () => {
       list_name text,
       timeline text,
       items jsonb,
+      clerk_user_id text,
+      status text NOT NULL DEFAULT 'submitted',
+      status_updated_at timestamptz,
       created_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE ${testSchema}.trade_profiles (
+      id serial PRIMARY KEY,
+      clerk_user_id text NOT NULL UNIQUE,
+      email text NOT NULL,
+      name text,
+      company text,
+      role text,
+      created_at timestamptz NOT NULL DEFAULT now(),
+      updated_at timestamptz NOT NULL DEFAULT now()
+    );
+    CREATE TABLE ${testSchema}.trade_shortlists (
+      clerk_user_id text PRIMARY KEY,
+      state jsonb NOT NULL,
+      updated_at timestamptz NOT NULL DEFAULT now()
     );
   `);
   const isolatedUrl = new URL(testDatabaseUrl);
@@ -220,6 +238,8 @@ test("every content endpoint rejects anonymous and signed-in non-staff requests"
     ["PUT", "/api/content/products/999999"],
     ["DELETE", "/api/content/products/999999"],
     ["POST", "/api/content/import"],
+    ["GET", "/api/content/inquiries"],
+    ["PATCH", "/api/content/inquiries/1"],
   ];
 
   for (const [method, path] of protectedRequests) {
@@ -428,4 +448,164 @@ test("public visitors can submit a valid inquiry and invalid bodies are rejected
 
   const anonymousProtected = await request("/api/content/access");
   assert.equal(anonymousProtected.status, 401);
+});
+
+test("guest inquiries stay public and signed-in inquiries attach to the account", async () => {
+  const guest = await request("/api/inquiries", {
+    method: "POST",
+    body: {
+      kind: "general",
+      name: "Guest Buyer",
+      email: "buyer@example.com",
+      message: "Please confirm availability for a hotel floor.",
+    },
+  });
+  assert.equal(guest.status, 201);
+  const guestRef = (await json(guest)).reference;
+  const guestRow = await adminClient.query(
+    `SELECT clerk_user_id, status FROM ${testSchema}.catalog_inquiries WHERE reference = $1`,
+    [guestRef],
+  );
+  assert.equal(guestRow.rows[0].clerk_user_id, null);
+  assert.equal(guestRow.rows[0].status, "submitted");
+
+  const attached = await request("/api/inquiries", {
+    method: "POST",
+    userId: NON_STAFF_ID,
+    body: {
+      kind: "general",
+      name: "Signed Buyer",
+      email: "signed@example.com",
+      message: "Please confirm availability for a hotel floor.",
+    },
+  });
+  assert.equal(attached.status, 201);
+  const attachedRef = (await json(attached)).reference;
+  const attachedRow = await adminClient.query(
+    `SELECT clerk_user_id FROM ${testSchema}.catalog_inquiries WHERE reference = $1`,
+    [attachedRef],
+  );
+  assert.equal(attachedRow.rows[0].clerk_user_id, NON_STAFF_ID);
+
+  assert.equal((await request("/api/account/inquiries")).status, 401);
+  const mine = await request("/api/account/inquiries", { userId: NON_STAFF_ID });
+  assert.equal(mine.status, 200);
+  const mineBody = await json(mine);
+  assert.ok(mineBody.some((row) => row.reference === attachedRef));
+  assert.ok(!mineBody.some((row) => row.reference === guestRef));
+});
+
+test("signing in claims guest inquiries by email and staff can set status", async () => {
+  const created = await request("/api/inquiries", {
+    method: "POST",
+    body: {
+      kind: "general",
+      name: "Procure Lead",
+      email: "procure@example.com",
+      message: "Need a vendor file for a government project.",
+    },
+  });
+  const reference = (await json(created)).reference;
+
+  const profile = await request("/api/account/profile", {
+    method: "PUT",
+    userId: NON_STAFF_ID,
+    body: { email: "procure@example.com", name: "Procure Lead", company: "Ministry", role: "procurement" },
+  });
+  assert.equal(profile.status, 200);
+
+  const claimed = await request("/api/account/inquiries", { userId: NON_STAFF_ID });
+  assert.equal(claimed.status, 200);
+  assert.ok((await json(claimed)).some((row) => row.reference === reference));
+
+  const inbox = await request("/api/content/inquiries", { userId: STAFF_ID });
+  assert.equal(inbox.status, 200);
+  const row = (await json(inbox)).find((item) => item.reference === reference);
+  assert.ok(row);
+
+  const patched = await request(`/api/content/inquiries/${row.id}`, {
+    method: "PATCH",
+    userId: STAFF_ID,
+    body: { status: "in_progress" },
+  });
+  assert.equal(patched.status, 200);
+  assert.equal((await json(patched)).status, "in_progress");
+
+  const history = await json(await request("/api/account/inquiries", { userId: NON_STAFF_ID }));
+  assert.equal(history.find((item) => item.reference === reference).status, "in_progress");
+});
+
+test("account shortlists merge on first save and stay private to the user", async () => {
+  assert.equal((await request("/api/account/shortlists")).status, 401);
+  const first = await request("/api/account/shortlists", {
+    method: "PUT",
+    userId: NON_STAFF_ID,
+    body: {
+      merge: true,
+      state: {
+        version: 1,
+        activeListId: "local-1",
+        lists: [
+          {
+            id: "local-1",
+            name: "Villa kitchen",
+            createdAt: "2026-01-01T00:00:00.000Z",
+            items: [
+              {
+                key: "ginkgo",
+                slug: "ginkgo",
+                name: "Ginkgo",
+                brandName: "DND",
+                reference: "GK11",
+                variant: null,
+                image: null,
+                quantity: 2,
+                addedAt: "2026-01-01T00:00:00.000Z",
+                kind: "product",
+              },
+            ],
+          },
+        ],
+      },
+    },
+  });
+  assert.equal(first.status, 200);
+  const second = await request("/api/account/shortlists", {
+    method: "PUT",
+    userId: NON_STAFF_ID,
+    body: {
+      merge: true,
+      state: {
+        version: 1,
+        activeListId: "local-2",
+        lists: [
+          {
+            id: "local-2",
+            name: "Villa kitchen",
+            createdAt: "2026-02-01T00:00:00.000Z",
+            items: [
+              {
+                key: "ginkgo",
+                slug: "ginkgo",
+                name: "Ginkgo",
+                brandName: "DND",
+                reference: "GK11",
+                variant: null,
+                image: null,
+                quantity: 1,
+                addedAt: "2026-02-01T00:00:00.000Z",
+                kind: "product",
+              },
+            ],
+          },
+        ],
+      },
+    },
+  });
+  assert.equal(second.status, 200);
+  const merged = await json(second);
+  assert.equal(merged.lists[0].items[0].quantity, 3);
+
+  const other = await json(await request("/api/account/shortlists", { userId: STAFF_ID }));
+  assert.equal(other.lists[0].items.length, 0);
 });

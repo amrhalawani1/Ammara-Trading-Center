@@ -42,6 +42,38 @@ export function useCompare() {
   return { slugs, toggle, remove, clear };
 }
 
+function compareStatus(count: number) {
+  const room = COMPARE_LIMIT - count;
+  if (count < 2) return "Add one more to compare";
+  if (room === 0) return "Ready to compare";
+  return `Ready to compare · add up to ${room} more`;
+}
+
+function TrayActions({ ready, onOpen, onClear, className }: { ready: boolean; onOpen: () => void; onClear: () => void; className?: string }) {
+  return (
+    <div className={cn("flex shrink-0 items-center gap-2", className)}>
+      <button
+        type="button"
+        onClick={onOpen}
+        disabled={!ready}
+        className="inline-flex h-10 items-center gap-2 bg-primary px-4 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-45"
+        data-testid="button-open-compare"
+      >
+        Compare
+        <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
+      </button>
+      <button
+        type="button"
+        onClick={onClear}
+        className="inline-flex h-10 w-10 items-center justify-center bg-background/10 text-background transition hover:bg-background/20"
+        aria-label="Clear comparison"
+      >
+        <X className="h-4 w-4" strokeWidth={2} />
+      </button>
+    </div>
+  );
+}
+
 interface CompareTrayProps {
   products: Product[];
   onRemove: (slug: string) => void;
@@ -51,6 +83,7 @@ interface CompareTrayProps {
 
 export function CompareTray({ products, onRemove, onClear, onOpen }: CompareTrayProps) {
   const reduceMotion = useReducedMotion();
+  const ready = products.length >= 2;
   return (
     <AnimatePresence>
       {products.length > 0 && (
@@ -59,38 +92,35 @@ export function CompareTray({ products, onRemove, onClear, onOpen }: CompareTray
           animate={{ y: 0, opacity: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { y: 90, opacity: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 30 }}
-          className="fixed inset-x-0 bottom-0 z-40 border-t border-foreground bg-foreground text-background md:inset-x-auto md:bottom-6 md:left-1/2 md:w-[min(760px,calc(100vw-3rem))] md:-translate-x-1/2 md:border"
+          className="fixed inset-x-3 bottom-3 z-40 bg-foreground text-background shadow-[0_18px_40px_-18px_rgba(0,0,0,0.55)] md:inset-x-auto md:bottom-6 md:left-1/2 md:w-[min(1280px,calc(100vw-3rem))] md:-translate-x-1/2"
           role="region"
           aria-label="Product comparison"
           data-testid="compare-tray"
         >
-          <div className="flex items-center gap-3 px-4 py-3 md:px-5">
-            <p className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-[0.2em] text-background/60 sm:block">
-              Compare <span className="font-mono tabular-nums text-background">{products.length}/{COMPARE_LIMIT}</span>
-            </p>
-            <ul className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex flex-col gap-2.5 px-3 py-3 md:flex-row md:items-center md:gap-4 md:px-5">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-8 min-w-11 shrink-0 items-center justify-center bg-primary px-2 font-mono text-sm font-bold tabular-nums text-primary-foreground">
+                {products.length}/{COMPARE_LIMIT}
+              </span>
+              <p className="min-w-0 flex-1 truncate text-sm font-medium text-background md:flex-none">{compareStatus(products.length)}</p>
+              <TrayActions ready={ready} onOpen={onOpen} onClear={onClear} className="md:hidden" />
+            </div>
+            <ul className="flex items-center gap-2 overflow-x-auto md:min-w-0 md:flex-1 md:overflow-hidden">
               {products.map((product) => (
-                <li key={product.slug} className="flex shrink-0 items-center gap-1.5 border border-background/20 py-1 pl-2.5 pr-1 text-xs">
-                  <span className="max-w-[9rem] truncate">{product.name}</span>
-                  <button type="button" onClick={() => onRemove(product.slug)} className="p-1 text-background/60 transition hover:text-background" aria-label={`Remove ${product.name} from comparison`}>
-                    <X className="h-3 w-3" strokeWidth={2} />
+                <li key={product.slug} className="flex w-max max-w-[11rem] shrink-0 items-center gap-2 bg-background/10 px-2 py-1.5 text-sm">
+                  <button
+                    type="button"
+                    onClick={() => onRemove(product.slug)}
+                    className="shrink-0 text-base leading-none text-background/80 transition hover:text-background"
+                    aria-label={`Remove ${product.name} from comparison`}
+                  >
+                    ×
                   </button>
+                  <span className="min-w-0 truncate font-medium" title={product.name}>{product.name}</span>
                 </li>
               ))}
             </ul>
-            <button type="button" onClick={onClear} className="hidden shrink-0 text-xs text-background/70 transition hover:text-background sm:block">
-              Clear
-            </button>
-            <button
-              type="button"
-              onClick={onOpen}
-              disabled={products.length < 2}
-              className="inline-flex h-10 shrink-0 items-center gap-2 bg-primary px-4 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
-              data-testid="button-open-compare"
-            >
-              {products.length < 2 ? "Add one more" : "Compare now"}
-              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
-            </button>
+            <TrayActions ready={ready} onOpen={onOpen} onClear={onClear} className="hidden md:flex" />
           </div>
         </motion.div>
       )}
@@ -185,7 +215,7 @@ export function CompareDialog({ open, onOpenChange, products, onRemove }: Compar
                         {image ? (
                           <MediaImage src={image} alt={product.name} width={400} height={300} className="absolute inset-0 h-full w-full object-contain p-4 mix-blend-multiply" />
                         ) : (
-                          <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">Image on request</span>
+                          <span className="absolute inset-0 flex items-center justify-center text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/70">Photo on request</span>
                         )}
                         <button type="button" onClick={() => onRemove(product.slug)} className="absolute right-1.5 top-1.5 bg-background/90 p-1 text-muted-foreground transition hover:text-foreground" aria-label={`Remove ${product.name}`}>
                           <X className="h-3.5 w-3.5" strokeWidth={2} />
@@ -221,9 +251,9 @@ export function CompareDialog({ open, onOpenChange, products, onRemove }: Compar
         </div>
 
         <div className="flex flex-col gap-3 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
-          <p className="text-xs text-muted-foreground">Availability and project pricing are confirmed by our trade team.</p>
+          <p className="text-xs text-muted-foreground">A consultant confirms availability and terms for your project.</p>
           <a href={askHref} target="_blank" rel="noreferrer" className="inline-flex h-11 items-center justify-center gap-2 bg-primary px-5 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground transition hover:bg-primary/90 active:scale-[0.98]" data-testid="button-compare-whatsapp">
-            <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Ask about these on WhatsApp
+            <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Ask on WhatsApp
           </a>
         </div>
       </DialogContent>

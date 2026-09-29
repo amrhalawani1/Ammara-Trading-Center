@@ -1,6 +1,6 @@
 import { Router, type IRouter, type RequestHandler } from "express";
-import { eq } from "drizzle-orm";
-import { brandsTable, db, productsTable } from "@workspace/db";
+import { and, desc, eq } from "drizzle-orm";
+import { brandsTable, db, inquiriesTable, productsTable } from "@workspace/db";
 import {
   CreateContentBrandBody,
   CreateContentBrandResponse,
@@ -16,7 +16,13 @@ import {
   ImportCatalogContentBody,
   ImportCatalogContentResponse,
   ListContentBrandsResponse,
+  ListContentInquiriesQueryParams,
+  ListContentInquiriesResponse,
+  ListContentInquiriesResponseItem,
   ListContentProductsResponse,
+  PatchContentInquiryBody,
+  PatchContentInquiryParams,
+  PatchContentInquiryResponse,
   UpdateContentBrandBody,
   UpdateContentBrandParams,
   UpdateContentBrandResponse,
@@ -325,6 +331,62 @@ router.post("/content/import", async (req, res): Promise<void> => {
       preservedSlugs,
     }),
   );
+});
+
+const toContentInquiry = (row: typeof inquiriesTable.$inferSelect) =>
+  ListContentInquiriesResponseItem.parse({
+    id: row.id,
+    kind: row.kind,
+    name: row.name,
+    email: row.email,
+    phone: row.phone ?? null,
+    company: row.company ?? null,
+    reference: row.reference ?? null,
+    status: row.status,
+    listName: row.listName ?? null,
+    timeline: row.timeline ?? null,
+    message: row.message,
+    clerkUserId: row.clerkUserId ?? null,
+    createdAt: row.createdAt.toISOString(),
+    statusUpdatedAt: row.statusUpdatedAt?.toISOString() ?? null,
+  });
+
+router.get("/content/inquiries", async (req, res): Promise<void> => {
+  const query = ListContentInquiriesQueryParams.safeParse(req.query);
+  if (!query.success) {
+    sendError(res, 400, "Invalid request", query.error.flatten());
+    return;
+  }
+  const filters = [
+    query.data.status ? eq(inquiriesTable.status, query.data.status) : undefined,
+    query.data.kind ? eq(inquiriesTable.kind, query.data.kind) : undefined,
+  ].filter((clause): clause is NonNullable<typeof clause> => Boolean(clause));
+  const filtered = db.select().from(inquiriesTable);
+  const rows = await (filters.length ? filtered.where(and(...filters)) : filtered).orderBy(desc(inquiriesTable.createdAt));
+  res.json(ListContentInquiriesResponse.parse(rows.map(toContentInquiry)));
+});
+
+router.patch("/content/inquiries/:id", async (req, res): Promise<void> => {
+  const params = PatchContentInquiryParams.safeParse(req.params);
+  const parsed = PatchContentInquiryBody.safeParse(req.body);
+  if (!params.success) {
+    sendError(res, 400, "Invalid request", params.error.flatten());
+    return;
+  }
+  if (!parsed.success) {
+    sendError(res, 400, "Invalid status", parsed.error.flatten());
+    return;
+  }
+  const [row] = await db
+    .update(inquiriesTable)
+    .set({ status: parsed.data.status, statusUpdatedAt: new Date() })
+    .where(eq(inquiriesTable.id, params.data.id))
+    .returning();
+  if (!row) {
+    sendError(res, 404, "Inquiry not found");
+    return;
+  }
+  res.json(PatchContentInquiryResponse.parse(toContentInquiry(row)));
 });
 
 return router;

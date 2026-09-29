@@ -2,6 +2,55 @@ import { motion, useReducedMotion } from "framer-motion";
 import { finishCode, finishTone, isLightTone } from "@/lib/finishes";
 import { cn } from "@/lib/utils";
 
+/** Manufacturer finish codes stay as written. Longer article numbers become initials. */
+export function finishMark(code: string, label: string): string {
+  return /^[A-Z]{2,5}([+-][A-Z0-9]{2,4})*$/.test(code) ? code : finishCode(label);
+}
+
+export interface FinishChoice {
+  code: string;
+  label: string;
+  index: number;
+}
+
+/** DND finish list: a 45px material disc with the finish code centred under it, four across. */
+export function FinishCodes({ items, selected, marked = selected, onSelect, label, className }: { items: FinishChoice[]; selected: number; marked?: number; onSelect: (index: number) => void; label: string; className?: string }) {
+  if (items.length === 0) return null;
+  return (
+    <ul className={cn("flex max-w-[400px] flex-wrap", className)} role="radiogroup" aria-label={label}>
+      {items.map((item) => {
+        const active = item.index === marked;
+        const toneName = item.label.includes("+") ? item.label.split("+").slice(1).join(" ") : item.label;
+        const tone = finishTone(toneName, item.index);
+        return (
+          <li key={`${item.code}-${item.index}`} className="mb-[15px] flex w-1/4 justify-center">
+            <label className="w-full cursor-pointer has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring" title={item.label}>
+              <input
+                type="radio"
+                name="product-variant"
+                className="sr-only"
+                checked={active}
+                onChange={() => onSelect(item.index)}
+                aria-label={`${finishMark(item.code, item.label)}, ${item.label}`}
+              />
+              <span
+                className={cn(
+                  "mx-auto block h-[45px] w-[45px] rounded-full",
+                  isLightTone(tone) && "ring-1 ring-inset ring-black/15",
+                  active && "outline outline-1 outline-offset-[3px] outline-foreground",
+                )}
+                style={{ backgroundColor: tone }}
+                aria-hidden
+              />
+              <span className="mt-[5px] block text-center text-[0.65rem] font-light leading-[1.3] text-foreground">{finishMark(item.code, item.label)}</span>
+            </label>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 interface FinishSelectorProps {
   finishes: string[];
   selected: number;

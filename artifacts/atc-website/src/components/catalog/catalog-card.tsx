@@ -4,7 +4,7 @@ import { Check, Plus } from "lucide-react";
 import { Link } from "wouter";
 import type { Product } from "@workspace/api-client-react";
 import { MediaImage } from "@/components/media-image";
-import { FinishSwatches } from "@/components/catalog/finish-swatches";
+import { ShortlistPicker } from "@/components/catalog/shortlist-picker";
 import { designerOf } from "@/lib/catalog-filters";
 import { isNew, primaryImage, productType, secondaryImage, variantSummary } from "@/lib/product-media";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,27 @@ interface CatalogCardProps {
 
 export const hasPhoto = (product: Product) => Boolean(primaryImage(product));
 
+function SaveToShortlist({ product, image }: { product: Product; image: string | null }) {
+  return (
+    <ShortlistPicker
+      item={{
+        key: product.slug,
+        slug: product.slug,
+        name: product.name,
+        brandName: product.brandName,
+        reference: product.sku?.trim() || product.slug,
+        variant: null,
+        image,
+      }}
+      className="left-3 top-3"
+      testId={`button-shortlist-${product.slug}`}
+    />
+  );
+}
+
 /**
- * Catalogue tile. With photography: the object on a steel panel, name beneath. Without it: a
- * graphite panel that carries the name in display type and the finishes as tones, so a product
- * awaiting its photo still reads as a deliberate object rather than a gap in the grid.
+ * Catalogue tile. The object sits on a steel panel with the name beneath. A product that has no
+ * photograph yet keeps the same frame and shows a placeholder in it.
  */
 export const CatalogCard = memo(function CatalogCard({ product, index = 0, wide = false, compared, compareFull, onToggleCompare }: CatalogCardProps) {
   const reduceMotion = useReducedMotion();
@@ -36,7 +53,6 @@ export const CatalogCard = memo(function CatalogCard({ product, index = 0, wide 
   const meta = [type, variantSummary(product)].filter(Boolean).join(", ");
   const designer = designerOf(product);
   const disabled = compareFull && !compared;
-  const typographic = !primary;
 
   return (
     <motion.li
@@ -49,18 +65,8 @@ export const CatalogCard = memo(function CatalogCard({ product, index = 0, wide 
     >
       <article className="group relative h-full">
         <Link href={`/products/${product.slug}`} className="block" data-testid={`card-product-${product.slug}`}>
-          {typographic ? (
-            <div className={cn("dark relative flex aspect-[4/5] flex-col justify-between overflow-hidden bg-background p-5 text-foreground transition-colors duration-500 group-hover:bg-primary md:p-6", compared && "ring-2 ring-inset ring-primary group-hover:ring-primary-foreground/60")}>
-              <p className="pr-28 text-xs text-foreground/60 transition-colors group-hover:text-primary-foreground/80">{product.brandName}</p>
-              <div>
-                <h3 className="font-display text-[clamp(1.6rem,2.4vw,2.4rem)] font-medium leading-[0.95] tracking-[-0.04em] [overflow-wrap:anywhere]">{product.name}</h3>
-                {type && <p className="mt-2 text-sm text-foreground/60 transition-colors group-hover:text-primary-foreground/80">{type}</p>}
-                <FinishSwatches finishes={product.finishes} size="md" className="mt-4 text-foreground/70" />
-              </div>
-              {isNew(product) && <span className="absolute left-5 top-5 hidden bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground" aria-hidden />}
-            </div>
-          ) : (
-            <div className={cn("relative overflow-hidden bg-tile", wide ? "aspect-[4/5] sm:aspect-[8/5]" : "aspect-[4/5]", compared && "ring-2 ring-inset ring-primary")}>
+          <div className={cn("relative overflow-hidden bg-tile", wide ? "aspect-[4/5] sm:aspect-[8/5]" : "aspect-[4/5]", compared && "ring-2 ring-inset ring-primary")}>
+            {primary ? (
               <MediaImage
                 src={primary}
                 alt={product.name}
@@ -72,32 +78,34 @@ export const CatalogCard = memo(function CatalogCard({ product, index = 0, wide 
                   secondary ? "group-hover:opacity-0" : "group-hover:scale-[1.06]",
                 )}
               />
-              {secondary && (
-                <MediaImage
-                  src={secondary}
-                  alt=""
-                  width={800}
-                  height={1000}
-                  sizes={wide ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"}
-                  className={cn(
-                    "absolute inset-0 h-full w-full opacity-0 transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100",
-                    secondaryIsPhoto ? "object-cover" : "object-contain p-8 mix-blend-multiply md:p-10",
-                  )}
-                />
-              )}
-              {isNew(product) && <span className="absolute left-4 top-4 bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground">New</span>}
-              <span className="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" aria-hidden />
-            </div>
-          )}
+            ) : (
+              <span className="absolute inset-0 flex items-center justify-center px-6 text-center text-xs font-medium text-tile-foreground/50">Photo on request</span>
+            )}
+            {secondary && (
+              <MediaImage
+                src={secondary}
+                alt=""
+                width={800}
+                height={1000}
+                sizes={wide ? "(min-width: 1024px) 50vw, 100vw" : "(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"}
+                className={cn(
+                  "absolute inset-0 h-full w-full opacity-0 transition duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100",
+                  secondaryIsPhoto ? "object-cover" : "object-contain p-8 mix-blend-multiply md:p-10",
+                )}
+              />
+            )}
+            {isNew(product) && <span className="absolute left-3 top-14 bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground">New</span>}
+            <span className="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-primary transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100" aria-hidden />
+          </div>
 
-          {!typographic && (
-            <div className="pt-4">
-              <p className="text-xs text-muted-foreground">{product.brandName}</p>
-              <h3 className="mt-1 font-display text-xl font-medium leading-none tracking-[-0.03em] text-foreground transition-colors group-hover:text-primary md:text-2xl">{product.name}</h3>
-              {(meta || designer) && <p className="mt-2 text-sm text-muted-foreground">{[meta, designer].filter(Boolean).join(". ")}</p>}
-            </div>
-          )}
+          <div className="pt-4">
+            <p className="text-xs text-muted-foreground">{product.brandName}</p>
+            <h3 className="mt-1 font-display text-xl font-medium leading-none tracking-[-0.03em] text-foreground transition-colors group-hover:text-primary md:text-2xl">{product.name}</h3>
+            {(meta || designer) && <p className="mt-2 text-sm text-muted-foreground">{[meta, designer].filter(Boolean).join(". ")}</p>}
+          </div>
         </Link>
+
+        <SaveToShortlist product={product} image={primary} />
 
         <button
           type="button"
@@ -109,10 +117,8 @@ export const CatalogCard = memo(function CatalogCard({ product, index = 0, wide 
           className={cn(
             "absolute right-3 top-3 inline-flex h-9 items-center gap-1.5 px-3 text-xs font-medium transition active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40",
             compared
-              ? "bg-primary text-primary-foreground group-hover:bg-background group-hover:text-foreground"
-              : typographic
-                ? "bg-white/10 text-white hover:bg-white hover:text-black"
-                : "bg-background/90 text-foreground backdrop-blur-sm hover:bg-foreground hover:text-background",
+              ? "bg-primary text-primary-foreground"
+              : "bg-background/90 text-foreground backdrop-blur-sm hover:bg-foreground hover:text-background",
           )}
           data-testid={`button-compare-${product.slug}`}
         >

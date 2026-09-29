@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { SmartSearch } from "@/components/search/smart-search";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
 
@@ -18,6 +19,7 @@ export function MainLayout({
         Skip to content
       </a>
       <Navbar overlay={immersiveHeader} />
+      <SmartSearch />
       <main id="main-content" className="flex-1 w-full flex flex-col">
         {children}
       </main>

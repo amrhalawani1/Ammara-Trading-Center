@@ -79,10 +79,10 @@ export function PartnerBrands({ brands, productCounts, isLoading }: PartnerBrand
     <Section tone="panel" className="overflow-hidden">
       <Reveal className="flex flex-wrap items-end justify-between gap-6">
         <h2 className="font-display text-5xl font-medium leading-[0.92] tracking-[-0.05em] md:text-7xl">
-          {brands.length > 0 ? `${brands.length} houses` : "The houses we represent"}
+          The brands we represent{countries.length > 0 ? "," : ""}
           {countries.length > 0 && <span className="block text-muted-foreground">from {countries.length} countries.</span>}
         </h2>
-        <SolidLink href="/brands" tone="light" className="hidden md:inline-flex">All partners</SolidLink>
+        <SolidLink href="/brands" tone="light" className="hidden md:inline-flex">All brands</SolidLink>
       </Reveal>
 
       <div className="mt-14 md:mt-20">
@@ -109,7 +109,7 @@ export function PartnerBrands({ brands, productCounts, isLoading }: PartnerBrand
                     <span className="relative">
                       <BrandMark slug={brand.slug} name={brand.name} />
                       <span className="mt-2 block text-xs text-muted-foreground transition-colors group-hover:text-primary-foreground/80">
-                        {count > 0 ? `${count} in the catalogue` : brand.category}
+                        {count > 0 ? `${count} ${count === 1 ? "product" : "products"}` : brand.category}
                       </span>
                     </span>
                   </Link>
@@ -117,7 +117,7 @@ export function PartnerBrands({ brands, productCounts, isLoading }: PartnerBrand
               );
             })}
       </RevealGroup>
-      <SolidLink href="/brands" tone="light" className="mt-10 md:hidden">All partners</SolidLink>
+      <SolidLink href="/brands" tone="light" className="mt-10 md:hidden">All brands</SolidLink>
     </Section>
   );
 }

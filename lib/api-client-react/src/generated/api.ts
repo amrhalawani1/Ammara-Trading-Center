@@ -20,19 +20,27 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AccountInquiry,
+  AccountShortlistState,
   Brand,
   BrandDetail,
   BrandInput,
   BrandUpdate,
   CatalogResponse,
+  ContentInquiry,
   HealthStatus,
   ImportInput,
   ImportResult,
   InquiryInput,
   InquiryResult,
+  ListContentInquiriesParams,
+  PatchInquiryStatusInput,
   Product,
   ProductInput,
-  ProductUpdate
+  ProductUpdate,
+  PutAccountShortlistsInput,
+  TradeProfile,
+  TradeProfileInput
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -379,7 +387,7 @@ export const getCreateInquiryUrl = () => {
 }
 
 /**
- * @summary Submit a general or shortlist inquiry
+ * @summary Submit a general, shortlist or newsletter inquiry
  */
 export const createInquiry = async (inquiryInput: InquiryInput, options?: Parameters<typeof customFetch>[1]): Promise<InquiryResult> => {
 
@@ -428,7 +436,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateInquiryMutationError = ErrorType<void>
 
     /**
- * @summary Submit a general or shortlist inquiry
+ * @summary Submit a general, shortlist or newsletter inquiry
  */
 export const useCreateInquiry = <TError = ErrorType<void>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createInquiry>>, TError,{data: BodyType<InquiryInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -439,6 +447,535 @@ export const useCreateInquiry = <TError = ErrorType<void>,
         TContext
       > => {
       return useMutation(getCreateInquiryMutationOptions(options));
+    }
+
+export const getGetAccountProfileUrl = () => {
+
+
+
+
+  return `/api/account/profile`
+}
+
+/**
+ * @summary The signed-in trade visitor's profile
+ */
+export const getAccountProfile = async ( options?: Parameters<typeof customFetch>[1]): Promise<TradeProfile> => {
+
+  return customFetch<TradeProfile>(getGetAccountProfileUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAccountProfileQueryKey = () => {
+    return [
+    `/api/account/profile`
+    ] as const;
+    }
+
+
+export const getGetAccountProfileQueryOptions = <TData = Awaited<ReturnType<typeof getAccountProfile>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAccountProfileQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAccountProfile>>> = ({ signal }) => getAccountProfile({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAccountProfile>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAccountProfileQueryResult = NonNullable<Awaited<ReturnType<typeof getAccountProfile>>>
+export type GetAccountProfileQueryError = ErrorType<void>
+
+
+/**
+ * @summary The signed-in trade visitor's profile
+ */
+
+export function useGetAccountProfile<TData = Awaited<ReturnType<typeof getAccountProfile>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountProfile>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAccountProfileQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPutAccountProfileUrl = () => {
+
+
+
+
+  return `/api/account/profile`
+}
+
+/**
+ * @summary Create or update the trade profile and claim guest inquiries by email
+ */
+export const putAccountProfile = async (tradeProfileInput: TradeProfileInput, options?: Parameters<typeof customFetch>[1]): Promise<TradeProfile> => {
+
+  return customFetch<TradeProfile>(getPutAccountProfileUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(tradeProfileInput)
+  }
+);}
+
+
+
+
+
+export const getPutAccountProfileMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAccountProfile>>, TError,{data: BodyType<TradeProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putAccountProfile>>, TError,{data: BodyType<TradeProfileInput>}, TContext> => {
+
+const mutationKey = ['putAccountProfile'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAccountProfile>>, {data: BodyType<TradeProfileInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putAccountProfile(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutAccountProfileMutationResult = NonNullable<Awaited<ReturnType<typeof putAccountProfile>>>
+    export type PutAccountProfileMutationBody = BodyType<TradeProfileInput>
+    export type PutAccountProfileMutationError = ErrorType<void>
+
+    /**
+ * @summary Create or update the trade profile and claim guest inquiries by email
+ */
+export const usePutAccountProfile = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAccountProfile>>, TError,{data: BodyType<TradeProfileInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof putAccountProfile>>,
+        TError,
+        {data: BodyType<TradeProfileInput>},
+        TContext
+      > => {
+      return useMutation(getPutAccountProfileMutationOptions(options));
+    }
+
+export const getGetAccountShortlistsUrl = () => {
+
+
+
+
+  return `/api/account/shortlists`
+}
+
+/**
+ * @summary The account's saved shortlists
+ */
+export const getAccountShortlists = async ( options?: Parameters<typeof customFetch>[1]): Promise<AccountShortlistState> => {
+
+  return customFetch<AccountShortlistState>(getGetAccountShortlistsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAccountShortlistsQueryKey = () => {
+    return [
+    `/api/account/shortlists`
+    ] as const;
+    }
+
+
+export const getGetAccountShortlistsQueryOptions = <TData = Awaited<ReturnType<typeof getAccountShortlists>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountShortlists>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAccountShortlistsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAccountShortlists>>> = ({ signal }) => getAccountShortlists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAccountShortlists>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAccountShortlistsQueryResult = NonNullable<Awaited<ReturnType<typeof getAccountShortlists>>>
+export type GetAccountShortlistsQueryError = ErrorType<void>
+
+
+/**
+ * @summary The account's saved shortlists
+ */
+
+export function useGetAccountShortlists<TData = Awaited<ReturnType<typeof getAccountShortlists>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountShortlists>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAccountShortlistsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPutAccountShortlistsUrl = () => {
+
+
+
+
+  return `/api/account/shortlists`
+}
+
+/**
+ * @summary Replace or merge device shortlists into the account
+ */
+export const putAccountShortlists = async (putAccountShortlistsInput: PutAccountShortlistsInput, options?: Parameters<typeof customFetch>[1]): Promise<AccountShortlistState> => {
+
+  return customFetch<AccountShortlistState>(getPutAccountShortlistsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(putAccountShortlistsInput)
+  }
+);}
+
+
+
+
+
+export const getPutAccountShortlistsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAccountShortlists>>, TError,{data: BodyType<PutAccountShortlistsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putAccountShortlists>>, TError,{data: BodyType<PutAccountShortlistsInput>}, TContext> => {
+
+const mutationKey = ['putAccountShortlists'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putAccountShortlists>>, {data: BodyType<PutAccountShortlistsInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putAccountShortlists(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutAccountShortlistsMutationResult = NonNullable<Awaited<ReturnType<typeof putAccountShortlists>>>
+    export type PutAccountShortlistsMutationBody = BodyType<PutAccountShortlistsInput>
+    export type PutAccountShortlistsMutationError = ErrorType<void>
+
+    /**
+ * @summary Replace or merge device shortlists into the account
+ */
+export const usePutAccountShortlists = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putAccountShortlists>>, TError,{data: BodyType<PutAccountShortlistsInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof putAccountShortlists>>,
+        TError,
+        {data: BodyType<PutAccountShortlistsInput>},
+        TContext
+      > => {
+      return useMutation(getPutAccountShortlistsMutationOptions(options));
+    }
+
+export const getGetAccountInquiriesUrl = () => {
+
+
+
+
+  return `/api/account/inquiries`
+}
+
+/**
+ * @summary Trade inquiries submitted by or claimed for this account
+ */
+export const getAccountInquiries = async ( options?: Parameters<typeof customFetch>[1]): Promise<AccountInquiry[]> => {
+
+  return customFetch<AccountInquiry[]>(getGetAccountInquiriesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAccountInquiriesQueryKey = () => {
+    return [
+    `/api/account/inquiries`
+    ] as const;
+    }
+
+
+export const getGetAccountInquiriesQueryOptions = <TData = Awaited<ReturnType<typeof getAccountInquiries>>, TError = ErrorType<void>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountInquiries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAccountInquiriesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAccountInquiries>>> = ({ signal }) => getAccountInquiries({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAccountInquiries>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAccountInquiriesQueryResult = NonNullable<Awaited<ReturnType<typeof getAccountInquiries>>>
+export type GetAccountInquiriesQueryError = ErrorType<void>
+
+
+/**
+ * @summary Trade inquiries submitted by or claimed for this account
+ */
+
+export function useGetAccountInquiries<TData = Awaited<ReturnType<typeof getAccountInquiries>>, TError = ErrorType<void>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAccountInquiries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAccountInquiriesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getListContentInquiriesUrl = (params?: ListContentInquiriesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/content/inquiries?${stringifiedParams}` : `/api/content/inquiries`
+}
+
+/**
+ * @summary List inquiries for the staff inbox
+ */
+export const listContentInquiries = async (params?: ListContentInquiriesParams, options?: Parameters<typeof customFetch>[1]): Promise<ContentInquiry[]> => {
+
+  return customFetch<ContentInquiry[]>(getListContentInquiriesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListContentInquiriesQueryKey = (params?: ListContentInquiriesParams,) => {
+    return [
+    `/api/content/inquiries`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListContentInquiriesQueryOptions = <TData = Awaited<ReturnType<typeof listContentInquiries>>, TError = ErrorType<void>>(params?: ListContentInquiriesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listContentInquiries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListContentInquiriesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listContentInquiries>>> = ({ signal }) => listContentInquiries(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listContentInquiries>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListContentInquiriesQueryResult = NonNullable<Awaited<ReturnType<typeof listContentInquiries>>>
+export type ListContentInquiriesQueryError = ErrorType<void>
+
+
+/**
+ * @summary List inquiries for the staff inbox
+ */
+
+export function useListContentInquiries<TData = Awaited<ReturnType<typeof listContentInquiries>>, TError = ErrorType<void>>(
+ params?: ListContentInquiriesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listContentInquiries>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListContentInquiriesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPatchContentInquiryUrl = (id: number,) => {
+
+
+
+
+  return `/api/content/inquiries/${id}`
+}
+
+/**
+ * @summary Update an inquiry's status
+ */
+export const patchContentInquiry = async (id: number,
+    patchInquiryStatusInput: PatchInquiryStatusInput, options?: Parameters<typeof customFetch>[1]): Promise<ContentInquiry> => {
+
+  return customFetch<ContentInquiry>(getPatchContentInquiryUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(patchInquiryStatusInput)
+  }
+);}
+
+
+
+
+
+export const getPatchContentInquiryMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchContentInquiry>>, TError,{id: number;data: BodyType<PatchInquiryStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchContentInquiry>>, TError,{id: number;data: BodyType<PatchInquiryStatusInput>}, TContext> => {
+
+const mutationKey = ['patchContentInquiry'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchContentInquiry>>, {id: number;data: BodyType<PatchInquiryStatusInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  patchContentInquiry(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchContentInquiryMutationResult = NonNullable<Awaited<ReturnType<typeof patchContentInquiry>>>
+    export type PatchContentInquiryMutationBody = BodyType<PatchInquiryStatusInput>
+    export type PatchContentInquiryMutationError = ErrorType<void>
+
+    /**
+ * @summary Update an inquiry's status
+ */
+export const usePatchContentInquiry = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchContentInquiry>>, TError,{id: number;data: BodyType<PatchInquiryStatusInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof patchContentInquiry>>,
+        TError,
+        {id: number;data: BodyType<PatchInquiryStatusInput>},
+        TContext
+      > => {
+      return useMutation(getPatchContentInquiryMutationOptions(options));
     }
 
 export const getListContentBrandsUrl = () => {

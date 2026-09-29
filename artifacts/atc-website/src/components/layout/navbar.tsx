@@ -1,25 +1,35 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, LayoutGroup, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
-import { ArrowUpRight, FolderHeart, Menu, MessageCircle, X } from "lucide-react";
+import { ArrowUpRight, FolderHeart, Menu, MessageCircle, Search, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { AccountControl, MobileAccountLink } from "@/components/account/account-control";
 import { BrandLogo } from "@/components/brand-logo";
+import { openSearch } from "@/hooks/use-search-overlay";
 import { useShortlistCount } from "@/hooks/use-shortlists";
 import { company } from "@/lib/content";
 import { whatsappUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
-  { href: "/catalog", label: "Catalog" },
+  { href: "/catalog", label: "Catalogue" },
   { href: "/brands", label: "Brands" },
-  { href: "/showroom", label: "Showroom" },
+  { href: "/showroom", label: "Showrooms" },
+  { href: "/projects", label: "Projects" },
   { href: "/resources", label: "Resources" },
   { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 /** The phone menu lists the shortlists too; on desktop they sit behind the folder icon. */
-const MOBILE_LINKS = [...NAV_LINKS, { href: "/lists", label: "Shortlists" }];
+const MOBILE_LINKS = [...NAV_LINKS, { href: "/lists", label: "Quote" }];
 
 const SPRING = { type: "spring", stiffness: 320, damping: 32 } as const;
+
+/** `/catalog` is the product catalogue; `/catalogues` is a different page and must not light that link. */
+function isNavActive(location: string, href: string) {
+  const path = location.split("?")[0] ?? location;
+  return path === href || path.startsWith(`${href}/`);
+}
 
 /**
  * Site header. Over an immersive hero it is transparent on the dark ground; once the page
@@ -89,7 +99,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
   }, [menuOpen]);
 
   const transparent = overlay && !scrolled && !menuOpen;
-  const indicatorTarget = hovered ?? NAV_LINKS.find((link) => location.startsWith(link.href))?.href ?? null;
+  const indicatorTarget = hovered ?? NAV_LINKS.find((link) => isNavActive(location, link.href))?.href ?? null;
 
   return (
     // The header itself never transforms: a transformed ancestor would turn the fixed phone menu
@@ -97,9 +107,10 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
     <header className={cn("z-50 w-full", overlay ? "fixed inset-x-0 top-0" : "sticky top-0")} data-testid="site-header" data-state={transparent ? "transparent" : "solid"}>
       <div
         className={cn(
-          "text-foreground transition-[background-color,border-color] duration-300",
-          transparent && "dark",
-          !transparent && "border-b border-foreground/10 bg-background/85 backdrop-blur-xl",
+          "relative z-[60] text-foreground transition-[background-color,border-color] duration-300",
+          (transparent || menuOpen) && "dark",
+          menuOpen && "border-b border-white/10 bg-background",
+          !transparent && !menuOpen && "border-b border-foreground/10 bg-background/85 backdrop-blur-xl",
         )}
         data-testid="site-header-bar"
       >
@@ -113,7 +124,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
           <LayoutGroup id="primary-nav">
             <ul className="flex items-center gap-2 xl:gap-4">
               {NAV_LINKS.map((link) => {
-                const active = location.startsWith(link.href);
+                const active = isNavActive(location, link.href);
                 return (
                   <li key={link.href} className="relative">
                     <Link
@@ -137,22 +148,51 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
         </nav>
 
         <div className="flex items-center justify-self-end gap-1">
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false);
+              openSearch();
+            }}
+            aria-label="Search products, brands or a problem"
+            className="group relative flex h-11 w-11 items-center justify-center text-foreground transition-colors hover:text-primary"
+            data-testid="button-nav-search"
+          >
+            <Search className="h-5 w-5" strokeWidth={1.4} />
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap bg-foreground px-2.5 py-1.5 text-[11px] font-medium tracking-normal text-background opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+            >
+              Search <span aria-hidden="true" className="ml-1.5 hidden font-mono text-[10px] text-background/60 sm:inline">⌘K</span>
+            </span>
+          </button>
+
           {/* Project shortlists: the folder, with how many references it holds. */}
           <Link
             href="/lists"
-            aria-label={shortlistCount > 0 ? `Project shortlists, ${shortlistCount} saved` : "Project shortlists"}
-            title="Project shortlists"
+            aria-label={shortlistCount > 0 ? `Quote list, ${shortlistCount} ${shortlistCount === 1 ? "product" : "products"}` : "Quote list"}
             aria-current={location.startsWith("/lists") ? "page" : undefined}
-            className={cn("relative hidden h-11 w-11 items-center justify-center transition-colors sm:flex", location.startsWith("/lists") ? "text-primary" : "text-foreground hover:text-primary")}
+            className={cn("group relative hidden h-11 w-11 items-center justify-center transition-colors sm:flex", location.startsWith("/lists") ? "text-primary" : "text-foreground hover:text-primary")}
             data-testid="link-nav-lists"
           >
-            <FolderHeart className="h-5 w-5" strokeWidth={1.4} />
+            <FolderHeart
+              className={cn("h-5 w-5", location.startsWith("/lists") && "[&_path:last-child]:fill-current")}
+              strokeWidth={1.4}
+            />
             {shortlistCount > 0 && (
               <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center bg-primary px-1 font-mono text-[10px] leading-none tabular-nums text-primary-foreground" data-testid="text-nav-shortlist-count">
                 {shortlistCount}
               </span>
             )}
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 whitespace-nowrap bg-foreground px-2.5 py-1.5 text-[11px] font-medium tracking-normal text-background opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100"
+            >
+              {shortlistCount > 0 ? `Quote list, ${shortlistCount} ${shortlistCount === 1 ? "product" : "products"}` : "Quote list"}
+            </span>
           </Link>
+
+          <AccountControl />
 
           <button
             ref={toggleRef}
@@ -178,7 +218,7 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="dark fixed inset-0 top-0 flex flex-col bg-background px-6 pb-8 pt-24 text-foreground lg:hidden"
+            className="dark fixed inset-0 top-0 z-40 flex flex-col overflow-y-auto bg-background px-6 pb-8 pt-24 text-foreground lg:hidden"
             data-testid="mobile-menu"
           >
             <motion.nav
@@ -188,14 +228,26 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
             >
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  openSearch();
+                }}
+                className="mb-4 flex h-12 w-full items-center gap-3 border border-foreground/15 px-4 text-left text-sm text-foreground/80"
+                data-testid="button-mobile-search"
+              >
+                <Search className="h-4 w-4" strokeWidth={1.75} />
+                Search products, brands or a problem
+              </button>
               <ul>
-                {MOBILE_LINKS.map((link) => (
+                {MOBILE_LINKS.filter((link) => link.href !== "/contact").map((link) => (
                   <motion.li key={link.href} variants={reduce ? undefined : { hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0, transition: SPRING } }}>
                     <Link
                       href={link.href}
                       onClick={() => setMenuOpen(false)}
                       data-testid={`link-mobile-nav-${link.label.toLowerCase()}`}
-                      className={cn("flex items-center justify-between border-b border-foreground/10 py-4 font-display text-4xl font-medium tracking-[-0.04em] transition-colors", location.startsWith(link.href) ? "text-primary" : "text-foreground")}
+                      className={cn("flex items-center justify-between border-b border-foreground/10 py-4 font-display text-4xl font-medium tracking-[-0.04em] transition-colors", isNavActive(location, link.href) ? "text-primary" : "text-foreground")}
                     >
                       <span>
                         {link.label}
@@ -212,9 +264,10 @@ export function Navbar({ overlay = false }: { overlay?: boolean }) {
                 Contact us
               </Link>
               <a href={whatsappUrl("Hello ATC, I have a question about a product.")} target="_blank" rel="noreferrer" className="flex h-12 items-center justify-center gap-2 border border-foreground/25 text-[11px] font-semibold uppercase tracking-[0.16em] text-foreground">
-                <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> WhatsApp
+                <MessageCircle className="h-4 w-4" strokeWidth={1.75} /> Ask on WhatsApp
               </a>
             </div>
+            <MobileAccountLink onNavigate={() => setMenuOpen(false)} />
             <p className="mt-4 text-xs text-foreground/50">{company.showrooms.map((s) => s.name).join(" and ")}, Amman</p>
           </motion.div>
         )}

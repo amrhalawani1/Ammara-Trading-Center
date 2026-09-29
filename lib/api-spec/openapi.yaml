@@ -14,6 +14,8 @@ tags:
     description: Published catalogue content
   - name: inquiries
     description: Public inquiries from the contact page
+  - name: account
+    description: Optional trade account profile, shortlists, and inquiry history
   - name: content
     description: Staff content workspace
 paths:
@@ -77,7 +79,7 @@ paths:
     post:
       operationId: createInquiry
       tags: [inquiries]
-      summary: Submit a general or shortlist inquiry
+      summary: Submit a general, shortlist or newsletter inquiry
       requestBody:
         required: true
         content:
@@ -93,6 +95,157 @@ paths:
                 $ref: "#/components/schemas/InquiryResult"
         "400":
           description: Invalid inquiry
+  /account/profile:
+    get:
+      operationId: getAccountProfile
+      tags: [account]
+      security: [{ clerkSession: [] }]
+      summary: The signed-in trade visitor's profile
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradeProfile"
+        "401":
+          description: Sign-in required
+    put:
+      operationId: putAccountProfile
+      tags: [account]
+      security: [{ clerkSession: [] }]
+      summary: Create or update the trade profile and claim guest inquiries by email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TradeProfileInput"
+      responses:
+        "200":
+          description: Saved profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradeProfile"
+        "400":
+          description: Invalid profile
+        "401":
+          description: Sign-in required
+  /account/shortlists:
+    get:
+      operationId: getAccountShortlists
+      tags: [account]
+      security: [{ clerkSession: [] }]
+      summary: The account's saved shortlists
+      responses:
+        "200":
+          description: Shortlist state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountShortlistState"
+        "401":
+          description: Sign-in required
+    put:
+      operationId: putAccountShortlists
+      tags: [account]
+      security: [{ clerkSession: [] }]
+      summary: Replace or merge device shortlists into the account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutAccountShortlistsInput"
+      responses:
+        "200":
+          description: Canonical shortlist state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountShortlistState"
+        "400":
+          description: Invalid shortlists
+        "401":
+          description: Sign-in required
+  /account/inquiries:
+    get:
+      operationId: getAccountInquiries
+      tags: [account]
+      security: [{ clerkSession: [] }]
+      summary: Trade inquiries submitted by or claimed for this account
+      responses:
+        "200":
+          description: Inquiry history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AccountInquiry"
+        "401":
+          description: Sign-in required
+  /content/inquiries:
+    get:
+      operationId: listContentInquiries
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: List inquiries for the staff inbox
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/InquiryStatus"
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [general, shortlist, newsletter]
+      responses:
+        "200":
+          description: Inquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentInquiry"
+        "401":
+          description: Staff sign-in required
+        "403":
+          description: Not a staff account
+  /content/inquiries/{id}:
+    patch:
+      operationId: patchContentInquiry
+      tags: [content]
+      security: [{ clerkSession: [] }]
+      summary: Update an inquiry's status
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchInquiryStatusInput"
+      responses:
+        "200":
+          description: Updated inquiry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentInquiry"
+        "400":
+          description: Invalid status
+        "401":
+          description: Staff sign-in required
+        "403":
+          description: Not a staff account
+        "404":
+          description: Inquiry not found
   /content/brands:
     get:
       operationId: listContentBrands
@@ -677,7 +830,7 @@ components:
       properties:
         kind:
           type: string
-          enum: [general, shortlist]
+          enum: [general, shortlist, newsletter]
         name:
           type: string
           minLength: 2
@@ -741,3 +894,167 @@ components:
         reference:
           type: string
       required: [accepted, reference]
+    InquiryStatus:
+      type: string
+      enum: [submitted, in_progress, responded]
+    TradeRole:
+      type: string
+      enum: [specifier, procurement, fabricator, other]
+    SavedItemKind:
+      type: string
+      enum: [product, brand]
+    TradeProfile:
+      type: object
+      properties:
+        clerkUserId:
+          type: string
+        email:
+          type: string
+        name:
+          type: [string, "null"]
+        company:
+          type: [string, "null"]
+        role:
+          oneOf:
+            - $ref: "#/components/schemas/TradeRole"
+            - type: "null"
+      required: [clerkUserId, email]
+    TradeProfileInput:
+      type: object
+      properties:
+        email:
+          type: string
+          minLength: 3
+        name:
+          type: [string, "null"]
+          maxLength: 120
+        company:
+          type: [string, "null"]
+          maxLength: 120
+        role:
+          oneOf:
+            - $ref: "#/components/schemas/TradeRole"
+            - type: "null"
+      required: [email]
+    AccountShortlistItem:
+      type: object
+      properties:
+        key:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        brandName:
+          type: string
+        reference:
+          type: string
+        variant:
+          type: [string, "null"]
+        image:
+          type: [string, "null"]
+        quantity:
+          type: number
+          multipleOf: 1
+          minimum: 1
+          maximum: 9999
+        addedAt:
+          type: string
+        kind:
+          $ref: "#/components/schemas/SavedItemKind"
+      required: [key, slug, name, brandName, reference, quantity, addedAt]
+    AccountShortlist:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountShortlistItem"
+      required: [id, name, createdAt, items]
+    AccountShortlistState:
+      type: object
+      properties:
+        version:
+          type: number
+          enum: [1]
+        lists:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountShortlist"
+        activeListId:
+          type: string
+      required: [version, lists, activeListId]
+    PutAccountShortlistsInput:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/AccountShortlistState"
+        merge:
+          type: boolean
+      required: [state]
+    AccountInquiry:
+      type: object
+      properties:
+        id:
+          type: number
+        kind:
+          type: string
+          enum: [general, shortlist, newsletter]
+        reference:
+          type: [string, "null"]
+        status:
+          $ref: "#/components/schemas/InquiryStatus"
+        listName:
+          type: [string, "null"]
+        message:
+          type: string
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: [string, "null"]
+      required: [id, kind, status, message, createdAt]
+    ContentInquiry:
+      type: object
+      properties:
+        id:
+          type: number
+        kind:
+          type: string
+          enum: [general, shortlist, newsletter]
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: [string, "null"]
+        company:
+          type: [string, "null"]
+        reference:
+          type: [string, "null"]
+        status:
+          $ref: "#/components/schemas/InquiryStatus"
+        listName:
+          type: [string, "null"]
+        timeline:
+          type: [string, "null"]
+        message:
+          type: string
+        clerkUserId:
+          type: [string, "null"]
+        createdAt:
+          type: string
+        statusUpdatedAt:
+          type: [string, "null"]
+      required: [id, kind, name, email, status, message, createdAt]
+    PatchInquiryStatusInput:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/InquiryStatus"
+      required: [status]

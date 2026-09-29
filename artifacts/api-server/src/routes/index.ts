@@ -1,15 +1,19 @@
 import { Router, type IRouter } from "express";
+import { getAuth } from "@clerk/express";
 import catalogRouter, { createCatalogRouter } from "./catalog";
 import healthRouter from "./health";
-import inquiriesRouter from "./inquiries";
+import { createAccountRouter } from "./account";
+import { createInquiriesRouter } from "./inquiries";
 import { createRequireStaffAuth, type AuthReader } from "../middlewares/requireStaffAuth";
 
 export function createRouter(options: { authReader?: AuthReader } = {}): IRouter {
+  const reader = options.authReader ?? getAuth;
   const router: IRouter = Router();
 
   router.use(healthRouter);
-  router.use(inquiriesRouter);
-  router.use(options.authReader ? createCatalogRouter(createRequireStaffAuth(options.authReader)) : catalogRouter);
+  router.use(createInquiriesRouter(reader));
+  router.use(createAccountRouter(reader));
+  router.use(options.authReader ? createCatalogRouter(createRequireStaffAuth(reader)) : catalogRouter);
 
   return router;
 }

@@ -1,14 +1,21 @@
 /**
- * Project shortlists: the visitor's own lists of references, kept on their device. Everything
+ * Shortlists: the visitor's own saved products, kept on their device. Everything
  * here is pure so the store stays thin and the rules (names, quantities, the default list) can be
  * read in one place.
  */
 
 export const STORAGE_KEY = "atc-store";
-export const DEFAULT_LIST_NAME = "New project shortlist";
-export const UNTITLED_LIST_NAME = "Untitled project";
+export const DEFAULT_LIST_NAME = "My shortlist";
+export const UNTITLED_LIST_NAME = "Untitled shortlist";
+/**
+ * Names the defaults had before. Lists stored on a device may still carry them; they are renamed on load.
+ */
+const LEGACY_DEFAULT_LIST_NAME = "New project shortlist";
+const LEGACY_UNTITLED_LIST_NAME = "Untitled project";
 export const LIST_NAME_MAX = 80;
 export const QUANTITY_MAX = 9999;
+
+export type SavedItemKind = "product" | "brand";
 
 export interface ShortlistItem {
   /** Product slug, or `slug::variantCode` when a finish or size was chosen. */
@@ -23,7 +30,11 @@ export interface ShortlistItem {
   image: string | null;
   quantity: number;
   addedAt: string;
+  kind?: SavedItemKind;
 }
+
+export const savedItemHref = (item: Pick<ShortlistItem, "slug" | "kind">): string =>
+  item.kind === "brand" ? `/brands/${item.slug}` : `/products/${item.slug}`;
 
 export interface Shortlist {
   id: string;
@@ -89,6 +100,7 @@ function normaliseItem(raw: unknown): ShortlistItem | null {
     image: str(raw.image),
     quantity: clampQuantity(raw.quantity),
     addedAt: str(raw.addedAt) ?? new Date(0).toISOString(),
+    kind: raw.kind === "brand" ? "brand" : "product",
   };
 }
 
@@ -114,9 +126,25 @@ export function normaliseState(raw: unknown, now: string = new Date().toISOStrin
     lists.push({ id, name: normaliseName(str(entry.name) ?? "") || UNTITLED_LIST_NAME, createdAt: str(entry.createdAt) ?? now, items });
   }
   if (lists.length === 0) return emptyState(now);
+  renameLegacyDefaults(lists);
   const activeListId = str(raw.activeListId);
   return { version: 1, lists, activeListId: lists.some((list) => list.id === activeListId) ? activeListId! : lists[0]!.id };
 }
+
+/** Old default names become the current ones, unless that would duplicate a name already in use. */
+function renameLegacyDefaults(lists: Shortlist[]): void {
+  const renames: [string, string][] = [
+    [LEGACY_DEFAULT_LIST_NAME, DEFAULT_LIST_NAME],
+    [LEGACY_UNTITLED_LIST_NAME, UNTITLED_LIST_NAME],
+  ];
+  for (const [from, to] of renames) {
+    lists.forEach((list, index) => {
+      if (!sameName(list.name, from) || findDuplicate(lists, to, list.id)) return;
+      lists[index] = { ...list, name: to };
+    });
+  }
+}
+
 
 export function createList(state: ShortlistState, rawName: string, now: string = new Date().toISOString()): { state: ShortlistState; error?: ListNameError; list?: Shortlist } {
   const name = normaliseName(rawName);
@@ -126,7 +154,7 @@ export function createList(state: ShortlistState, rawName: string, now: string =
   return { state: { ...state, lists: [...state.lists, list], activeListId: list.id }, list };
 }
 
-/** Blank becomes "Untitled project"; a name another list already uses leaves this one unchanged. */
+/** Blank becomes "Untitled shortlist"; a name another list already uses leaves this one unchanged. */
 export function renameList(state: ShortlistState, id: string, rawName: string): ShortlistState {
   const name = normaliseName(rawName) || UNTITLED_LIST_NAME;
   if (findDuplicate(state.lists, name, id)) return state;
@@ -171,4 +199,4 @@ export function removeItem(state: ShortlistState, listId: string, key: string): 
 
 export const totalReferences = (state: ShortlistState): number => state.lists.reduce((sum, list) => sum + list.items.length, 0);
 
-export const referenceCount = (n: number): string => `${n} ${n === 1 ? "reference" : "references"}`;
+export const productCount = (n: number): string => `${n} ${n === 1 ? "product" : "products"}`;
