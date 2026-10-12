@@ -17,6 +17,20 @@ const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
 
 let _baseUrl: string | null = null;
 let _authTokenGetter: AuthTokenGetter | null = null;
+let _unavailableFallback: UnavailableFallback | null = null;
+
+/** Why the API could not answer: no response, a server error, or a response that was not JSON. */
+export type UnavailableReason = "network" | "server" | "not-json";
+
+/**
+ * Answers a request the API could not serve. Return the response body to use instead, or
+ * `undefined` to let the original failure through.
+ */
+export type UnavailableFallback = (request: {
+  method: string;
+  url: string;
+  reason: UnavailableReason;
+}) => Promise<unknown> | unknown;
 
 /**
  * Set a base URL that is prepended to every relative request URL
@@ -42,6 +56,24 @@ export function setBaseUrl(url: string | null): void {
  */
 export function setAuthTokenGetter(getter: AuthTokenGetter | null): void {
   _authTokenGetter = getter;
+}
+
+/**
+ * Register a fallback for when the API is unreachable, returns a 5xx, or answers with something
+ * other than JSON (for example a static host serving its index page for /api/*). A real 4xx JSON
+ * error, such as a 404 for an unknown slug, is never routed to the fallback.
+ * Pass `null` to clear it.
+ */
+export function setUnavailableFallback(fallback: UnavailableFallback | null): void {
+  _unavailableFallback = fallback;
+}
+
+async function runFallback(
+  requestInfo: { method: string; url: string },
+  reason: UnavailableReason,
+): Promise<unknown> {
+  if (!_unavailableFallback) return undefined;
+  return _unavailableFallback({ ...requestInfo, reason });
 }
 
 function isRequest(input: RequestInfo | URL): input is Request {
@@ -360,12 +392,31 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, {
-    ...init,
-    credentials: init.credentials ?? "same-origin",
-    method,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(input, {
+      ...init,
+      credentials: init.credentials ?? "same-origin",
+      method,
+      headers,
+    });
+  } catch (error) {
+    const fallback = await runFallback(requestInfo, "network");
+    if (fallback !== undefined) return fallback as T;
+    throw error;
+  }
+
+  const mediaType = getMediaType(response.headers);
+  const unavailable: UnavailableReason | null =
+    response.status >= 500
+      ? "server"
+      : !hasNoBody(response, method) && !isJsonMediaType(mediaType) && responseType !== "text" && responseType !== "blob"
+        ? "not-json"
+        : null;
+  if (unavailable) {
+    const fallback = await runFallback(requestInfo, unavailable);
+    if (fallback !== undefined) return fallback as T;
+  }
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);

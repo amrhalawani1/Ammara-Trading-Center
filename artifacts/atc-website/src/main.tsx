@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client';
 
 import App from './App';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { installDemoCatalogFallback } from '@/lib/demo-catalog';
 
 // Self-hosted fonts. Cormorant Garamond at the design system's three
 // approved weights (300/400/600), upright + italic; DM Sans variable
@@ -12,6 +13,9 @@ import '@fontsource-variable/dm-sans/opsz.css';
 import '@fontsource-variable/dm-sans/opsz-italic.css';
 
 import './index.css';
+
+// A frontend-only deployment has no API; serve the public catalogue from the bundled snapshot.
+installDemoCatalogFallback();
 
 createRoot(document.getElementById('root')!, {
   // Keeps caught errors off reportError(), which would raise the dev overlay.

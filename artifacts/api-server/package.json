@@ -10,7 +10,8 @@
     "test": "pnpm run build && NODE_ENV=test node --test --test-force-exit ./tests/catalog-regressions.test.mjs",
     "test:catalog": "pnpm run test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "seed:catalog": "tsx ./src/seed-cli.ts"
+    "seed:catalog": "tsx ./src/seed-cli.ts",
+    "demo:catalog": "tsx ./src/demo-catalog-cli.ts"
   },
   "dependencies": {
     "@clerk/express": "^2.1.63",
